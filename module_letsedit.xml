@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_letsedit" default="compile.module.letsedit">
+  <dirname property="module.letsedit.basedir" file="${ant.file.module_letsedit}"/>
+  
+  <property name="module.jdk.home.letsedit" value="${jdk.home.idea_ic-117.963}"/>
+  <property name="module.jdk.bin.letsedit" value="${jdk.bin.idea_ic-117.963}"/>
+  <property name="module.jdk.classpath.letsedit" value="jdk.classpath.idea_ic-117.963"/>
+  
+  <property name="compiler.args.letsedit" value="${compiler.args}"/>
+  
+  <property name="letsedit.output.dir" value="${module.letsedit.basedir}/out/production/letsedit"/>
+  <property name="letsedit.testoutput.dir" value="${module.letsedit.basedir}/out/test/letsedit"/>
+  
+  <path id="letsedit.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="letsedit.module.production.classpath">
+    <path refid="${module.jdk.classpath.letsedit}"/>
+  </path>
+  
+  <path id="letsedit.runtime.production.module.classpath">
+    <pathelement location="${letsedit.output.dir}"/>
+  </path>
+  
+  <path id="letsedit.module.classpath">
+    <path refid="${module.jdk.classpath.letsedit}"/>
+    <pathelement location="${letsedit.output.dir}"/>
+  </path>
+  
+  <path id="letsedit.runtime.module.classpath">
+    <pathelement location="${letsedit.testoutput.dir}"/>
+    <pathelement location="${letsedit.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.letsedit">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.letsedit">
+    <patternset refid="excluded.from.module.letsedit"/>
+  </patternset>
+  
+  <path id="letsedit.module.sourcepath">
+    <dirset dir="${module.letsedit.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.letsedit" depends="compile.module.letsedit.production,compile.module.letsedit.tests" description="Compile module letsedit"/>
+  
+  <target name="compile.module.letsedit.production" depends="register.custom.compilers" description="Compile module letsedit; production classes">
+    <mkdir dir="${letsedit.output.dir}"/>
+    <javac2 destdir="${letsedit.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.letsedit}/javac">
+      <compilerarg line="${compiler.args.letsedit}"/>
+      <bootclasspath refid="letsedit.module.bootclasspath"/>
+      <classpath refid="letsedit.module.production.classpath"/>
+      <src refid="letsedit.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.letsedit"/>
+    </javac2>
+    
+    <copy todir="${letsedit.output.dir}">
+      <fileset dir="${module.letsedit.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.letsedit.tests" depends="register.custom.compilers,compile.module.letsedit.production" description="compile module letsedit; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.letsedit" description="cleanup module">
+    <delete dir="${letsedit.output.dir}"/>
+    <delete dir="${letsedit.testoutput.dir}"/>
+  </target>
+  
+  <property name="letsedit.plugin.path.jar" value="${module.letsedit.basedir}/letsedit.jar"/>
+  
+  <!-- Build archive for plugin 'letsedit' -->
+  <target name="plugin.build.jar.letsedit" depends="compile.module.letsedit" description="Build plugin archive for module &#39;letsedit&#39;">
+    <jar destfile="${letsedit.plugin.path.jar}" duplicate="preserve">
+      <zipfileset dir="${module.letsedit.basedir}/out/production/letsedit"/>
+      <zipfileset file="${module.letsedit.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
+  </target>
+</project>
