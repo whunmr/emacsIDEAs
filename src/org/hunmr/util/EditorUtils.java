@@ -1,6 +1,5 @@
 package org.hunmr.util;
 
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.TextRange;
@@ -15,37 +14,13 @@ public class EditorUtils {
 
         LogicalPosition startLogicalPosition = editor.xyToLogicalPosition(visibleArea.getLocation());
 
-        Double endVisiualX = visibleArea.getX() + visibleArea.getWidth();
-        Double endVisiualY = visibleArea.getY() + visibleArea.getHeight();
-        LogicalPosition endLogicalPosition = editor.xyToLogicalPosition(new Point(endVisiualX.intValue(), endVisiualY.intValue()));
+        Double endVisualX = visibleArea.getX() + visibleArea.getWidth();
+        Double endVisualY = visibleArea.getY() + visibleArea.getHeight();
+        LogicalPosition endLogicalPosition = editor.xyToLogicalPosition(new Point(endVisualX.intValue(), endVisualY.intValue()));
 
         return new TextRange(editor.logicalPositionToOffset(startLogicalPosition), editor.logicalPositionToOffset(endLogicalPosition));
     }
 
-    public static ArrayList<Integer> getOffsetsOfCharIgnoreCase(char charToFind, TextRange markerRange, Document document) {
-        ArrayList<Integer> offsets = new ArrayList<Integer>();
-
-        String visibleText = document.getText(markerRange);
-
-        char lowCase = Character.toLowerCase(charToFind);
-        char upperCase = Character.toUpperCase(charToFind);
-
-        getOffsetsOfChar(markerRange.getStartOffset(), lowCase, visibleText, offsets);
-        if (upperCase != lowCase) {
-            getOffsetsOfChar(markerRange.getStartOffset(), upperCase, visibleText, offsets);
-        }
-
-        return offsets;
-    }
-
-    private static void getOffsetsOfChar(int startOffset, char charToSet, String visibleText, ArrayList<Integer> offsets) {
-        int index = visibleText.indexOf(charToSet);
-        while (index >= 0) {
-            int offset = startOffset + index;
-            offsets.add(offset);
-            index = visibleText.indexOf(charToSet, index + 1);
-        }
-    }
 
     public static boolean isPrintableChar( char c ) {
         Character.UnicodeBlock block = Character.UnicodeBlock.of( c );

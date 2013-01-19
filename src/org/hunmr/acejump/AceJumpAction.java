@@ -7,7 +7,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
-import org.hunmr.acejump.marker.Marker;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 import org.hunmr.acejump.runnable.JumpRunnable;
@@ -140,19 +139,63 @@ public class AceJumpAction extends AnAction {
     }
 
     private ArrayList<Integer> getOffsetsOfCurrentKey(char key) {
-        Marker marker = _markers.get(key);
-        if (marker != null) {
-            return marker.getOffsets();
+        if (_markers.get(key) != null) {
+            return _markers.get(key).getOffsets();
         }
 
         TextRange visibleTextRange = EditorUtils.getVisibleTextRange(_editor);
 
-        ArrayList offsets = EditorUtils.getOffsetsOfCharIgnoreCase(key, visibleTextRange, _document);
+        ArrayList offsets = getOffsetsOfCharIgnoreCase(key, visibleTextRange, _document);
         if (key == KeyEvent.VK_SPACE) {
-            offsets.addAll(EditorUtils.getOffsetsOfCharIgnoreCase('\n', visibleTextRange, _document));
+            offsets.addAll(getOffsetsOfCharIgnoreCase('\t', visibleTextRange, _document));
+        } else if (key == '/') {
+            offsets.addAll(getOffsetsOfCharIgnoreCase('\n', visibleTextRange, _document));
         }
 
         return offsets;
+    }
+
+    public ArrayList<Integer> getOffsetsOfCharIgnoreCase(char charToFind, TextRange markerRange, Document document) {
+        ArrayList<Integer> offsets = new ArrayList<Integer>();
+        String visibleText = document.getText(markerRange);
+        char lowCase = Character.toLowerCase(charToFind);
+        char upperCase = Character.toUpperCase(charToFind);
+
+        offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), lowCase, visibleText));
+        if (upperCase != lowCase) {
+            offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), upperCase, visibleText));
+        }
+
+        return offsets;
+    }
+
+    private ArrayList<Integer> getOffsetsOfChar(int startOffset, char c, String visibleText) {
+        ArrayList<Integer> offsets = new ArrayList<Integer>();
+
+        int index = visibleText.indexOf(c);
+        while (index >= 0) {
+            if (!isSpaceInMiddleOfSpaces(c, visibleText, index)) {
+                offsets.add(startOffset + index);
+            }
+
+            index = visibleText.indexOf(c, index + 1);
+        }
+
+        return offsets;
+    }
+
+    private boolean isSpaceInMiddleOfSpaces(char c, String visibleText, int index) {
+        boolean charIsWhiteSpace = c == ' ' || c == '\t';
+        if (charIsWhiteSpace) {
+            boolean inMiddleOfWhiteSpaces = (index != 0)
+                                            && (index != visibleText.length() - 1)
+                                            && (visibleText.charAt(index - 1) == c)
+                                            && (visibleText.charAt(index + 1) == c);
+            if (inMiddleOfWhiteSpaces) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void runReadAction(ShowMarkersRunnable action) {

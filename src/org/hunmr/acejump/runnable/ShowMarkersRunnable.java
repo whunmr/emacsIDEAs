@@ -12,7 +12,7 @@ import java.util.Comparator;
 
 public class ShowMarkersRunnable implements Runnable {
     public static final char INFINITE_JUMP_CHAR = 'z';
-    private final String _markerCharSet = "abcdefghijklmnopqrstuvwxy"; //ABCDEFGHIJKLMNOPQRSTUVWXY
+    private final String _markerCharSet = "abcdefghijklmnopqrstuvwxy;,./"; //ABCDEFGHIJKLMNOPQRSTUVWXY
     private final ArrayList<Integer> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;
@@ -100,7 +100,7 @@ public class ShowMarkersRunnable implements Runnable {
                 boolean oAIsLineEndOffset = isLineEndOffset(oA, document);
                 boolean oBIsLineEndOffset = isLineEndOffset(oB, document);
 
-                if (oAIsLineEndOffset && oBIsLineEndOffset) {
+                if (!(oAIsLineEndOffset ^ oBIsLineEndOffset)) {
                     return 0;
                 }
 
