@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Marker {
-    private char _markupChar;
+    private char _markerChar;
     private ArrayList<Integer> _offsets = new ArrayList<Integer>();
 
-    public Marker(char markupChar, int offset) {
-        _markupChar = markupChar;
+    public Marker(char markerChar, int offset) {
+        _markerChar = markerChar;
         addOffsetToMarker(offset);
     }
 
@@ -22,8 +22,8 @@ public class Marker {
         return _offsets;
     }
 
-    public char getMarkupChar() {
-        return _markupChar;
+    public char getMarkerChar() {
+        return _markerChar;
     }
 
     public int getOffset() {

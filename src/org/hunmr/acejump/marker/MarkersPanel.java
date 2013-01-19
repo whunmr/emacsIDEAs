@@ -9,7 +9,7 @@ import java.awt.geom.Rectangle2D;
 
 public class MarkersPanel extends JComponent {
     public static final Color PANEL_BACKGROUND_COLOR = new Color(128, 138, 142);
-    public static final Color MARKUP_CHAR_COLOR = new Color(255, 0, 0);
+    public static final Color MARKER_CHAR_COLOR = new Color(255, 0, 0);
     private Editor _editor;
     private MarkerCollection _markerCollection;
     private JComponent _parent;
@@ -36,18 +36,18 @@ public class MarkersPanel extends JComponent {
                 double y = getVisiblePosition(offset).getY() + _parent.getLocation().getY();
 
                 drawBackgroundOfMarupChar(g, x, y);
-                drawMarkupChar(g, marker, x, y);
+                drawMarkerChar(g, marker, x, y);
             }
         }
 
         super.paint(g);
     }
 
-    private void drawMarkupChar(Graphics g, Marker markup, double x, double y) {
-        float buttomYOfMarkupChar = (float) (y + _fontInEditor.getSize());
+    private void drawMarkerChar(Graphics g, Marker marker, double x, double y) {
+        float buttomYOfMarkerChar = (float) (y + _fontInEditor.getSize());
 
-        g.setColor(MARKUP_CHAR_COLOR);
-        ((Graphics2D)g).drawString(String.valueOf(markup.getMarkupChar()), (float)x, buttomYOfMarkupChar);
+        g.setColor(MARKER_CHAR_COLOR);
+        ((Graphics2D)g).drawString(String.valueOf(marker.getMarkerChar()), (float)x, buttomYOfMarkerChar);
     }
 
     private void drawBackgroundOfMarupChar(Graphics g, double x, double y) {

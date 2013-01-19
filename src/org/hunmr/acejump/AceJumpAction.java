@@ -57,7 +57,7 @@ public class AceJumpAction extends AnAction {
     }
 
     private boolean handleShowMarkersKey(char key) {
-        if (isJumpTargetChar(key)) {
+        if (EditorUtils.isPrintableChar(key)) {
             runReadAction(new ShowMarkersRunnable(getOffsetsOfCurrentKey(key), _action));
 
             if (_markers.hasNoPlaceToJump()) {
@@ -77,12 +77,8 @@ public class AceJumpAction extends AnAction {
         return false;
     }
 
-    private boolean isJumpTargetChar(char key) {
-        return EditorUtils.isPrintableChar(key) || key == '\n';
-    }
-
     private boolean handleJumpToMarkerKey(char key) {
-        if (isJumpTargetChar(key) && _markers.containsKey(key)) {
+        if (EditorUtils.isPrintableChar(key) && _markers.containsKey(key)) {
             if (_markers.keyMappingToMultipleMarkers(key)) {
                 ArrayList<Integer> offsets = _markers.get(key).getOffsets();
                 _markers.clear();
@@ -116,13 +112,13 @@ public class AceJumpAction extends AnAction {
         };
     }
 
-    private KeyListener createShowMarkupKeyListener() {
+    private KeyListener createShowMarkersKeyListener() {
         return new KeyListener() {
             public void keyTyped(KeyEvent keyEvent) {
                 keyEvent.consume();
                 _targetChar = keyEvent.getKeyChar();
-                boolean showMarkupFinished = handleShowMarkersKey(keyEvent.getKeyChar());
-                if (showMarkupFinished) {
+                boolean showMarkersFinished = handleShowMarkersKey(keyEvent.getKeyChar());
+                if (showMarkersFinished) {
                     _contentComponent.removeKeyListener(_showMarkersKeyListener);
                 }
             }
@@ -246,7 +242,7 @@ public class AceJumpAction extends AnAction {
         _contentComponent = _editor.getContentComponent();
         _markers = new MarkerCollection();
 
-        _showMarkersKeyListener = createShowMarkupKeyListener();
+        _showMarkersKeyListener = createShowMarkersKeyListener();
         _jumpToMarkerKeyListener = createJumpToMarupKeyListener();
     }
 
