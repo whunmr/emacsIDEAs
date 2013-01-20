@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class ShowMarkersRunnable implements Runnable {
-    public static final char INFINITE_JUMP_CHAR = 'z';
-    private final String _markerCharSet = "abcdefghijklmnopqrstuvwxy;,./"; //ABCDEFGHIJKLMNOPQRSTUVWXY
+    public static final char INFINITE_JUMP_CHAR = '/';
+    private final String _markerCharSet = "abcdeghijklmnopqrstuvwxyf"; //ABCDEFGHIJKLMNOPQRSTUVWXY //no z
     private final ArrayList<Integer> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;

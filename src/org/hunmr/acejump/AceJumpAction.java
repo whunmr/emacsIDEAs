@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.acejump.command.*;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 import org.hunmr.acejump.runnable.JumpRunnable;
@@ -17,6 +18,7 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class AceJumpAction extends AnAction {
     private volatile boolean _isStillRunning = false;
@@ -27,9 +29,9 @@ public class AceJumpAction extends AnAction {
     private KeyListener[] _keyListeners;
     private Document _document;
     private MarkersPanel _markersPanel;
-    private char _targetChar;
     private KeyListener _showMarkersKeyListener;
     private KeyListener _jumpToMarkerKeyListener;
+    private Stack<CommandAroundJump> _commandsAroundJump;
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -43,7 +45,7 @@ public class AceJumpAction extends AnAction {
             return;
         }
 
-        initMemberVariableForConvenientAccess(e);
+        initMemberVariableForConvenientAccess();
         disableAllExistingKeyListeners();
         _contentComponent.addKeyListener(_showMarkersKeyListener);
     }
@@ -53,6 +55,7 @@ public class AceJumpAction extends AnAction {
         if (_editor != null && _editor != newEditor) {
             cleanupSetupsInAndBackToNormalEditingMode();
         }
+
         _editor = newEditor;
     }
 
@@ -65,10 +68,10 @@ public class AceJumpAction extends AnAction {
                 return false;
             }
 
-            if (_markers.hasOnlyOnePlaceToJump()) {
-                jumpToOffset(_markers.getFirstOffset());
-                return false;
-            }
+//            if (_markers.hasOnlyOnePlaceToJump()) {
+//                jumpToOffset(_markers.getFirstOffset());
+//                return false;
+//            }
 
             _contentComponent.addKeyListener(_jumpToMarkerKeyListener);
             return true;
@@ -78,6 +81,11 @@ public class AceJumpAction extends AnAction {
     }
 
     private boolean handleJumpToMarkerKey(char key) {
+        if (CommandAroundJumpFactory.isCommandKey(key)) {
+            _commandsAroundJump.push(CommandAroundJumpFactory.createCommand(key, _editor));
+            return false;
+        }
+
         if (EditorUtils.isPrintableChar(key) && _markers.containsKey(key)) {
             if (_markers.keyMappingToMultipleMarkers(key)) {
                 ArrayList<Integer> offsets = _markers.get(key).getOffsets();
@@ -91,6 +99,27 @@ public class AceJumpAction extends AnAction {
         }
 
         return false;
+    }
+
+    private KeyListener createShowMarkersKeyListener() {
+        return new KeyListener() {
+            public void keyTyped(KeyEvent keyEvent) {
+                keyEvent.consume();
+                boolean showMarkersFinished = handleShowMarkersKey(keyEvent.getKeyChar());
+                if (showMarkersFinished) {
+                    _contentComponent.removeKeyListener(_showMarkersKeyListener);
+                }
+            }
+
+            public void keyPressed(KeyEvent keyEvent) {
+                if (KeyEvent.VK_ESCAPE == keyEvent.getKeyChar()) {
+                    cleanupSetupsInAndBackToNormalEditingMode();
+                }
+            }
+
+            public void keyReleased(KeyEvent keyEvent) {
+            }
+        };
     }
 
     private KeyListener createJumpToMarupKeyListener() {
@@ -112,28 +141,6 @@ public class AceJumpAction extends AnAction {
         };
     }
 
-    private KeyListener createShowMarkersKeyListener() {
-        return new KeyListener() {
-            public void keyTyped(KeyEvent keyEvent) {
-                keyEvent.consume();
-                _targetChar = keyEvent.getKeyChar();
-                boolean showMarkersFinished = handleShowMarkersKey(keyEvent.getKeyChar());
-                if (showMarkersFinished) {
-                    _contentComponent.removeKeyListener(_showMarkersKeyListener);
-                }
-            }
-
-            public void keyPressed(KeyEvent keyEvent) {
-                if (KeyEvent.VK_ESCAPE == keyEvent.getKeyChar()) {
-                    cleanupSetupsInAndBackToNormalEditingMode();
-                }
-            }
-
-            public void keyReleased(KeyEvent keyEvent) {
-            }
-        };
-    }
-
     private ArrayList<Integer> getOffsetsOfCurrentKey(char key) {
         if (_markers.get(key) != null) {
             return _markers.get(key).getOffsets();
@@ -144,8 +151,9 @@ public class AceJumpAction extends AnAction {
         ArrayList offsets = getOffsetsOfCharIgnoreCase(key, visibleTextRange, _document);
         if (key == KeyEvent.VK_SPACE) {
             offsets.addAll(getOffsetsOfCharIgnoreCase('\t', visibleTextRange, _document));
-        } else if (key == '/') {
             offsets.addAll(getOffsetsOfCharIgnoreCase('\n', visibleTextRange, _document));
+        } else if (key == ',') {
+            offsets.addAll(getOffsetsOfCharIgnoreCase('.', visibleTextRange, _document));
         }
 
         return offsets;
@@ -166,12 +174,15 @@ public class AceJumpAction extends AnAction {
     }
 
     private ArrayList<Integer> getOffsetsOfChar(int startOffset, char c, String visibleText) {
+        int caretOffset = _editor.getCaretModel().getOffset();
+
         ArrayList<Integer> offsets = new ArrayList<Integer>();
 
         int index = visibleText.indexOf(c);
         while (index >= 0) {
-            if (!isSpaceInMiddleOfSpaces(c, visibleText, index)) {
-                offsets.add(startOffset + index);
+            int offset = startOffset + index;
+            if (!isSpaceAndShouldIgnore(c, visibleText, index) && offset != caretOffset) {
+                offsets.add(offset);
             }
 
             index = visibleText.indexOf(c, index + 1);
@@ -180,26 +191,39 @@ public class AceJumpAction extends AnAction {
         return offsets;
     }
 
-    private boolean isSpaceInMiddleOfSpaces(char c, String visibleText, int index) {
-        boolean charIsWhiteSpace = c == ' ' || c == '\t';
-        if (charIsWhiteSpace) {
-            boolean inMiddleOfWhiteSpaces = (index != 0)
-                                            && (index != visibleText.length() - 1)
-                                            && (visibleText.charAt(index - 1) == c)
-                                            && (visibleText.charAt(index + 1) == c);
-            if (inMiddleOfWhiteSpaces) {
+    private boolean isSpaceAndShouldIgnore(char c, String visibleText, int index) {
+        if (isSpace(c)) {
+            boolean isAfterSpace = (index != 0) && (isSpace(visibleText.charAt(index - 1)));
+            boolean noSpaceAround = (index != 0)
+                                    && (index != visibleText.length() - 1)
+                                    && (!isSpace(visibleText.charAt(index - 1)))
+                                    && (!isSpace(visibleText.charAt(index + 1)));
+
+            if (isAfterSpace || noSpaceAround) {
                 return true;
             }
         }
         return false;
     }
 
+    private boolean isSpace(char c) {
+        return c == ' ' || c == '\t';
+    }
+
     private void runReadAction(ShowMarkersRunnable action) {
         ApplicationManager.getApplication().runReadAction(action);
     }
 
-    private void jumpToOffset(int offset) {
-        ApplicationManager.getApplication().runReadAction(new JumpRunnable(offset, this));
+    private void jumpToOffset(final int jumpOffset) {
+        for (CommandAroundJump cmd : _commandsAroundJump) {
+            cmd.beforeJump();
+        }
+
+        ApplicationManager.getApplication().runReadAction(new JumpRunnable(jumpOffset, this));
+
+        for (CommandAroundJump cmd : _commandsAroundJump) {
+            cmd.afterJump();
+        }
     }
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
@@ -235,7 +259,7 @@ public class AceJumpAction extends AnAction {
         }
     }
 
-    private void initMemberVariableForConvenientAccess(AnActionEvent e) {
+    private void initMemberVariableForConvenientAccess() {
         _isStillRunning = true;
         _document = _editor.getDocument();
         _action = this;
@@ -244,6 +268,7 @@ public class AceJumpAction extends AnAction {
 
         _showMarkersKeyListener = createShowMarkersKeyListener();
         _jumpToMarkerKeyListener = createJumpToMarupKeyListener();
+        _commandsAroundJump = new Stack<CommandAroundJump>();
     }
 
     public void showNewMarkersPanel(MarkersPanel markersPanel) {
