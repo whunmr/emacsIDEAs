@@ -7,21 +7,22 @@ Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWi
 
 This is introduction to plugin emacsIDEAs of Intellij IDEA.
 
-1) normal jump demo      **Cmd-L char**
+* normal jump demo:      **C-L char**
 
-2) jump to line end      **Cmd-L space**
+* jump to line end:      **C-L space**
+
    type space to show line end.
 
-3) Jump and Copy         **Cmd-L char  , marker_char**
-   after markers show up, type ',' to copy jump area.
+* Jump and Copy:         **C-L char x marker_char**
 
-4) Jump and Paste        **Cmd-L char  . marker_char**
-   after markers show up, type '.' to paste clipboard contents to jump target position.
+   after markers show up, type 'x' to copy jump area.
 
-5) Jump and Cut          **Cmd-L char  space marker_char**
-   after markers show up, type space before marker_char to cut jump area.
+* Jump and Paste:        **C-L char p marker_char**
 
-6) during jump, type ESC to exit.
+   after markers show up, type 'p' to paste clipboard contents to jump target position.
 
+* Jump and Cut:          **C-L char x marker_char**
 
-site: http://hunmr.blogspot.com/2013/01/acejump-for-intellij-idea-development.html
+   after markers show up, type x before marker_char to cut jump area.
+
+* during jump, type ESC to exit.

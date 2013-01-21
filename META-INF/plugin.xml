@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <name>emacsIDEAs</name>
   <description>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelection.</description>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor>hunmr.blogspot.com  whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->

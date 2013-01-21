@@ -5,18 +5,18 @@ import com.intellij.openapi.editor.Editor;
 public class CommandAroundJumpFactory {
 
     public static boolean isCommandKey(char key) {
-        return key == '.' || key == ';' || key == ',' || key == ' ';
+        return key == 'p' || key == 's' || key == 'c' || key == 'x';
     }
 
     public static CommandAroundJump createCommand(char key, Editor editor) {
         switch (key) {
-            case ';' :
+            case 's' :
                 return new SelectionCommand(editor);
-            case ' ' :
+            case 'x' :
                 return new CutAfterJumpCommand(editor);
-            case ',' :
+            case 'c' :
                 return new CopyAfterJumpCommand(editor);
-            case '.' :
+            case 'p' :
                 return new PasteAfterJumpCommand(editor);
             default:
                 ;

@@ -68,10 +68,10 @@ public class AceJumpAction extends AnAction {
                 return false;
             }
 
-//            if (_markers.hasOnlyOnePlaceToJump()) {
-//                jumpToOffset(_markers.getFirstOffset());
-//                return false;
-//            }
+            //if (_markers.hasOnlyOnePlaceToJump()) {
+            //    jumpToOffset(_markers.getFirstOffset());
+            //    return false;
+            //}
 
             _contentComponent.addKeyListener(_jumpToMarkerKeyListener);
             return true;
@@ -216,13 +216,13 @@ public class AceJumpAction extends AnAction {
 
     private void jumpToOffset(final int jumpOffset) {
         for (CommandAroundJump cmd : _commandsAroundJump) {
-            cmd.beforeJump();
+            cmd.beforeJump(jumpOffset);
         }
 
         ApplicationManager.getApplication().runReadAction(new JumpRunnable(jumpOffset, this));
 
         for (CommandAroundJump cmd : _commandsAroundJump) {
-            cmd.afterJump();
+            cmd.afterJump(jumpOffset);
         }
     }
 
