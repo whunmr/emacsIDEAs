@@ -7,7 +7,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
-import org.hunmr.acejump.command.*;
+import org.hunmr.acejump.command.CommandAroundJump;
+import org.hunmr.acejump.command.CommandAroundJumpFactory;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 import org.hunmr.acejump.runnable.JumpRunnable;
@@ -42,7 +43,7 @@ public class AceJumpAction extends AnAction {
         switchEditorIfNeed(e);
 
         if (_isStillRunning) {
-            return;
+            cleanupSetupsInAndBackToNormalEditingMode();
         }
 
         initMemberVariableForConvenientAccess();

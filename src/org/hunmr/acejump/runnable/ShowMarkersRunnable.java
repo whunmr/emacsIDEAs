@@ -12,7 +12,7 @@ import java.util.Comparator;
 
 public class ShowMarkersRunnable implements Runnable {
     public static final char INFINITE_JUMP_CHAR = '/';
-    private final String _markerCharSet = "abdeghijklmnoqrtuvwyf.,;ABDEFGHIJKLMNOQRTUVWY"; //no c x p C X P z Z s S
+    private final String _markerCharSet = "abdeghijklmnoqrtuvwyzf.,;";
     private final ArrayList<Integer> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;
