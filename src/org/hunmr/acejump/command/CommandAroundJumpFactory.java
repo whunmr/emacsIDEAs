@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.Editor;
 public class CommandAroundJumpFactory {
 
     public static boolean isCommandKey(char key) {
-        return key == ' ' || key == 's' || key == 'x' || key == 'c' || key == 'p';
+        return key == ' ' || key == 's' || key == 'x' || key == 'c' || key == 'p' || key == 'P';
     }
 
     public static CommandAroundJump createCommand(char key, Editor editor) {
@@ -18,7 +18,9 @@ public class CommandAroundJumpFactory {
             case 'c' :
                 return new CopyAfterJumpCommand(editor);
             case 'p' :
-                return new PasteAfterJumpCommand(editor);
+                return new PasteAfterJumpCommand(editor, false);
+            case 'P' :
+                return new PasteAfterJumpCommand(editor, true);
             default:
                 ;
         }

@@ -6,8 +6,11 @@ import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.util.TextRange;
 
 public class PasteAfterJumpCommand extends CommandAroundJump {
-    public PasteAfterJumpCommand(Editor editor) {
+    private boolean _addNewLineBeforePaste;
+
+    public PasteAfterJumpCommand(Editor editor, boolean addNewLineBeforePaste) {
         super(editor);
+        _addNewLineBeforePaste = addNewLineBeforePaste;
     }
 
     @Override
@@ -19,6 +22,11 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (_addNewLineBeforePaste) {
+                    _editor.getDocument().insertString(_editor.getCaretModel().getOffset(), "\n");
+                    _editor.getCaretModel().moveToOffset(_editor.getCaretModel().getOffset() + 1);
+                }
+
                 TextRange tr = EditorModificationUtil.pasteFromClipboard(_editor);
                 _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
             }

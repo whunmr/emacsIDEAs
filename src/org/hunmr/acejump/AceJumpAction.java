@@ -1,11 +1,8 @@
 package org.hunmr.acejump;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.acejump.command.CommandAroundJump;
 import org.hunmr.acejump.command.CommandAroundJumpFactory;
@@ -13,22 +10,17 @@ import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 import org.hunmr.acejump.runnable.JumpRunnable;
 import org.hunmr.acejump.runnable.ShowMarkersRunnable;
+import org.hunmr.common.EmacsIdeasAction;
 import org.hunmr.util.EditorUtils;
+import org.hunmr.util.Str;
 
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class AceJumpAction extends AnAction {
-    private volatile boolean _isStillRunning = false;
+public class AceJumpAction extends EmacsIdeasAction {
     private MarkerCollection _markers;
-    private AceJumpAction _action;
-    private Editor _editor;
-    private JComponent _contentComponent;
-    private KeyListener[] _keyListeners;
-    private Document _document;
     private MarkersPanel _markersPanel;
     private KeyListener _showMarkersKeyListener;
     private KeyListener _jumpToMarkerKeyListener;
@@ -36,33 +28,14 @@ public class AceJumpAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        if (e.getData(PlatformDataKeys.EDITOR) == null) {
-            return;
+        if (super.initAction(e)) {
+            _contentComponent.addKeyListener(_showMarkersKeyListener);
         }
-
-        switchEditorIfNeed(e);
-
-        if (_isStillRunning) {
-            cleanupSetupsInAndBackToNormalEditingMode();
-        }
-
-        initMemberVariableForConvenientAccess();
-        disableAllExistingKeyListeners();
-        _contentComponent.addKeyListener(_showMarkersKeyListener);
-    }
-
-    private void switchEditorIfNeed(AnActionEvent e) {
-        Editor newEditor = e.getData(PlatformDataKeys.EDITOR);
-        if (_editor != null && _editor != newEditor) {
-            cleanupSetupsInAndBackToNormalEditingMode();
-        }
-
-        _editor = newEditor;
     }
 
     private boolean handleShowMarkersKey(char key) {
         if (EditorUtils.isPrintableChar(key)) {
-            runReadAction(new ShowMarkersRunnable(getOffsetsOfCurrentKey(key), _action));
+            runReadAction(new ShowMarkersRunnable(getOffsetsOfCurrentKey(key), (AceJumpAction) _action));
 
             if (_markers.hasNoPlaceToJump()) {
                 cleanupSetupsInAndBackToNormalEditingMode();
@@ -83,15 +56,19 @@ public class AceJumpAction extends AnAction {
 
     private boolean handleJumpToMarkerKey(char key) {
         if (CommandAroundJumpFactory.isCommandKey(key)) {
-            _commandsAroundJump.push(CommandAroundJumpFactory.createCommand(key, _editor));
+            _commandsAroundJump.push(CommandAroundJumpFactory.createCommand(key, getEditor()));
             return false;
+        }
+
+        if (!_markers.containsKey(key)){
+            key = Str.getCounterCase(key);
         }
 
         if (EditorUtils.isPrintableChar(key) && _markers.containsKey(key)) {
             if (_markers.keyMappingToMultipleMarkers(key)) {
                 ArrayList<Integer> offsets = _markers.get(key).getOffsets();
                 _markers.clear();
-                runReadAction(new ShowMarkersRunnable(offsets, _action));
+                runReadAction(new ShowMarkersRunnable(offsets, (AceJumpAction) _action));
                 return false;
             }
 
@@ -147,7 +124,7 @@ public class AceJumpAction extends AnAction {
             return _markers.get(key).getOffsets();
         }
 
-        TextRange visibleTextRange = EditorUtils.getVisibleTextRange(_editor);
+        TextRange visibleTextRange = EditorUtils.getVisibleTextRange(getEditor());
 
         ArrayList offsets = getOffsetsOfCharIgnoreCase(key, visibleTextRange, _document);
         if (key == KeyEvent.VK_SPACE) {
@@ -175,7 +152,7 @@ public class AceJumpAction extends AnAction {
     }
 
     private ArrayList<Integer> getOffsetsOfChar(int startOffset, char c, String visibleText) {
-        int caretOffset = _editor.getCaretModel().getOffset();
+        int caretOffset = getEditor().getCaretModel().getOffset();
 
         ArrayList<Integer> offsets = new ArrayList<Integer>();
 
@@ -211,10 +188,6 @@ public class AceJumpAction extends AnAction {
         return c == ' ' || c == '\t';
     }
 
-    private void runReadAction(ShowMarkersRunnable action) {
-        ApplicationManager.getApplication().runReadAction(action);
-    }
-
     private void jumpToOffset(final int jumpOffset) {
         for (CommandAroundJump cmd : _commandsAroundJump) {
             cmd.beforeJump(jumpOffset);
@@ -228,8 +201,6 @@ public class AceJumpAction extends AnAction {
     }
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
-        restoreOldKeyListeners();
-
         if (_showMarkersKeyListener != null) {
             _contentComponent.removeKeyListener(_showMarkersKeyListener);
             _showMarkersKeyListener = null;
@@ -243,30 +214,14 @@ public class AceJumpAction extends AnAction {
         if (_markersPanel != null) {
             _contentComponent.remove(_markersPanel);
         }
-        _contentComponent.repaint();
-        _isStillRunning = false;
+
+        super.cleanupSetupsInAndBackToNormalEditingMode();
     }
 
-    private void restoreOldKeyListeners() {
-        for (KeyListener kl : _keyListeners) {
-            _contentComponent.addKeyListener(kl);
-        }
-    }
+    protected void initMemberVariableForConvenientAccess() {
+        super.initMemberVariableForConvenientAccess();
 
-    private void disableAllExistingKeyListeners() {
-        _keyListeners = _contentComponent.getKeyListeners();
-        for (KeyListener kl : _keyListeners) {
-            _contentComponent.removeKeyListener(kl);
-        }
-    }
-
-    private void initMemberVariableForConvenientAccess() {
-        _isStillRunning = true;
-        _document = _editor.getDocument();
-        _action = this;
-        _contentComponent = _editor.getContentComponent();
         _markers = new MarkerCollection();
-
         _showMarkersKeyListener = createShowMarkersKeyListener();
         _jumpToMarkerKeyListener = createJumpToMarupKeyListener();
         _commandsAroundJump = new Stack<CommandAroundJump>();
@@ -281,14 +236,6 @@ public class AceJumpAction extends AnAction {
         _markersPanel = markersPanel;
         _contentComponent.add(markersPanel);
         _contentComponent.repaint();
-    }
-
-    public void setIsStillRunning(boolean isRunning) {
-        this._isStillRunning = isRunning;
-    }
-
-    public Editor getEditor() {
-        return _editor;
     }
 
     public MarkerCollection getMarkerCollection() {

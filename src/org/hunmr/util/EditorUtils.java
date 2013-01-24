@@ -6,7 +6,6 @@ import com.intellij.openapi.util.TextRange;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 
 public class EditorUtils {
     public static TextRange getVisibleTextRange(Editor editor) {
@@ -29,4 +28,5 @@ public class EditorUtils {
                 block != null &&
                 block != Character.UnicodeBlock.SPECIALS;
     }
+
 }

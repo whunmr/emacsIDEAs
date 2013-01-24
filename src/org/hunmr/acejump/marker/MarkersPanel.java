@@ -25,6 +25,7 @@ public class MarkersPanel extends JComponent {
 
     @Override
     public void paint(Graphics g) {
+
         drawPanelBackground(g);
 
         g.setFont(_fontInEditor);
@@ -71,7 +72,7 @@ public class MarkersPanel extends JComponent {
     private void setupLocationAndBoundsOfPanel(Editor editor) {
         this.setLocation(0, 0);
         Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
-        int x = (int) (_parent.getLocation().getX() + visibleArea.getX());
+        int x = (int) (_parent.getLocation().getX() + visibleArea.getX() + _editor.getScrollingModel().getHorizontalScrollOffset());
         this.setBounds(x, (int) (visibleArea.getY()), (int) visibleArea.getWidth(), (int) visibleArea.getHeight());
     }
 }
