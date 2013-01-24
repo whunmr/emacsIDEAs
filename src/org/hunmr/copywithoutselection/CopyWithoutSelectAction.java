@@ -87,7 +87,7 @@ public class CopyWithoutSelectAction extends EmacsIdeasAction {
         final int lineStart = _document.getLineStartOffset(lineNumber);
         final String lineText = _document.getText(new TextRange(lineStart, lineEnd));
 
-        int caretOffsetToLineStart = caretOffset;
+        int caretOffsetToLineStart = caretOffset - lineStart;
         if (isCaretBetweenSpaces()) {
             caretOffsetToLineStart = getNearestStringEndOffset(caretOffset, lineStart, lineText);
         }
