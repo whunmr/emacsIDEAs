@@ -223,8 +223,8 @@ public class AceJumpAction extends EmacsIdeasAction {
         super.cleanupSetupsInAndBackToNormalEditingMode();
     }
 
-    protected void initMemberVariableForConvenientAccess() {
-        super.initMemberVariableForConvenientAccess();
+    protected void initMemberVariableForConvenientAccess(AnActionEvent e) {
+        super.initMemberVariableForConvenientAccess(e);
 
         _markers = new MarkerCollection();
         _showMarkersKeyListener = createShowMarkersKeyListener();

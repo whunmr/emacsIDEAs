@@ -25,9 +25,14 @@
           <li><b>C-c  ' '     (w | s | l | q | a | p)   </b>  :  Type one space to cut related area</li>
           <li><b>C-c  ' ' ' ' (w | s | l | q | a | p)   </b>  :  Type two space to select related area</li>
       </ul>
+      <p><b>Other:</b></p>
+       <ul>
+          <li><b>C-c  i  </b>  :  Jump to next error quick fix intention</li>
+      </ul>
+      <br/>
     ]]>
   </description>
-  <version>1.1</version>
+  <version>1.1.2</version>
   <vendor>hmwang@thoughtworks.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->

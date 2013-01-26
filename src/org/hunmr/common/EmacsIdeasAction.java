@@ -2,10 +2,12 @@ package org.hunmr.common;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.psi.PsiFile;
 import org.hunmr.acejump.runnable.ShowMarkersRunnable;
 
 import javax.swing.*;
@@ -18,6 +20,7 @@ public abstract class EmacsIdeasAction extends AnAction {
     protected JComponent _contentComponent;
     protected Document _document;
     protected KeyListener[] _keyListeners;
+    protected PsiFile _psiFile;
 
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
@@ -43,7 +46,7 @@ public abstract class EmacsIdeasAction extends AnAction {
             cleanupSetupsInAndBackToNormalEditingMode();
         }
 
-        initMemberVariableForConvenientAccess();
+        initMemberVariableForConvenientAccess(e);
         disableAllExistingKeyListeners();
 
         return true;
@@ -58,11 +61,12 @@ public abstract class EmacsIdeasAction extends AnAction {
         _editor = newEditor;
     }
 
-    protected void initMemberVariableForConvenientAccess() {
+    protected void initMemberVariableForConvenientAccess(AnActionEvent e) {
         _isStillRunning = true;
         _document = _editor.getDocument();
         _action = this;
         _contentComponent = _editor.getContentComponent();
+        _psiFile = e.getData(LangDataKeys.PSI_FILE);
     }
 
     protected void disableAllExistingKeyListeners() {
