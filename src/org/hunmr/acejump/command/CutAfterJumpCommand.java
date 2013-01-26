@@ -3,6 +3,7 @@ package org.hunmr.acejump.command;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
+import org.hunmr.util.AppUtil;
 
 public class CutAfterJumpCommand extends CommandAroundJump {
     public CutAfterJumpCommand(Editor editor) {
@@ -26,6 +27,6 @@ public class CutAfterJumpCommand extends CommandAroundJump {
             }
         };
 
-        ApplicationManager.getApplication().runWriteAction(getRunnableWrapper(runnable));
+        ApplicationManager.getApplication().runWriteAction(AppUtil.getRunnableWrapper(runnable, _editor));
     }
 }

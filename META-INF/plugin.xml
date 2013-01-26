@@ -1,9 +1,34 @@
 <idea-plugin version="2">
   <name>emacsIDEAs</name>
-  <description>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction.
+  <description>
+      <![CDATA[
+      <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction.</p>
+      <p><b>AceJump:</b></p>
+      <ul>
+          <li><b>C-L 't' 'm'</b>  :  <b>Basic Jump       </b>| Type C-L, then type target char (e.g. 't') to jump to, then type marker char (e.g. 'm') to move caret.</li>
+          <li><b>C-L ' ' 'm'</b>  :  <b>Jump to line end </b>| To show marker on line end, type space ' ' as target char</li>
+          <li><b>C-L  c  'm'</b>  :  Copy jump area   </li>
+          <li><b>C-L  x  'm'</b>  :  Cut jump area    </li>
+          <li><b>C-L  p  'm'</b>  :  Paste clipborad content to target place</li>
+          <li><b>C-L  P  'm'</b>  :  Insert '\n' and Paste clipborad content to target place</li>
+          <li><b>C-L  s  'm'</b>  :  Select jump area</li>
+      </ul>
+      <br/>
+      <p><b>Copy without selection:</b></p>
+      <ul>
+          <li><b>C-c  w  </b>  :  Copy word</li>
+          <li><b>C-c  s  </b>  :  Copy string</li>
+          <li><b>C-c  l  </b>  :  Copy line</li>
+          <li><b>C-c  q  </b>  :  Copy quoted, such as abcd in "abcd"</li>
+          <li><b>C-c  a  </b>  :  Alias of copy quoted</li>
+          <li><b>C-c  p  </b>  :  Copy paragraph</li>
+          <li><b>C-c  ' '     (w | s | l | q | a | p)   </b>  :  Type one space to cut related area</li>
+          <li><b>C-c  ' ' ' ' (w | s | l | q | a | p)   </b>  :  Type two space to select related area</li>
+      </ul>
+    ]]>
   </description>
   <version>1.1</version>
-  <vendor>hunmr.blogspot.com  whunmr@gmail.com</vendor>
+  <vendor>hmwang@thoughtworks.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
   <idea-version since-build="107.105"/>

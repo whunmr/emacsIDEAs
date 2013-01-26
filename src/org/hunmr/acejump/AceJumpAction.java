@@ -132,6 +132,11 @@ public class AceJumpAction extends EmacsIdeasAction {
             offsets.addAll(getOffsetsOfCharIgnoreCase('\n', visibleTextRange, _document));
         } else if (key == ',') {
             offsets.addAll(getOffsetsOfCharIgnoreCase('.', visibleTextRange, _document));
+        }else if (key == ';') {
+            offsets.addAll(getOffsetsOfCharIgnoreCase('{', visibleTextRange, _document));
+            offsets.addAll(getOffsetsOfCharIgnoreCase('}', visibleTextRange, _document));
+            offsets.addAll(getOffsetsOfCharIgnoreCase('(', visibleTextRange, _document));
+            offsets.addAll(getOffsetsOfCharIgnoreCase(')', visibleTextRange, _document));
         }
 
         return offsets;
@@ -172,12 +177,12 @@ public class AceJumpAction extends EmacsIdeasAction {
     private boolean isSpaceAndShouldIgnore(char c, String visibleText, int index) {
         if (isSpace(c)) {
             boolean isAfterSpace = (index != 0) && (isSpace(visibleText.charAt(index - 1)));
-            boolean noSpaceAround = (index != 0)
-                                    && (index != visibleText.length() - 1)
-                                    && (!isSpace(visibleText.charAt(index - 1)))
-                                    && (!isSpace(visibleText.charAt(index + 1)));
+//            boolean noSpaceAround = (index != 0)
+//                                    && (index != visibleText.length() - 1)
+//                                    && (!isSpace(visibleText.charAt(index - 1)))
+//                                    && (!isSpace(visibleText.charAt(index + 1)));
 
-            if (isAfterSpace || noSpaceAround) {
+            if (isAfterSpace) {
                 return true;
             }
         }

@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.util.AppUtil;
 
 public class PasteAfterJumpCommand extends CommandAroundJump {
     private boolean _addNewLineBeforePaste;
@@ -32,6 +33,6 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
             }
         };
 
-        ApplicationManager.getApplication().runWriteAction(getRunnableWrapper(runnable));
+        ApplicationManager.getApplication().runWriteAction(AppUtil.getRunnableWrapper(runnable, _editor));
     }
 }

@@ -1,7 +1,5 @@
 package org.hunmr.acejump.command;
 
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Editor;
 
 public class CommandAroundJump {
@@ -32,12 +30,4 @@ public class CommandAroundJump {
         }
     }
 
-    protected Runnable getRunnableWrapper(final Runnable runnable) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                CommandProcessor.getInstance().executeCommand(_editor.getProject(), runnable, "cut", ActionGroup.EMPTY_GROUP);
-            }
-        };
-    }
 }
