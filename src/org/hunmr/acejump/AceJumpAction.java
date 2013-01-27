@@ -126,31 +126,28 @@ public class AceJumpAction extends EmacsIdeasAction {
 
         TextRange visibleTextRange = EditorUtils.getVisibleTextRange(getEditor());
 
-        ArrayList offsets = getOffsetsOfCharIgnoreCase(key, visibleTextRange, _document);
+        ArrayList offsets = getOffsetsOfCharIgnoreCase(String.valueOf(key), visibleTextRange, _document);
+
         if (key == KeyEvent.VK_SPACE) {
-            offsets.addAll(getOffsetsOfCharIgnoreCase('\t', visibleTextRange, _document));
-            offsets.addAll(getOffsetsOfCharIgnoreCase('\n', visibleTextRange, _document));
+            offsets.addAll(getOffsetsOfCharIgnoreCase("\t\n", visibleTextRange, _document));
         } else if (key == ',') {
-            offsets.addAll(getOffsetsOfCharIgnoreCase('.', visibleTextRange, _document));
-        }else if (key == ';') {
-            offsets.addAll(getOffsetsOfCharIgnoreCase('{', visibleTextRange, _document));
-            offsets.addAll(getOffsetsOfCharIgnoreCase('}', visibleTextRange, _document));
-            offsets.addAll(getOffsetsOfCharIgnoreCase('(', visibleTextRange, _document));
-            offsets.addAll(getOffsetsOfCharIgnoreCase(')', visibleTextRange, _document));
+            offsets.addAll(getOffsetsOfCharIgnoreCase(".{}()_=", visibleTextRange, _document));
         }
 
         return offsets;
     }
 
-    public ArrayList<Integer> getOffsetsOfCharIgnoreCase(char charToFind, TextRange markerRange, Document document) {
+    public ArrayList<Integer> getOffsetsOfCharIgnoreCase(String charSet, TextRange markerRange, Document document) {
         ArrayList<Integer> offsets = new ArrayList<Integer>();
         String visibleText = document.getText(markerRange);
-        char lowCase = Character.toLowerCase(charToFind);
-        char upperCase = Character.toUpperCase(charToFind);
 
-        offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), lowCase, visibleText));
-        if (upperCase != lowCase) {
-            offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), upperCase, visibleText));
+        for (char charToFind : charSet.toCharArray()) {
+            char lowCase = Character.toLowerCase(charToFind);
+            char upperCase = Character.toUpperCase(charToFind);
+            offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), lowCase, visibleText));
+            if (upperCase != lowCase) {
+                offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), upperCase, visibleText));
+            }
         }
 
         return offsets;
@@ -177,11 +174,6 @@ public class AceJumpAction extends EmacsIdeasAction {
     private boolean isSpaceAndShouldIgnore(char c, String visibleText, int index) {
         if (isSpace(c)) {
             boolean isAfterSpace = (index != 0) && (isSpace(visibleText.charAt(index - 1)));
-//            boolean noSpaceAround = (index != 0)
-//                                    && (index != visibleText.length() - 1)
-//                                    && (!isSpace(visibleText.charAt(index - 1)))
-//                                    && (!isSpace(visibleText.charAt(index + 1)));
-
             if (isAfterSpace) {
                 return true;
             }

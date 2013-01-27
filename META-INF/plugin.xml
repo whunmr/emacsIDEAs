@@ -7,6 +7,7 @@
       <ul>
           <li><b>C-L 't' 'm'</b>  :  <b>Basic Jump       </b>| Type C-L, then type target char (e.g. 't') to jump to, then type marker char (e.g. 'm') to move caret.</li>
           <li><b>C-L ' ' 'm'</b>  :  <b>Jump to line end </b>| To show marker on line end, type space ' ' as target char</li>
+          <li><b>C-L ',' 'm'</b>  :  <b>Jump to hard typed key </b>| Show markers on .{}()_= </li>
           <li><b>C-L  c  'm'</b>  :  Copy jump area   </li>
           <li><b>C-L  x  'm'</b>  :  Cut jump area    </li>
           <li><b>C-L  p  'm'</b>  :  Paste clipborad content to target place</li>
@@ -20,20 +21,25 @@
           <li><b>C-c  s  </b>  :  Copy string</li>
           <li><b>C-c  l  </b>  :  Copy line</li>
           <li><b>C-c  q  </b>  :  Copy quoted, such as abcd in "abcd"</li>
-          <li><b>C-c  a  </b>  :  Alias of copy quoted</li>
+          <li><b>C-c  a  </b>  :  Copy to line beginning</li>
+          <li><b>C-c  A  </b>  :  Copy to file beginning</li>
+          <li><b>C-c  e  </b>  :  Copy to line end</li>
+          <li><b>C-c  E  </b>  :  Copy to file end</li>
           <li><b>C-c  p  </b>  :  Copy paragraph</li>
-          <li><b>C-c  ' '     (w | s | l | q | a | p)   </b>  :  Type one space to cut related area</li>
-          <li><b>C-c  ' ' ' ' (w | s | l | q | a | p)   </b>  :  Type two space to select related area</li>
+          <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p)   </b>  :  Type one space to cut related area</li>
+          <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p)   </b>  :  Type two space to select related area</li>
       </ul>
       <p><b>Other:</b></p>
        <ul>
           <li><b>C-c  i  </b>  :  Jump to next error quick fix intention</li>
+          <li><b>C-c  I  </b>  :  Jump to next error quick fix intention, and show intention popup</li>
+          <li><b>C-c  ' ' i  </b>  :  Type a spece prefix key to jump to previous error quick fix intention</li>
       </ul>
       <br/>
     ]]>
   </description>
-  <version>1.1.2</version>
-  <vendor>hmwang@thoughtworks.com</vendor>
+  <version>1.1.3</version>
+  <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
   <idea-version since-build="107.105"/>

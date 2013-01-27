@@ -14,7 +14,7 @@ public class SelectorFactory {
     public static final Color HIGHLIGHT_COLOR = new Color(122, 214, 162);
 
     public static boolean isSelectorKey(char c) {
-        return "wslpbaq".indexOf(Character.toLowerCase(c)) != -1;
+        return "wslpbqae".indexOf(Character.toLowerCase(c)) != -1;
     }
 
     public static Selector createSelectorBy(char key, Editor editor) {
@@ -36,9 +36,14 @@ public class SelectorFactory {
             case 'b':
                 selector = new BlockSelector(editor);
                 break;
-            case 'a':
             case 'q':
                 selector = new QuoteSelector(editor);
+                break;
+            case 'a':
+                selector = new ToBeginningSelector(editor);
+                break;
+            case 'e':
+                selector = new ToEndSelector(editor);
                 break;
             default:
                 break;

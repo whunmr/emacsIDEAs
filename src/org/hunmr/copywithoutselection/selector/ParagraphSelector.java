@@ -2,6 +2,7 @@ package org.hunmr.copywithoutselection.selector;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.common.CommandContext;
 
 public class ParagraphSelector extends Selector {
     public ParagraphSelector(Editor editor) {
@@ -11,7 +12,6 @@ public class ParagraphSelector extends Selector {
     private int getParagraphStartOffset(int caretOffset) {
         int offset = caretOffset;
         while (offset > 0) {
-            //if (_docText.charAt(offset) == '\n' && offsetIsAtEmptyLine(offset - 1)) {
             if (offsetIsAtEmptyLine(offset - 1)) {
                 break;
             }
@@ -47,7 +47,7 @@ public class ParagraphSelector extends Selector {
         return line.trim().isEmpty();
     }
 
-    public TextRange getRange() {
+    public TextRange getRange(CommandContext cmdCtx) {
         final int caretOffset = getNearestStringEndOffset(_editor);
 
         int paraStart = getParagraphStartOffset(caretOffset);

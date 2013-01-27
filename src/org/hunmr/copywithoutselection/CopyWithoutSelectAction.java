@@ -1,18 +1,17 @@
 package org.hunmr.copywithoutselection;
 
-import com.intellij.codeInsight.daemon.impl.ShowIntentionsPass;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.EditorModificationUtil;
-import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
+import org.hunmr.caret.MoveToNextIntentionCommand;
+import org.hunmr.common.CommandContext;
 import org.hunmr.common.EmacsIdeasAction;
 import org.hunmr.copywithoutselection.selector.Selector;
 import org.hunmr.copywithoutselection.selector.SelectorFactory;
@@ -23,10 +22,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class CopyWithoutSelectAction extends EmacsIdeasAction {
-    public static final int INTENTION_OFFSET_NO_FOUND = -1;
     private KeyListener _handleCopyKeyListener;
     private SelectionModel _selection;
-    private int _spaceCmdCount;
+    private CommandContext _cmdCtx;
 
     public void actionPerformed(AnActionEvent e) {
         if (super.initAction(e)) {
@@ -39,7 +37,7 @@ public class CopyWithoutSelectAction extends EmacsIdeasAction {
         super.initMemberVariableForConvenientAccess(e);
         _handleCopyKeyListener = createHandleCopyWithoutSelectionKeyListener();
         _selection = _editor.getSelectionModel();
-        _spaceCmdCount = 0;
+        _cmdCtx = new CommandContext();
     }
 
     private KeyListener createHandleCopyWithoutSelectionKeyListener() {
@@ -64,8 +62,7 @@ public class CopyWithoutSelectAction extends EmacsIdeasAction {
     }
 
     private boolean handleKey(char key) {
-        if (key == ' ') {
-            _spaceCmdCount++;
+        if (_cmdCtx.consume(key)) {
             return false;
         }
 
@@ -80,7 +77,7 @@ public class CopyWithoutSelectAction extends EmacsIdeasAction {
         }
 
         if (Character.toLowerCase(key) == 'i') {
-            moveCaretToNextIntention();
+            new MoveToNextIntentionCommand(_editor, _psiFile, _cmdCtx).moveCaretToNextIntention();
             return true;
         }
 
@@ -88,9 +85,9 @@ public class CopyWithoutSelectAction extends EmacsIdeasAction {
     }
 
     private void doActionOnSelectedRange(TextRange tr) {
-        if (_spaceCmdCount == 0) {
+        if (_cmdCtx.getPrefixCount() == 0) {
             copySelection(tr);
-        } else if (_spaceCmdCount == 1) {
+        } else if (_cmdCtx.getPrefixCount() == 1) {
             cutSelection();
         }
     }
@@ -133,50 +130,12 @@ public class CopyWithoutSelectAction extends EmacsIdeasAction {
             return null;
         }
 
-        TextRange tr = selector.getRange();
+        TextRange tr = selector.getRange(_cmdCtx);
         if (tr == null) {
             HintManager.getInstance().showInformationHint(_editor, "404");
         }
 
         return tr;
-    }
-
-    private void moveCaretToNextIntention() {
-        final int originalCaretOffset = _editor.getCaretModel().getOffset();
-
-        int offset = findNextIntentionOffset();
-        if (offset != INTENTION_OFFSET_NO_FOUND) {
-            _editor.getCaretModel().moveToOffset(offset);
-            _editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-        } else {
-            HintManager.getInstance().showInformationHint(_editor, "no next intention.");
-            _editor.getCaretModel().moveToOffset(originalCaretOffset);
-        }
-    }
-
-    private int findNextIntentionOffset() {
-        PsiElement elem = _psiFile.findElementAt(_editor.getCaretModel().getOffset());
-        int startOffset = elem.getTextRange().getEndOffset() + 1;
-        int endOffset = _editor.getDocument().getTextLength();
-
-        for (int offset = startOffset; offset < endOffset;) {
-            if (hasIntentionAtCaret(offset)) {
-                return offset;
-            }
-
-            offset += _psiFile.findElementAt(offset).getTextLength();
-        }
-
-        return INTENTION_OFFSET_NO_FOUND;
-    }
-
-    private boolean hasIntentionAtCaret(int offset) {
-        _editor.getCaretModel().moveToOffset(offset);
-
-        ShowIntentionsPass.IntentionsInfo intentions = new ShowIntentionsPass.IntentionsInfo();
-        ShowIntentionsPass.getActionsToShow(_editor, _psiFile, intentions, -1);
-
-        return !intentions.errorFixesToShow.isEmpty();
     }
 
     private RangeHighlighter addHighlighterOnCopiedRange(TextRange tr) {

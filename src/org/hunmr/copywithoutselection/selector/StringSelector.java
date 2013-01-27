@@ -2,6 +2,7 @@ package org.hunmr.copywithoutselection.selector;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.common.CommandContext;
 
 public class StringSelector extends Selector {
     public StringSelector(Editor editor) {
@@ -26,7 +27,7 @@ public class StringSelector extends Selector {
         return offset;
     }
 
-    public TextRange getRange() {
+    public TextRange getRange(CommandContext cmdCtx) {
         final int caretOffset = getNearestStringEndOffset(_editor);
 
         int strStart = getStringStartOffset(caretOffset);

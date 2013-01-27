@@ -3,6 +3,7 @@ package org.hunmr.copywithoutselection.selector;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.common.CommandContext;
 
 public abstract class Selector {
 
@@ -16,7 +17,7 @@ public abstract class Selector {
         _docText = _document.getText();
     }
 
-    public abstract TextRange getRange();
+    public abstract TextRange getRange(CommandContext cmdCtx);
 
     protected boolean isCaretBetweenSpaces(Editor editor) {
         int caretOffset = editor.getCaretModel().getOffset();

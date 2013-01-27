@@ -2,6 +2,7 @@ package org.hunmr.copywithoutselection.selector;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.common.CommandContext;
 
 public class QuoteSelector extends Selector{
     public QuoteSelector(Editor editor) {
@@ -9,7 +10,7 @@ public class QuoteSelector extends Selector{
     }
 
     @Override
-    public TextRange getRange() {
+    public TextRange getRange(CommandContext cmdCtx) {
         if (caretIsAtEdge()) {
             return null;
         }

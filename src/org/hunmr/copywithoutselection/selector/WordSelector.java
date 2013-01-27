@@ -2,6 +2,7 @@ package org.hunmr.copywithoutselection.selector;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.common.CommandContext;
 
 public class WordSelector extends Selector {
 
@@ -9,7 +10,7 @@ public class WordSelector extends Selector {
         super(editor);
     }
 
-    public TextRange getRange() {
+    public TextRange getRange(CommandContext cmdCtx) {
         _editor.getSelectionModel().selectWordAtCaret(false);
         int wordStart = _editor.getSelectionModel().getSelectionStart();
         int wordEnd = _editor.getSelectionModel().getSelectionEnd();
