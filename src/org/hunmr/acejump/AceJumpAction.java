@@ -1,9 +1,12 @@
 package org.hunmr.acejump;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.wm.ToolWindowManager;
 import org.hunmr.acejump.command.CommandAroundJump;
 import org.hunmr.acejump.command.CommandAroundJumpFactory;
 import org.hunmr.acejump.marker.MarkerCollection;
@@ -28,6 +31,12 @@ public class AceJumpAction extends EmacsIdeasAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
+        Project p = e.getData(PlatformDataKeys.PROJECT);
+        if (!ToolWindowManager.getInstance(p).isEditorComponentActive()) {
+            ToolWindowManager.getInstance(p).activateEditorComponent();
+            return;
+        }
+
         if (super.initAction(e)) {
             _contentComponent.addKeyListener(_showMarkersKeyListener);
         }
@@ -131,7 +140,7 @@ public class AceJumpAction extends EmacsIdeasAction {
         if (key == KeyEvent.VK_SPACE) {
             offsets.addAll(getOffsetsOfCharIgnoreCase("\t\n", visibleTextRange, _document));
         } else if (key == ',') {
-            offsets.addAll(getOffsetsOfCharIgnoreCase(".{}()_=", visibleTextRange, _document));
+            offsets.addAll(getOffsetsOfCharIgnoreCase(";.{}()_=", visibleTextRange, _document));
         }
 
         return offsets;

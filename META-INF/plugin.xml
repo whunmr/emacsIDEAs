@@ -61,8 +61,8 @@
           </action>
       </group>
 
-      <action id="CopyWithoutSelect" class="org.hunmr.copywithoutselection.CopyWithoutSelectAction" text="CopyWithoutSelection"
-              description="org.hunmr.copywithoutselection.CopyWithoutSelectAction">
+      <action id="CopyWithoutSelect" class="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction" text="CopyWithoutSelection"
+              description="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction">
           <add-to-group group-id="emacsIDEAs" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="meta C" />
       </action>
