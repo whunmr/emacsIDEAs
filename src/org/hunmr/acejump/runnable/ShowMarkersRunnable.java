@@ -13,6 +13,7 @@ import java.util.Comparator;
 public class ShowMarkersRunnable implements Runnable {
     public static final char INFINITE_JUMP_CHAR = 'f';
     private final String _markerCharSet = "abdeghiyklmnoqrtuvwj,"; // / .
+    private final String _fullMarkerCharSet = "abdeghiyklmnopqrstuvwj,"; // / .
     private final ArrayList<Integer> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;
@@ -36,7 +37,7 @@ public class ShowMarkersRunnable implements Runnable {
         sortOffsetsToImprovePriorityOfLineEnd(caretOffset);
 
         int twiceJumpGroupCount = calcTwiceJumpGroupCount();
-        int singleJumpCount = Math.min(_markerCharSet.length() - twiceJumpGroupCount, _offsets.size());
+        int singleJumpCount = Math.min(getMarkerSet().length() - twiceJumpGroupCount, _offsets.size());
 
         createSingleJumpMarkers(singleJumpCount);
         if (twiceJumpGroupCount > 0) {
@@ -46,19 +47,23 @@ public class ShowMarkersRunnable implements Runnable {
         _action.showNewMarkersPanel(new MarkersPanel(_editor, _markerCollection));
     }
 
+    private String getMarkerSet() {
+        return _action.isCalledfromOtherAction() ? _fullMarkerCharSet : _markerCharSet;
+    }
+
     private void createSingleJumpMarkers(int singleJumpCount) {
         for (int i = 0; i < singleJumpCount ; i++) {
-            _markerCollection.addMarker(_markerCharSet.charAt(i), _offsets.get(i));
+            _markerCollection.addMarker(getMarkerSet().charAt(i), _offsets.get(i));
         }
     }
 
     private void createMultipleJumpMarkers(int singleJumpCount, int groupsNeedsTwiceJump) {
         int i = singleJumpCount;
 
-        int maxMarkersCountNeedsTwiceJump = Math.min(_offsets.size(), groupsNeedsTwiceJump * _markerCharSet.length());
+        int maxMarkersCountNeedsTwiceJump = Math.min(_offsets.size(), groupsNeedsTwiceJump * getMarkerSet().length());
         for (;i < maxMarkersCountNeedsTwiceJump; i++) {
-            int group = (i - singleJumpCount) / _markerCharSet.length();
-            char markerChar = _markerCharSet.charAt(singleJumpCount + group);
+            int group = (i - singleJumpCount) / getMarkerSet().length();
+            char markerChar = getMarkerSet().charAt(singleJumpCount + group);
             _markerCollection.addMarker(markerChar, _offsets.get(i));
         }
 
@@ -71,7 +76,7 @@ public class ShowMarkersRunnable implements Runnable {
     }
 
     private int calcTwiceJumpGroupCount() {
-        int makerCharSetSize = _markerCharSet.length();
+        int makerCharSetSize = getMarkerSet().length();
 
         for (int groupsNeedMultipleJump = 0; groupsNeedMultipleJump < makerCharSetSize; groupsNeedMultipleJump++) {
             int oneJumpMarkerCount = makerCharSetSize - groupsNeedMultipleJump;

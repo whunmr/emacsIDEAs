@@ -5,14 +5,17 @@
       <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction.</p>
       <p><b>AceJump:</b></p>
       <ul>
-          <li><b>C-L 't' 'm'</b>  :  <b>Basic Jump       </b>| Type C-L, then type target char (e.g. 't') to jump to, then type marker char (e.g. 'm') to move caret.</li>
-          <li><b>C-L ' ' 'm'</b>  :  <b>Jump to line end </b>| To show marker on line end, type space ' ' as target char</li>
-          <li><b>C-L ',' 'm'</b>  :  <b>Jump to hard typed key </b>| Show markers on .{}()_= </li>
-          <li><b>C-L  c  'm'</b>  :  Copy jump area   </li>
-          <li><b>C-L  x  'm'</b>  :  Cut jump area    </li>
-          <li><b>C-L  p  'm'</b>  :  Paste clipborad content to target place</li>
-          <li><b>C-L  P  'm'</b>  :  Insert '\n' and Paste clipborad content to target place</li>
-          <li><b>C-L  s  'm'</b>  :  Select jump area</li>
+          <li><b>C-i 't' 'm'</b>  :  <b>Basic Jump       </b>| Type C-i, then type target char (e.g. 't') to jump to, then type marker char (e.g. 'm') to move caret.</li>
+          <li><b>C-i ' ' 'm'</b>  :  <b>Jump to line end or start. </b>| To show marker on line end and line start, type space ' ' as target char</li>
+          <li><b>C-i ',' 'm'</b>  :  <b>Jump to symbol key </b>| Show markers on .{}(|`/\;.{}()[]?_=-+'"!@#$%^&*)_= </li>
+      </ul>
+      <br/>
+      <p><b>AceJump and copy,cut,select:</b></p>
+      <ul>
+          <li><b>C-L C-c 'm'</b>  :  Copy jump area      </li> | C-L C-c means type C-L then continue type C-c
+          <li><b>C-L C-x 'm'</b>  :  Cut jump area       </li>
+          <li><b>C-L C-s 'm'</b>  :  Select jump area    </li>
+          <li><b>C-L C-f 'm'</b>  :  Basic Jump alias    </li>
       </ul>
       <br/>
       <p><b>Copy without selection:</b></p>
@@ -20,6 +23,7 @@
           <li><b>C-c  w  </b>  :  Copy word</li>
           <li><b>C-c  s  </b>  :  Copy string</li>
           <li><b>C-c  l  </b>  :  Copy line</li>
+          <li><b>C-c  b  </b>  :  Copy block between balanced { and } </li>
           <li><b>C-c  q  </b>  :  Copy quoted, such as abcd in "abcd"</li>
           <li><b>C-c  a  </b>  :  Copy to line beginning</li>
           <li><b>C-c  A  </b>  :  Copy to file beginning</li>
@@ -29,16 +33,23 @@
           <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p)   </b>  :  Type one space to cut related area</li>
           <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p)   </b>  :  Type two space to select related area</li>
       </ul>
-      <p><b>Other:</b></p>
-       <ul>
-          <li><b>C-c  i  </b>  :  Jump to next error quick fix intention</li>
-          <li><b>C-c  I  </b>  :  Jump to next error quick fix intention, and show intention popup</li>
-          <li><b>C-c  ' ' i  </b>  :  Type a spece prefix key to jump to previous error quick fix intention</li>
-      </ul>
       <br/>
     ]]>
   </description>
-  <version>1.1.3</version>
+    <change-notes><![CDATA[
+    <html>
+    <dl>
+        <dt>1.1.5</dt>
+        <dd>Changed AceJump's keymap to be more intuitive one. such as "C-L C-s" for select jump area. <dd>
+        <dt>1.1.0</dt>
+        <dd>Add copy without selection<dd>
+        <dt>1.0</dt>
+        <dd>Add basic AceJump function<dd>
+    </dl>
+    </html>
+    ]]>
+    </change-notes>
+  <version>1.1.5</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
@@ -57,7 +68,19 @@
       <group id="emacsIDEAs" text="emacsIDEAs" description="emacsIDEAs">
           <!--<add-to-group group-id="MainMenu" anchor="last"  />-->
           <action id="emacsIDEAs.AceJump" class="org.hunmr.acejump.AceJumpAction" text="AceJump" description="AceJump" >
-              <keyboard-shortcut keymap="$default" first-keystroke="ctrl L"/>
+              <keyboard-shortcut keymap="$default" first-keystroke="meta I" />
+              <keyboard-shortcut keymap="$default" first-keystroke="meta L" second-keystroke="meta L"/>
+              <keyboard-shortcut keymap="$default" first-keystroke="meta L" second-keystroke="meta F"/>
+          </action>
+          <action id="emacsIDEAs.AceJumpSelect" class="org.hunmr.acejump.AceJumpSelectAction" text="AceJumpSelect" description="AceJumpSelect" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta L" second-keystroke="meta S"/>
+          </action>
+          <action id="emacsIDEAs.AceJumpCopy" class="org.hunmr.acejump.AceJumpCopyAction" text="AceJumpCopy" description="AceJumpCopy" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta L" second-keystroke="meta C"/>
+          </action>
+          <action id="emacsIDEAs.AceJumpCut" class="org.hunmr.acejump.AceJumpCutAction" text="AceJumpCut" description="AceJumpCut" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta L" second-keystroke="meta W"/>
+              <keyboard-shortcut keymap="$default" first-keystroke="meta L" second-keystroke="meta X"/>
           </action>
       </group>
 

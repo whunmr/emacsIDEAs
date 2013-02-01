@@ -10,7 +10,6 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.TextRange;
-import org.hunmr.caret.MoveToNextIntentionCommand;
 import org.hunmr.common.CommandContext;
 import org.hunmr.common.EmacsIdeasAction;
 import org.hunmr.copycutwithoutselection.selector.Selector;
@@ -73,11 +72,6 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
                 doActionOnSelectedRange(tr);
             }
 
-            return true;
-        }
-
-        if (Character.toLowerCase(key) == 'i') {
-            new MoveToNextIntentionCommand(_editor, _psiFile, _cmdCtx).moveCaretToNextIntention();
             return true;
         }
 
