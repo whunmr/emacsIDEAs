@@ -8,16 +8,31 @@ public class CommandAroundJumpFactory {
     public static final char COPY_AFTER_JUMP = 'c';
     public static final char CUT_AFTER_JUMP = 'x';
     public static final char CUT_AFTER_JUMP_WITH_SPACE_KEY = ' ';
+    public static final char PASTE_AFTER_JUMP = 'p';
+    public static final char PASTE_WITH_NEWLINE_AFTER_JUMP = 'P';
 
     public static boolean isCommandKey(char key) {
         key = Character.toLowerCase(key);
         return key == CUT_AFTER_JUMP_WITH_SPACE_KEY
                 || key == SELECT_AFTER_JUMP
                 || key == CUT_AFTER_JUMP
-                || key == COPY_AFTER_JUMP;
+                || key == COPY_AFTER_JUMP
+                || key == PASTE_AFTER_JUMP;
     }
 
     public static CommandAroundJump createCommand(char key, Editor editor) {
+        switch (key) {
+            case PASTE_AFTER_JUMP:
+                return new PasteAfterJumpCommand(editor, false);
+            case PASTE_WITH_NEWLINE_AFTER_JUMP:
+                return new PasteAfterJumpCommand(editor, true);
+            default:
+                return getCommandsIgnoreCase(key, editor);
+        }
+
+    }
+
+    private static CommandAroundJump getCommandsIgnoreCase(char key, Editor editor) {
         switch (Character.toLowerCase(key)) {
             case SELECT_AFTER_JUMP :
                 return new SelectionCommand(editor);
