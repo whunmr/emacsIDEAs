@@ -9,7 +9,7 @@ public class ParagraphSelector extends Selector {
         super(editor);
     }
 
-    private int getParagraphStartOffset(int caretOffset) {
+    protected int getParagraphStartOffset(int caretOffset) {
         int offset = caretOffset;
         while (offset > 0) {
             if (offsetIsAtEmptyLine(offset - 1)) {
@@ -22,7 +22,7 @@ public class ParagraphSelector extends Selector {
         return offset;
     }
 
-    private int getParagraphEndOffset(int caretOffset) {
+    protected int getParagraphEndOffset(int caretOffset) {
         int offset = caretOffset;
         int length = _docText.length();
 

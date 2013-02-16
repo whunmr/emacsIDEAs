@@ -6,20 +6,20 @@ import org.hunmr.acejump.AceJumpAction;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class ShowMarkersRunnable implements Runnable {
     public static final char INFINITE_JUMP_CHAR = 'f';
     private final String _markerCharSet = "abdeghiyklmnoqrtuvwj,"; // / .
     private final String _fullMarkerCharSet = "abdeghiyklmnopqrstuvwj,"; // / .
-    private final ArrayList<Integer> _offsets;
+    private final List<Integer> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;
     private MarkerCollection _markerCollection;
 
-    public ShowMarkersRunnable(ArrayList<Integer> offsets, AceJumpAction currentExecutingAction) {
+    public ShowMarkersRunnable(List<Integer> offsets, AceJumpAction currentExecutingAction) {
         _offsets = offsets;
         _editor = currentExecutingAction.getEditor();
         this._action = currentExecutingAction;
@@ -48,7 +48,7 @@ public class ShowMarkersRunnable implements Runnable {
     }
 
     private String getMarkerSet() {
-        return _action.isCalledfromOtherAction() ? _fullMarkerCharSet : _markerCharSet;
+        return _action.isCalledFromOtherAction() ? _fullMarkerCharSet : _markerCharSet;
     }
 
     private void createSingleJumpMarkers(int singleJumpCount) {
