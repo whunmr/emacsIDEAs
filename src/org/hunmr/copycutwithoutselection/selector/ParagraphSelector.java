@@ -34,6 +34,7 @@ public class ParagraphSelector extends Selector {
             offset++;
         }
 
+        offset = backWindToSkipEndingBracket(offset);
         return offset;
     }
 
@@ -54,5 +55,37 @@ public class ParagraphSelector extends Selector {
         int paraEnd = getParagraphEndOffset(caretOffset);
 
         return paraEnd > paraStart ? new TextRange(paraStart, paraEnd) : null;
+    }
+
+    protected int backWindToSkipEndingBracket(final int paraEnd) {
+        int end = paraEnd;
+        String preSelectedText = _document.getText(new TextRange(_editor.getCaretModel().getOffset(), paraEnd));
+        String[] lines = preSelectedText.split("\n");
+
+        for (int i = lines.length-1; i >= 0; i--) {
+            String line = lines[i];
+            if (!isBracketLine(line)) {
+                break;
+            }
+
+            end -= line.length();
+        }
+
+        if (end != paraEnd) {
+            end--;
+        }
+
+        return end;
+    }
+
+    private boolean isBracketLine(String line) {
+        for (char aChar : line.toCharArray()) {
+            boolean isBracketOrSpace = aChar == '{' || aChar == '}' || Character.isSpaceChar(aChar);
+            if (!isBracketOrSpace) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

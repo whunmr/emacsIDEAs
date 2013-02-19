@@ -15,7 +15,7 @@ public class OffsetsFinder {
         List<Integer> offsets = getOffsetsOfCharIgnoreCase(String.valueOf(key), visibleRange, document, editor);
 
         if (key == KeyEvent.VK_SPACE) {
-            offsets.addAll(getOffsetsOfCharIgnoreCase("\t\n", visibleRange, document, editor));
+            offsets.addAll(getOffsetsOfCharIgnoreCase("\t\r\n", visibleRange, document, editor));
             addStartLineOffsetsTo(offsets, editor);
         } else if (key == ',') {
             offsets.addAll(getOffsetsOfCharIgnoreCase("|`/\\;.{}()[]<>?_=-+'\"!@#$%^&*", visibleRange, document, editor));

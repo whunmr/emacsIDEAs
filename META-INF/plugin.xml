@@ -5,7 +5,8 @@
       <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction.</p>
       <p><b>AceJump</b></p>
       <ul>
-          <li><b>C-L 't' 'm'</b>  :  <b>Basic Jump       </b>| Type C-L, then type target char (eg. 't') to jump to, then type marker char (eg. 'm') to move caret.</li>
+          <li><b>C-L 't' 'm'</b>  :  <b>Basic Word Jump       </b>| Type C-L, then type target char (eg. 't') to jump to, then type marker char (eg. 'm') to move caret.</li>
+          <li><b>C-J 't' 'm'</b>  :  <b>Basic Char Jump       </b></li>
       </ul>
       <br/>
       <p><b>AceJump, jump to special place</b></p>
@@ -52,6 +53,10 @@
     <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.1.7</dt>
+        <dd>Let cut to paragraph end(C-c ' ' d) and cut paragraph (C-c ' ' p) skip ending brackets.<dd>
+        <dt>1.1.6</dt>
+        <dd>Add Jump Word Action, and assigned to C-L.  Jump Char Action assigned to C-J.<dd>
         <dt>1.1.5</dt>
         <dd>Changed AceJump's keymap to be more intuitive one. such as "C-L C-s" for select jump area. <dd>
         <dt>1.1.0</dt>
@@ -62,7 +67,7 @@
     </html>
     ]]>
     </change-notes>
-  <version>1.1.5</version>
+  <version>1.1.6</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
