@@ -1,11 +1,9 @@
 package org.hunmr.acejump.offsets;
 
-import java.awt.event.KeyEvent;
-
 public class WordOffsetsFinder extends OffsetsFinder {
     @Override
     protected boolean isValidOffset(char c, String visibleText, int index, int offset, int caretOffset) {
-        if (c == KeyEvent.VK_SPACE || c == ',') {
+        if (!Character.isLetterOrDigit(c)) {
             return true;
         }
 
@@ -15,7 +13,7 @@ public class WordOffsetsFinder extends OffsetsFinder {
         }
 
         char charBeforeOffset = visibleText.charAt(index - 1);
-        if (!Character.isLetterOrDigit(charBeforeOffset)) {
+        if (isCharInDifferentCategory(c, charBeforeOffset)) {
             return true;
         }
 
@@ -25,5 +23,9 @@ public class WordOffsetsFinder extends OffsetsFinder {
         }
 
         return false;
+    }
+
+    private boolean isCharInDifferentCategory(char c, char charBeforeOffset) {
+        return Character.isLetter(c) ^ Character.isLetter(charBeforeOffset) || Character.isDigit(c) ^ Character.isDigit(charBeforeOffset);
     }
 }
