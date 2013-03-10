@@ -34,7 +34,7 @@ public class ParagraphSelector extends Selector {
             offset++;
         }
 
-        offset = backWindToSkipEndingBracket(offset);
+        //offset = backWindToSkipEndingBracket(offset);
         return offset;
     }
 

@@ -16,5 +16,4 @@ public class ParagraphEndingSelector extends ParagraphSelector {
         int paraEnd = getParagraphEndOffset(caretOffset);
         return paraEnd > caretOffset ? new TextRange(caretOffset, paraEnd) : null;
     }
-
 }

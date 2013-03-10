@@ -44,8 +44,10 @@
           <li><b>C-c  e  </b>  :  Copy to line end</li>
           <li><b>C-c  E  </b>  :  Copy to file end</li>
           <li><b>C-c  p  </b>  :  Copy paragraph</li>
-          <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p)   </b>  :  Type one space to cut related area</li>
-          <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p)   </b>  :  Type two space to select related area</li>
+          <li><b>C-c  u  </b>  :  Copy to paragraph begining</li>
+          <li><b>C-c  d  </b>  :  Copy to paragraph end</li>
+          <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | u | d)   </b>  :  Type one space to cut related area</li>
+          <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | u | d)   </b>  :  Type two space to select related area</li>
       </ul>
       <br/>
     ]]>
@@ -108,6 +110,18 @@
               description="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction">
           <add-to-group group-id="emacsIDEAs" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="meta C" />
+      </action>
+
+      <action id="HighlightNextSymbol" class="org.hunmr.highlightsymbol.HighlightNextSymbolAction" text="HighlightNextSymbol"
+              description="org.hunmr.highlightsymbol.HighlightNextSymbolAction">
+          <add-to-group group-id="emacsIDEAs" anchor="last"/>
+          <keyboard-shortcut keymap="$default" first-keystroke="meta PERIOD" />
+      </action>
+
+      <action id="HighlightPrevSymbol" class="org.hunmr.highlightsymbol.HighlightPrevSymbolAction" text="HighlightPrevSymbol"
+              description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
+          <add-to-group group-id="emacsIDEAs" anchor="last"/>
+          <keyboard-shortcut keymap="$default" first-keystroke="meta COMMA" />
       </action>
 
   </actions>
