@@ -50,11 +50,19 @@
           <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | u | d)   </b>  :  Type two space to select related area</li>
       </ul>
       <br/>
+      <p><b>Highlight symbol:</b></p>
+      <ul>
+          <li><b>C-,</b>  :  hightlight-symbol-prev | Jump to prev occurrence of symbol that around caret</li>
+          <li><b>C-.</b>  :  hightlight-symbol-next | Jump to next occurrence of symbol that around caret</li>
+      </ul>
+      <br/>
     ]]>
   </description>
     <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.1.8</dt>
+        <dd>Add hightlight-symbol-prev and hightlight-symbol-next<dd>
         <dt>1.1.7</dt>
         <dd>Let cut to paragraph end(C-c ' ' d) and cut paragraph (C-c ' ' p) skip ending brackets.<dd>
         <dt>1.1.6</dt>
@@ -69,7 +77,7 @@
     </html>
     ]]>
     </change-notes>
-  <version>1.1.6</version>
+  <version>1.1.8</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
