@@ -2,12 +2,11 @@ package org.hunmr.common;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.PsiFile;
+import com.intellij.openapi.project.Project;
 import org.hunmr.acejump.runnable.ShowMarkersRunnable;
 
 import javax.swing.*;
@@ -20,7 +19,8 @@ public abstract class EmacsIdeasAction extends AnAction {
     protected JComponent _contentComponent;
     protected Document _document;
     protected KeyListener[] _keyListeners;
-    protected PsiFile _psiFile;
+    protected AnActionEvent _event;
+    protected Project _project;
 
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
@@ -36,7 +36,7 @@ public abstract class EmacsIdeasAction extends AnAction {
     }
 
     public boolean initAction(AnActionEvent e) {
-        if (e.getData(PlatformDataKeys.EDITOR) == null) {
+        if (getEditorFrom(e) == null) {
             return false;
         }
 
@@ -52,8 +52,20 @@ public abstract class EmacsIdeasAction extends AnAction {
         return true;
     }
 
+    private Editor getEditorFrom(AnActionEvent e) {
+        if (e instanceof ChainActionEvent) {
+            ChainActionEvent chainActionEvent = (ChainActionEvent) e;
+            Editor editor = chainActionEvent.getEditor();
+            if (editor != null) {
+                return editor;
+            }
+        }
+
+        return e.getData(PlatformDataKeys.EDITOR);
+    }
+
     protected void switchEditorIfNeed(AnActionEvent e) {
-        Editor newEditor = e.getData(PlatformDataKeys.EDITOR);
+        Editor newEditor = getEditorFrom(e);
         if (_editor != null && _editor != newEditor) {
             cleanupSetupsInAndBackToNormalEditingMode();
         }
@@ -62,11 +74,12 @@ public abstract class EmacsIdeasAction extends AnAction {
     }
 
     protected void initMemberVariableForConvenientAccess(AnActionEvent e) {
+        _event = e;
         _isStillRunning = true;
         _document = _editor.getDocument();
         _action = this;
         _contentComponent = _editor.getContentComponent();
-        _psiFile = e.getData(LangDataKeys.PSI_FILE);
+        _project = getProjectFrom(e);
     }
 
     protected void disableAllExistingKeyListeners() {
@@ -82,5 +95,24 @@ public abstract class EmacsIdeasAction extends AnAction {
 
     protected void runReadAction(ShowMarkersRunnable action) {
         ApplicationManager.getApplication().runReadAction(action);
+    }
+
+    protected void handlePendingActionOnSuccess() {
+        if (_event instanceof ChainActionEvent) {
+            ChainActionEvent chainActionEvent = (ChainActionEvent) _event;
+            chainActionEvent.getPendingAction().run();
+        }
+    }
+
+    protected Project getProjectFrom(AnActionEvent e) {
+        if (e instanceof ChainActionEvent) {
+            ChainActionEvent chainActionEvent = (ChainActionEvent) e;
+            Project project = chainActionEvent.getProject();
+            if (project != null) {
+                return project;
+            }
+        }
+
+        return e.getData(PlatformDataKeys.PROJECT);
     }
 }

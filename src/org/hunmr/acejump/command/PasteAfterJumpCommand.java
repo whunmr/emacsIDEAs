@@ -29,7 +29,9 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
                 }
 
                 TextRange tr = EditorModificationUtil.pasteFromClipboard(_editor);
-                _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+                if (tr.getEndOffset() < _editor.getDocument().getTextLength()) {
+                    _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+                }
             }
         };
 

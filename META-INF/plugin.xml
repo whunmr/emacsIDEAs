@@ -32,6 +32,15 @@
           <li><b>C-i C-f 't' 'm'</b>  :  Basic Jump alias    </li>
       </ul>
       <br/>
+
+      <p><b>Replace target (word | line | paragraph) with text in clipboard:</b></p>
+      <ul>
+          <li><b>C-i C-w 't' 'm'</b>  :  replace target word      </li>
+          <li><b>C-i C-l 't' 'm'</b>  :  replace target line      </li>
+          <li><b>C-i C-p 't' 'm'</b>  :  replace target paragraph </li>
+      </ul>
+      <br/>
+
       <p><b>Copy without selection:</b></p>
       <ul>
           <li><b>C-c  w  </b>  :  Copy word</li>
@@ -49,6 +58,12 @@
           <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | u | d)   </b>  :  Type one space to cut related area</li>
           <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | u | d)   </b>  :  Type two space to select related area</li>
       </ul>
+
+      <p><b>Copy and Replace:</b></p>
+      <ul>
+          <li><b>C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'</b>  :  copy current word/line/paragraph, jump, then replace target word/line/paragraph </li>
+      </ul>
+
       <br/>
       <p><b>Highlight symbol:</b></p>
       <ul>
@@ -61,6 +76,10 @@
     <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.1.9</dt>
+        <dd>Add action to copy current word | line | paragraph, jump, then replace target word/line/paragraph.<br/>
+            C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'
+        <dd>
         <dt>1.1.8</dt>
         <dd>Add hightlight-symbol-prev and hightlight-symbol-next<dd>
         <dt>1.1.7</dt>
@@ -77,7 +96,7 @@
     </html>
     ]]>
     </change-notes>
-  <version>1.1.8</version>
+  <version>1.1.9</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
@@ -109,8 +128,17 @@
               <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta C"/>
           </action>
           <action id="emacsIDEAs.AceJumpCut" class="org.hunmr.acejump.AceJumpCutAction" text="AceJumpCut" description="AceJumpCut" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta W"/>
               <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta X"/>
+          </action>
+
+          <action id="emacsIDEAs.AceJumpAndReplaceWord" class="org.hunmr.acejump.AceJumpAndReplaceWordAction" text="AceJumpAndOverwriteWord" description="AceJumpAndReplaceWord" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta W"/>
+          </action>
+          <action id="emacsIDEAs.AceJumpAndReplaceLine" class="org.hunmr.acejump.AceJumpAndReplaceLineAction" text="AceJumpAndOverwriteLine" description="AceJumpAndReplaceLine" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta L"/>
+          </action>
+          <action id="emacsIDEAs.AceJumpAndReplaceParagraph" class="org.hunmr.acejump.AceJumpAndReplaceParagraphAction" text="AceJumpAndOverwriteLine" description="AceJumpAndReplaceParagraph" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta P"/>
           </action>
       </group>
 
@@ -118,6 +146,12 @@
               description="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction">
           <add-to-group group-id="emacsIDEAs" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="meta C" />
+      </action>
+
+      <action id="CopyThenJumpPaste" class="org.hunmr.copycutwithoutselection.CopyAndReplaceAction" text="CopyWithoutSelection"
+              description="org.hunmr.copycutwithoutselection.CopyAndReplaceAction">
+          <add-to-group group-id="emacsIDEAs" anchor="last"/>
+          <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta R" />
       </action>
 
       <action id="HighlightNextSymbol" class="org.hunmr.highlightsymbol.HighlightNextSymbolAction" text="HighlightNextSymbol"

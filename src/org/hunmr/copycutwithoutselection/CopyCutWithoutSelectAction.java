@@ -1,6 +1,5 @@
 package org.hunmr.copycutwithoutselection;
 
-import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.EditorModificationUtil;
@@ -12,7 +11,7 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.common.CommandContext;
 import org.hunmr.common.EmacsIdeasAction;
-import org.hunmr.copycutwithoutselection.selector.Selector;
+import org.hunmr.copycutwithoutselection.selector.Selection;
 import org.hunmr.copycutwithoutselection.selector.SelectorFactory;
 import org.hunmr.util.AppUtil;
 import org.hunmr.util.ThreadUtil;
@@ -21,9 +20,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
+    private static CopyCutWithoutSelectAction _instance;
     private KeyListener _handleCopyKeyListener;
-    private SelectionModel _selection;
-    private CommandContext _cmdCtx;
+    protected SelectionModel _selection;
+    protected CommandContext _cmdCtx;
+
+    public CopyCutWithoutSelectAction() {
+        this._instance = this;
+    }
 
     public void actionPerformed(AnActionEvent e) {
         if (super.initAction(e)) {
@@ -46,6 +50,7 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
                 boolean copyFinished  = handleKey(keyEvent.getKeyChar());
                 if (copyFinished) {
                     cleanupSetupsInAndBackToNormalEditingMode();
+                    handlePendingActionOnSuccess();
                 }
             }
 
@@ -60,13 +65,13 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
         };
     }
 
-    private boolean handleKey(char key) {
+    protected boolean handleKey(char key) {
         if (_cmdCtx.consume(key)) {
             return false;
         }
 
         if (SelectorFactory.isSelectorKey(key)) {
-            final TextRange tr = getTextRangeBy(key);
+            final TextRange tr = Selection.getTextRangeBy(_editor, _cmdCtx);
             if (tr != null) {
                 _selection.setSelection(tr.getStartOffset(), tr.getEndOffset());
                 doActionOnSelectedRange(tr);
@@ -116,22 +121,6 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
         };
     }
 
-    private TextRange getTextRangeBy(char key) {
-        Selector selector = SelectorFactory.createSelectorBy(key, _editor);
-
-        if (selector == null) {
-            HintManager.getInstance().showInformationHint(_editor, SelectorFactory.HELP_MSG);
-            return null;
-        }
-
-        TextRange tr = selector.getRange(_cmdCtx);
-        if (tr == null) {
-            HintManager.getInstance().showInformationHint(_editor, "404");
-        }
-
-        return tr;
-    }
-
     private RangeHighlighter addHighlighterOnCopiedRange(TextRange tr) {
         TextAttributes textAttributes = new TextAttributes();
         textAttributes.setBackgroundColor(SelectorFactory.HIGHLIGHT_COLOR);
@@ -148,4 +137,14 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
         super.cleanupSetupsInAndBackToNormalEditingMode();
     }
 
+    public static CopyCutWithoutSelectAction getInstance() {
+        if (_instance == null) {
+            _instance = new CopyCutWithoutSelectAction();
+        }
+        return _instance;
+    }
+
+    public CommandContext getCmdContext() {
+        return _instance._cmdCtx;
+    }
 }

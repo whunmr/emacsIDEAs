@@ -1,7 +1,6 @@
 package org.hunmr.acejump;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -50,7 +49,8 @@ public class AceJumpAction extends EmacsIdeasAction {
     public void actionPerformed(AnActionEvent e) {
         _isCalledFromOtherAction = false;
 
-        Project p = e.getData(PlatformDataKeys.PROJECT);
+        Project p = getProjectFrom(e);
+
         if (!ToolWindowManager.getInstance(p).isEditorComponentActive()) {
             ToolWindowManager.getInstance(p).activateEditorComponent();
             return;
@@ -88,7 +88,7 @@ public class AceJumpAction extends EmacsIdeasAction {
             return false;
         }
 
-        if (!_markers.containsKey(key)){
+        if (!_markers.containsKey(key)) {
             key = Str.getCounterCase(key);
         }
 
@@ -139,6 +139,7 @@ public class AceJumpAction extends EmacsIdeasAction {
                 boolean jumpFinished = handleJumpToMarkerKey(keyEvent.getKeyChar());
                 if (jumpFinished) {
                     _contentComponent.removeKeyListener(_jumpToMarkerKeyListener);
+                    handlePendingActionOnSuccess();
                 }
             }
 
@@ -147,7 +148,9 @@ public class AceJumpAction extends EmacsIdeasAction {
                     cleanupSetupsInAndBackToNormalEditingMode();
                 }
             }
-            public void keyReleased(KeyEvent keyEvent){}
+
+            public void keyReleased(KeyEvent keyEvent) {
+            }
         };
     }
 

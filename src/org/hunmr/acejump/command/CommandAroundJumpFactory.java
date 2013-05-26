@@ -10,6 +10,9 @@ public class CommandAroundJumpFactory {
     public static final char CUT_AFTER_JUMP_WITH_SPACE_KEY = ' ';
     public static final char PASTE_AFTER_JUMP = 'p';
     public static final char PASTE_WITH_NEWLINE_AFTER_JUMP = 'P';
+    public static final char REPLACE_WORD_AFTER_JUMP = 'w';
+    public static final char REPLACE_LINE_AFTER_JUMP = 'l';
+    public static final char REPLACE_PARAGRAPH_AFTER_JUMP = '&';
 
     public static boolean isCommandKey(char key) {
         key = Character.toLowerCase(key);
@@ -41,6 +44,12 @@ public class CommandAroundJumpFactory {
                 return new CutAfterJumpCommand(editor);
             case COPY_AFTER_JUMP:
                 return new CopyAfterJumpCommand(editor);
+            case REPLACE_WORD_AFTER_JUMP:
+                return new ReplaceWordAfterJumpCommand(editor);
+            case REPLACE_LINE_AFTER_JUMP:
+                return new ReplaceLineAfterJumpCommand(editor);
+            case REPLACE_PARAGRAPH_AFTER_JUMP:
+                return new ReplaceParagraphAfterJumpCommand(editor);
             default:
                 return null;
         }
