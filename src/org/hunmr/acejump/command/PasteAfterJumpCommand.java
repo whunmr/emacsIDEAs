@@ -3,7 +3,6 @@ package org.hunmr.acejump.command;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
-import com.intellij.openapi.util.TextRange;
 import org.hunmr.util.AppUtil;
 
 public class PasteAfterJumpCommand extends CommandAroundJump {
@@ -28,10 +27,10 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
                     _editor.getCaretModel().moveToOffset(_editor.getCaretModel().getOffset() + 1);
                 }
 
-                TextRange tr = EditorModificationUtil.pasteFromClipboard(_editor);
-                if (tr.getEndOffset() < _editor.getDocument().getTextLength()) {
-                    _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
-                }
+                EditorModificationUtil.pasteFromClipboard(_editor);
+//                if (tr.getEndOffset() < _editor.getDocument().getTextLength()) {
+//                    _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+//                }
             }
         };
 

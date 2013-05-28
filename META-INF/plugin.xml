@@ -148,10 +148,11 @@
           <keyboard-shortcut keymap="$default" first-keystroke="meta C" />
       </action>
 
-      <action id="CopyThenJumpPaste" class="org.hunmr.copycutwithoutselection.CopyAndReplaceAction" text="CopyWithoutSelection"
+      <action id="CopyThenJumpPaste" class="org.hunmr.copycutwithoutselection.CopyAndReplaceAction" text="CopyJumpAndReplace"
               description="org.hunmr.copycutwithoutselection.CopyAndReplaceAction">
           <add-to-group group-id="emacsIDEAs" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta R" />
+          <keyboard-shortcut keymap="$default" first-keystroke="meta R" />
       </action>
 
       <action id="HighlightNextSymbol" class="org.hunmr.highlightsymbol.HighlightNextSymbolAction" text="HighlightNextSymbol"
@@ -164,6 +165,13 @@
               description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
           <add-to-group group-id="emacsIDEAs" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="meta COMMA" />
+      </action>
+
+      <action id="JustOneSpace" class="org.hunmr.buildin.JustOneSpace" text="JustOneSpace"
+              description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
+          <add-to-group group-id="emacsIDEAs" anchor="last"/>
+          <keyboard-shortcut keymap="$default" first-keystroke="meta ctrl SPACE" />
+          <keyboard-shortcut keymap="$default" first-keystroke="meta C" second-keystroke="S"/>
       </action>
 
   </actions>
