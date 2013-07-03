@@ -171,7 +171,12 @@
               description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
           <add-to-group group-id="emacsIDEAs" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="meta ctrl SPACE" />
-          <keyboard-shortcut keymap="$default" first-keystroke="meta C" second-keystroke="S"/>
+      </action>
+
+      <action id="Demo" class="org.hunmr.demo.DemoAction" text="Demo"
+              description="org.hunmr.demo.DemoAction">
+          <add-to-group group-id="emacsIDEAs" anchor="last"/>
+          <keyboard-shortcut keymap="$default" first-keystroke="meta t" />
       </action>
 
   </actions>
