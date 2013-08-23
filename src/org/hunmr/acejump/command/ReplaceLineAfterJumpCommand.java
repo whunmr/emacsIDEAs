@@ -10,10 +10,8 @@ public class ReplaceLineAfterJumpCommand extends PasteAfterJumpCommand {
         super(editor, false);
     }
 
-    @Override
-    public void afterJump(int jumpTargetOffset) {
-        TextRange tr = new LineSelector(_editor).getRange(new CommandContext());
-        _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
-        super.afterJump(jumpTargetOffset);
+    public TextRange getTextRangeToReplace()
+    {
+        return new LineSelector(_editor).getRange(new CommandContext());
     }
 }

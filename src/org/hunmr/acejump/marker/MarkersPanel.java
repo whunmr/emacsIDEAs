@@ -24,9 +24,7 @@ public class MarkersPanel extends JComponent {
 
     @Override
     public void paint(Graphics g) {
-
         drawPanelBackground(g);
-
         g.setFont(_fontInEditor);
 
         for (Marker marker : _markerCollection.values()) {

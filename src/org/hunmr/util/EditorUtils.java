@@ -4,6 +4,8 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.common.CommandContext;
+import org.hunmr.copycutwithoutselection.selector.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -45,4 +47,37 @@ public class EditorUtils {
 
         return offsets;
     }
+
+    public static void copyWord(Editor editor) {
+        copySelectorContentToClipboard(new WordSelector(editor), editor);
+    }
+
+    public static void copyLine(Editor editor) {
+        copySelectorContentToClipboard(new LineSelector(editor), editor);
+    }
+
+    public static void copyParagraph(Editor editor) {
+        copySelectorContentToClipboard(new ParagraphSelector(editor), editor);
+    }
+
+    public static void copyToLineEnd(Editor editor) {
+        copySelectorContentToClipboard(new ToEndSelector(editor), editor);
+    }
+
+    public static void copyBlock(Editor editor) {
+        copySelectorContentToClipboard(new BlockSelector(editor), editor);
+    }
+
+    private static void copySelectorContentToClipboard(Selector selector, Editor editor)
+    {
+        TextRange tr = selector.getRange(new CommandContext());
+        copySelectionToClipboard(editor, tr);
+    }
+
+    private static void copySelectionToClipboard(Editor editor, TextRange tr) {
+        editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+        editor.getSelectionModel().copySelectionToClipboard();
+        editor.getSelectionModel().removeSelection();
+    }
+
 }

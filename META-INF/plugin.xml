@@ -38,6 +38,8 @@
           <li><b>C-i C-w 't' 'm'</b>  :  replace target word      </li>
           <li><b>C-i C-l 't' 'm'</b>  :  replace target line      </li>
           <li><b>C-i C-p 't' 'm'</b>  :  replace target paragraph </li>
+          <li><b>C-i C-e 't' 'm'</b>  :  replace target char to line end </li>
+          <li><b>C-i C-b 't' 'm'</b>  :  replace target block </li>
       </ul>
       <br/>
 
@@ -69,6 +71,11 @@
       <ul>
           <li><b>C-,</b>  :  hightlight-symbol-prev | Jump to prev occurrence of symbol that around caret</li>
           <li><b>C-.</b>  :  hightlight-symbol-next | Jump to next occurrence of symbol that around caret</li>
+      </ul>
+      <br/>
+      <p><b>Just one space:</b></p>
+      <ul>
+          <li><b>C-M-Space</b>  :  Make just one space around caret by Ctrl-Cmd-Space.</li>
       </ul>
       <br/>
     ]]>
@@ -140,6 +147,13 @@
           <action id="emacsIDEAs.AceJumpAndReplaceParagraph" class="org.hunmr.acejump.AceJumpAndReplaceParagraphAction" text="AceJumpAndOverwriteLine" description="AceJumpAndReplaceParagraph" >
               <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta P"/>
           </action>
+          <action id="emacsIDEAs.AceJumpAndReplaceToLineEndAction" class="org.hunmr.acejump.AceJumpAndReplaceToLineEndAction" text="AceJumpAndReplaceToLineEndAction" description="AceJumpAndReplaceToLineEndActione" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta E"/>
+          </action>
+          <action id="emacsIDEAs.AceJumpAndReplaceBlockAction" class="org.hunmr.acejump.AceJumpAndReplaceBlockAction" text="AceJumpAndReplaceBlockAction" description="AceJumpAndReplaceBlockAction" >
+              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta B"/>
+          </action>
+
       </group>
 
       <action id="CopyWithoutSelect" class="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction" text="CopyWithoutSelection"
@@ -171,12 +185,6 @@
               description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
           <add-to-group group-id="emacsIDEAs" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="meta ctrl SPACE" />
-      </action>
-
-      <action id="Demo" class="org.hunmr.demo.DemoAction" text="Demo"
-              description="org.hunmr.demo.DemoAction">
-          <add-to-group group-id="emacsIDEAs" anchor="last"/>
-          <keyboard-shortcut keymap="$default" first-keystroke="meta t" />
       </action>
 
   </actions>

@@ -10,10 +10,8 @@ public class ReplaceParagraphAfterJumpCommand extends PasteAfterJumpCommand {
         super(editor, false);
     }
 
-    @Override
-    public void afterJump(int jumpTargetOffset) {
-        TextRange tr = new ParagraphSelector(_editor).getRange(new CommandContext());
-        _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
-        super.afterJump(jumpTargetOffset);
+    public TextRange getTextRangeToReplace()
+    {
+        return new ParagraphSelector(_editor).getRange(new CommandContext());
     }
 }

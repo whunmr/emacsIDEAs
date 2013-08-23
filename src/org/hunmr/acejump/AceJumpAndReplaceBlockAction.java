@@ -6,12 +6,11 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import org.hunmr.acejump.command.CommandAroundJumpFactory;
 import org.hunmr.util.EditorUtils;
 
-public class AceJumpAndReplaceLineAction extends AnAction {
+public class AceJumpAndReplaceBlockAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
-        EditorUtils.copyLine(e.getData(PlatformDataKeys.EDITOR));
-        AceJumpAction.getInstance().addCommandsAroundJumpKey(CommandAroundJumpFactory.REPLACE_LINE_AFTER_JUMP);
+        EditorUtils.copyBlock(e.getData(PlatformDataKeys.EDITOR));
+        AceJumpAction.getInstance().addCommandsAroundJumpKey(CommandAroundJumpFactory.REPLACE_BLOCK_AFTER_JUMP);
         AceJumpAction.getInstance().performAction(e);
     }
-
 }
