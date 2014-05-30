@@ -223,6 +223,9 @@ public class AceJumpAction extends EmacsIdeasAction {
     }
 
     public static AceJumpAction getInstance() {
+        if (_instance == null) {
+            _instance = new AceJumpAction();
+        }
         return _instance;
     }
 
