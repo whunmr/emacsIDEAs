@@ -60,6 +60,15 @@ public class HighlightSymbolAction extends EmacsIdeasAction{
             }
 
             FindResult findResult = findManager.findString(_editor.getDocument().getText(), startOffset, findModel);
+
+            //fix errors in Appcode, which is the findManager.findString return 0, when string not found.
+            if (findResult.getStartOffset() == 0) {
+                String potentialSymbol =  _editor.getDocument().getText(new TextRange(0, symbol.length()));
+                if (!potentialSymbol.equals(symbol)) {
+                    return -1;
+                }
+            }
+
             return findResult.getStartOffset();
         }
 
