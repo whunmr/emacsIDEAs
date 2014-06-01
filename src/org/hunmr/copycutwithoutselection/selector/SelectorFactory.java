@@ -40,7 +40,7 @@ public class SelectorFactory {
                 selector = new ToBeginningSelector(editor);
                 break;
             case 'e':
-                selector = new ToEndSelector(editor);
+                selector = new ToLineEndSelector(editor);
                 break;
             case 'p':
                 selector = new ParagraphSelector(editor);

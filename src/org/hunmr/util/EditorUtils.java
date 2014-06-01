@@ -9,6 +9,7 @@ import org.hunmr.copycutwithoutselection.selector.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class EditorUtils {
@@ -48,36 +49,50 @@ public class EditorUtils {
         return offsets;
     }
 
-    public static void copyWord(Editor editor) {
-        copySelectorContentToClipboard(new WordSelector(editor), editor);
+    private static Selector getSelector(Class<? extends Selector> selectorClass, Editor editor) {
+        try {
+            return selectorClass.getDeclaredConstructor(Editor.class).newInstance(editor);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public static void copyLine(Editor editor) {
-        copySelectorContentToClipboard(new LineSelector(editor), editor);
-    }
-
-    public static void copyParagraph(Editor editor) {
-        copySelectorContentToClipboard(new ParagraphSelector(editor), editor);
-    }
-
-    public static void copyToLineEnd(Editor editor) {
-        copySelectorContentToClipboard(new ToEndSelector(editor), editor);
-    }
-
-    public static void copyBlock(Editor editor) {
-        copySelectorContentToClipboard(new BlockSelector(editor), editor);
-    }
-
-    private static void copySelectorContentToClipboard(Selector selector, Editor editor)
-    {
+    public static void selectRangeOf(Class<? extends Selector> selectorClass, Editor editor) {
+        Selector selector = getSelector(selectorClass, editor);
         TextRange tr = selector.getRange(new CommandContext());
-        copySelectionToClipboard(editor, tr);
+        editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
     }
 
-    private static void copySelectionToClipboard(Editor editor, TextRange tr) {
-        editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+    public static void copyRange(Class<? extends Selector> selectorClass, Editor editor) {
+        selectRangeOf(selectorClass, editor);
         editor.getSelectionModel().copySelectionToClipboard();
         editor.getSelectionModel().removeSelection();
     }
 
+    public static void copyWord(Editor editor) {
+        copyRange(WordSelector.class, editor);
+    }
+
+    public static void copyLine(Editor editor) {
+        copyRange(LineSelector.class, editor);
+    }
+
+    public static void copyParagraph(Editor editor) {
+        copyRange(ParagraphSelector.class, editor);
+    }
+
+    public static void copyToLineEnd(Editor editor) {
+        copyRange(ToLineEndSelector.class, editor);
+    }
+
+    public static void copyBlock(Editor editor) {
+        copyRange(BlockSelector.class, editor);
+    }
 }
