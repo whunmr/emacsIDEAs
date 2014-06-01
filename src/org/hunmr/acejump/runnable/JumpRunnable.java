@@ -16,6 +16,5 @@ public class JumpRunnable implements Runnable{
     public void run() {
         _action.getEditor().getCaretModel().moveToOffset(_offsetToJump);
         _action.getEditor().getSelectionModel().removeSelection();
-        _action.cleanupSetupsInAndBackToNormalEditingMode();
     }
 }

@@ -2,12 +2,16 @@ package org.hunmr.acejump;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import org.hunmr.acejump.command.CommandAroundJumpFactory;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.editor.Editor;
+import org.hunmr.acejump.command.CutAfterJumpCommand;
 
 public class AceJumpCutAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
-        AceJumpAction.getInstance().addCommandsAroundJumpKey(CommandAroundJumpFactory.CUT_AFTER_JUMP);
+        Editor editor = e.getData(PlatformDataKeys.EDITOR);
+
+        AceJumpAction.getInstance().addCommandAroundJump(new CutAfterJumpCommand(editor));
         AceJumpAction.getInstance().performAction(e);
     }
 }

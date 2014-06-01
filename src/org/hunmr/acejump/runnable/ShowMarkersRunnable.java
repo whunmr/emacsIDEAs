@@ -12,8 +12,8 @@ import java.util.List;
 
 public class ShowMarkersRunnable implements Runnable {
     public static final char INFINITE_JUMP_CHAR = 'f';
-    private final String _markerCharSet = "abdeghiyklmnoqrtuvwj,"; // / .
-    private final String _fullMarkerCharSet = "abdeghiyklmnopqrstuvwj,"; // / .
+    private final String _markerCharSet =     "abcdeghiyklmnopqrstuvwj,"; // / .
+    private final String _fullMarkerCharSet = "abcdeghiyklmnopqrstuvwj,"; // / .
     private final List<Integer> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;

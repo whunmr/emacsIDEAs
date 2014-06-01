@@ -3,44 +3,42 @@ package org.hunmr.acejump.command;
 import com.intellij.openapi.editor.Editor;
 
 public class CommandAroundJumpFactory {
-
     public static final char SELECT_AFTER_JUMP = 's';
     public static final char COPY_AFTER_JUMP = 'c';
     public static final char CUT_AFTER_JUMP = 'x';
     public static final char CUT_AFTER_JUMP_WITH_SPACE_KEY = ' ';
-    public static final char PASTE_AFTER_JUMP = 'p';
-    public static final char PASTE_WITH_NEWLINE_AFTER_JUMP = 'P';
+
     public static final char REPLACE_WORD_AFTER_JUMP = 'w';
     public static final char REPLACE_LINE_AFTER_JUMP = 'l';
     public static final char REPLACE_PARAGRAPH_AFTER_JUMP = '&';
     public static final char REPLACE_TO_LINE_END_AFTER_JUMP = 'e';
     public static final char REPLACE_BLOCK_AFTER_JUMP = 'b';
+    //TODO a, u and d
 
-    public static boolean isCommandKey(char key) {
-        key = Character.toLowerCase(key);
-        return key == CUT_AFTER_JUMP_WITH_SPACE_KEY
-                || key == SELECT_AFTER_JUMP
-                || key == CUT_AFTER_JUMP
-                || key == COPY_AFTER_JUMP
-                || key == PASTE_AFTER_JUMP;
-    }
+//    //todo remove
+//    C-L 't' c 'm' : Copy jump area
+//    C-L 't' x 'm' : Cut jump area
+//    C-L 't' p 'm' : Paste clipborad content to target place
+//    C-L 't' P 'm' : Insert '\n' and Paste clipborad content to target place
+//    C-L 't' s 'm' : Select jump area
+
+    public static final char OBTAIN_REMOTE_WORD = '0';
+    public static final char OBTAIN_REMOTE_LINE = '1';
+    public static final char OBTAIN_REMOTE_PARAGRAPH = '2';
+    public static final char OBTAIN_REMOTE_TO_LINE_END = '3';
+    public static final char OBTAIN_REMOTE_BLOCK = '3';
 
     public static CommandAroundJump createCommand(char key, Editor editor) {
         switch (key) {
-            case PASTE_AFTER_JUMP:
-                return new PasteAfterJumpCommand(editor, false);
-            case PASTE_WITH_NEWLINE_AFTER_JUMP:
-                return new PasteAfterJumpCommand(editor, true);
             default:
                 return getCommandsIgnoreCase(key, editor);
         }
-
     }
 
     private static CommandAroundJump getCommandsIgnoreCase(char key, Editor editor) {
         switch (Character.toLowerCase(key)) {
             case SELECT_AFTER_JUMP :
-                return new SelectionCommand(editor);
+                return new SelectAfterJumpCommand(editor);
             case CUT_AFTER_JUMP_WITH_SPACE_KEY:
             case CUT_AFTER_JUMP:
                 return new CutAfterJumpCommand(editor);

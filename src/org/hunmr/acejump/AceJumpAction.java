@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.hunmr.acejump.command.CommandAroundJump;
-import org.hunmr.acejump.command.CommandAroundJumpFactory;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 import org.hunmr.acejump.offsets.CharOffsetsFinder;
@@ -20,7 +19,6 @@ import org.hunmr.util.Str;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -29,10 +27,9 @@ public class AceJumpAction extends EmacsIdeasAction {
     private MarkersPanel _markersPanel;
     private KeyListener _showMarkersKeyListener;
     private KeyListener _jumpToMarkerKeyListener;
-    private Stack<CommandAroundJump> _commandsAroundJump;
-    private HashSet<Character> _commandsAroundJumpCodes = new HashSet<Character>();
+    private Stack<CommandAroundJump> _commandsAroundJump = new Stack<CommandAroundJump>();
     private static volatile AceJumpAction _instance;
-    private boolean _isCalledFromOtherAction;
+    private boolean _isCalledFromOtherAction; //TODO
     private OffsetsFinder _offsetsFinder = new WordOffsetsFinder();
 
     public AceJumpAction() {
@@ -83,11 +80,6 @@ public class AceJumpAction extends EmacsIdeasAction {
     }
 
     private boolean handleJumpToMarkerKey(char key) {
-        if (!_isCalledFromOtherAction && CommandAroundJumpFactory.isCommandKey(key)) {
-            addCommandsAroundJump(CommandAroundJumpFactory.createCommand(key, _editor));
-            return false;
-        }
-
         if (!_markers.containsKey(key)) {
             key = Str.getCounterCase(key);
         }
@@ -105,10 +97,6 @@ public class AceJumpAction extends EmacsIdeasAction {
         }
 
         return false;
-    }
-
-    private void addCommandsAroundJump(CommandAroundJump command) {
-        _commandsAroundJump.push(command);
     }
 
     private KeyListener createShowMarkersKeyListener() {
@@ -172,6 +160,8 @@ public class AceJumpAction extends EmacsIdeasAction {
         for (CommandAroundJump cmd : _commandsAroundJump) {
             cmd.afterJump(jumpOffset);
         }
+
+        cleanupSetupsInAndBackToNormalEditingMode();
     }
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
@@ -189,7 +179,7 @@ public class AceJumpAction extends EmacsIdeasAction {
             _contentComponent.remove(_markersPanel);
         }
 
-        _commandsAroundJumpCodes = new HashSet<Character>();
+        _commandsAroundJump = new Stack<CommandAroundJump>();
         _offsetsFinder = new WordOffsetsFinder();
         super.cleanupSetupsInAndBackToNormalEditingMode();
     }
@@ -200,11 +190,6 @@ public class AceJumpAction extends EmacsIdeasAction {
         _markers = new MarkerCollection();
         _showMarkersKeyListener = createShowMarkersKeyListener();
         _jumpToMarkerKeyListener = createJumpToMarkupKeyListener();
-        _commandsAroundJump = new Stack<CommandAroundJump>();
-
-        for (Character commandsCode : _commandsAroundJumpCodes) {
-            addCommandsAroundJump(CommandAroundJumpFactory.createCommand(commandsCode, _editor));
-        }
     }
 
     public void showNewMarkersPanel(MarkersPanel markersPanel) {
@@ -229,8 +214,8 @@ public class AceJumpAction extends EmacsIdeasAction {
         return _instance;
     }
 
-    public void addCommandsAroundJumpKey(char commandsAroundJumpCode) {
-        _commandsAroundJumpCodes.add(commandsAroundJumpCode);
+    public void addCommandAroundJump(CommandAroundJump commandAroundJump) {
+        _commandsAroundJump.push(commandAroundJump);
     }
 
     public boolean isCalledFromOtherAction() {
