@@ -9,6 +9,11 @@ import org.hunmr.util.AppUtil;
 public class PasteAfterJumpCommand extends CommandAroundJump {
     private boolean _addNewLineBeforePaste;
 
+    public PasteAfterJumpCommand(Editor editor) {
+        super(editor);
+        _addNewLineBeforePaste = false;
+    }
+
     public PasteAfterJumpCommand(Editor editor, boolean addNewLineBeforePaste) {
         super(editor);
         _addNewLineBeforePaste = addNewLineBeforePaste;

@@ -1,4 +1,4 @@
-package org.hunmr.copycutwithoutselection.selector;
+package org.hunmr.common.selector;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;

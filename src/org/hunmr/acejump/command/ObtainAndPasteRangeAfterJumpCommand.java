@@ -3,8 +3,7 @@ package org.hunmr.acejump.command;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
-import org.hunmr.acejump.command.CommandAroundJump;
-import org.hunmr.copycutwithoutselection.selector.Selector;
+import org.hunmr.common.selector.Selector;
 import org.hunmr.util.AppUtil;
 import org.hunmr.util.EditorUtils;
 
@@ -24,6 +23,7 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
             public void run() {
                 EditorUtils.copyRange(_selectorClass, _editor);
                 _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
+
                 EditorUtils.selectRangeOf(_selectorClass, _editor);
                 EditorModificationUtil.pasteFromClipboard(_editor);
             }

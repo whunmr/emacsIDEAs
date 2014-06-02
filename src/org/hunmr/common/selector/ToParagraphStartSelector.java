@@ -1,11 +1,11 @@
-package org.hunmr.copycutwithoutselection.selector;
+package org.hunmr.common.selector;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.common.CommandContext;
 
-public class ParagraphBeginningSelector extends ParagraphSelector {
-    public ParagraphBeginningSelector(Editor editor) {
+public class ToParagraphStartSelector extends ParagraphSelector {
+    public ToParagraphStartSelector(Editor editor) {
         super(editor);
     }
 

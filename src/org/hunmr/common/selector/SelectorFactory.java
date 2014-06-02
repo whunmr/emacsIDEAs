@@ -1,4 +1,4 @@
-package org.hunmr.copycutwithoutselection.selector;
+package org.hunmr.common.selector;
 
 import com.intellij.openapi.editor.Editor;
 
@@ -37,7 +37,7 @@ public class SelectorFactory {
                 selector = new QuoteSelector(editor);
                 break;
             case 'a':
-                selector = new ToBeginningSelector(editor);
+                selector = new ToLineStartSelector(editor);
                 break;
             case 'e':
                 selector = new ToLineEndSelector(editor);
@@ -46,10 +46,10 @@ public class SelectorFactory {
                 selector = new ParagraphSelector(editor);
                 break;
             case 'u':
-                selector = new ParagraphBeginningSelector(editor);
+                selector = new ToParagraphStartSelector(editor);
                 break;
             case 'd':
-                selector = new ParagraphEndingSelector(editor);
+                selector = new ToParagraphEndSelector(editor);
                 break;
             default:
                 break;

@@ -11,8 +11,8 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.common.CommandContext;
 import org.hunmr.common.EmacsIdeasAction;
-import org.hunmr.copycutwithoutselection.selector.Selection;
-import org.hunmr.copycutwithoutselection.selector.SelectorFactory;
+import org.hunmr.common.selector.Selection;
+import org.hunmr.common.selector.SelectorFactory;
 import org.hunmr.util.AppUtil;
 import org.hunmr.util.ThreadUtil;
 

@@ -8,7 +8,7 @@ import org.hunmr.acejump.AceJumpAction;
 import org.hunmr.common.ChainActionEvent;
 import org.hunmr.common.CommandContext;
 import org.hunmr.common.EmacsIdeasAction;
-import org.hunmr.copycutwithoutselection.selector.Selection;
+import org.hunmr.common.selector.Selection;
 import org.hunmr.util.AppUtil;
 
 public class CopyAndReplaceAction extends EmacsIdeasAction {

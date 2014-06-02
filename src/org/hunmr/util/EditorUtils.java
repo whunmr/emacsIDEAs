@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.common.CommandContext;
-import org.hunmr.copycutwithoutselection.selector.*;
+import org.hunmr.common.selector.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -64,35 +64,21 @@ public class EditorUtils {
         return null;
     }
 
-    public static void selectRangeOf(Class<? extends Selector> selectorClass, Editor editor) {
+    public static TextRange getRangeOf(Class<? extends Selector> selectorClass, Editor editor) {
         Selector selector = getSelector(selectorClass, editor);
-        TextRange tr = selector.getRange(new CommandContext());
-        editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+        return selector.getRange(new CommandContext());
+    }
+
+    public static void selectRangeOf(Class<? extends Selector> selectorClass, Editor editor) {
+        TextRange tr = getRangeOf(selectorClass, editor);
+        if (tr != null) {
+            editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+        }
     }
 
     public static void copyRange(Class<? extends Selector> selectorClass, Editor editor) {
         selectRangeOf(selectorClass, editor);
         editor.getSelectionModel().copySelectionToClipboard();
         editor.getSelectionModel().removeSelection();
-    }
-
-    public static void copyWord(Editor editor) {
-        copyRange(WordSelector.class, editor);
-    }
-
-    public static void copyLine(Editor editor) {
-        copyRange(LineSelector.class, editor);
-    }
-
-    public static void copyParagraph(Editor editor) {
-        copyRange(ParagraphSelector.class, editor);
-    }
-
-    public static void copyToLineEnd(Editor editor) {
-        copyRange(ToLineEndSelector.class, editor);
-    }
-
-    public static void copyBlock(Editor editor) {
-        copyRange(BlockSelector.class, editor);
     }
 }

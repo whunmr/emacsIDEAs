@@ -1,11 +1,11 @@
-package org.hunmr.copycutwithoutselection.selector;
+package org.hunmr.common.selector;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.common.CommandContext;
 
-public class ParagraphEndingSelector extends ParagraphSelector {
-    public ParagraphEndingSelector(Editor editor) {
+public class ToParagraphEndSelector extends ParagraphSelector {
+    public ToParagraphEndSelector(Editor editor) {
         super(editor);
     }
 
