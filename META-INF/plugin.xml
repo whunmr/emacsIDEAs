@@ -16,16 +16,6 @@
       </ul>
       <br/>
 
-      <br/>
-      <p><b>Separate AceJump copy,cut,select command:</b></p>
-      <ul>
-          <li><b>C-i C-c 't' 'm'</b>  :  Copy jump area      </li> | C-i C-c means type C-i then continue type C-c
-          <li><b>C-i C-x 't' 'm'</b>  :  Cut jump area       </li>
-          <li><b>C-i C-i 't' 'm'</b>  :  Select jump area    </li>
-          <li><b>C-i C-f 't' 'm'</b>  :  Basic Jump alias    </li>
-      </ul>
-      <br/>
-
       <p><b>Copy without selection:</b></p>
       <ul>
           <li><b>C-c  w  </b>  :  Copy word</li>
@@ -43,6 +33,7 @@
           <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | u | d | b)   </b>  :  Type one space to cut related area</li>
           <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | u | d | b)   </b>  :  Type two space to select related area</li>
       </ul>
+      <br/>
 
       <p><b>Replace target (word | line | paragraph) with text at current caret:</b></p>
       <ul>
@@ -74,11 +65,6 @@
       </ul>
       <br/>
 
-      <p><b>Copy and Replace:</b></p>
-      <ul>
-          <li><b>C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'</b>  :  copy current word/line/paragraph, jump, then replace target word/line/paragraph </li>
-      </ul>
-
       <br/>
       <p><b>Highlight symbol:</b></p>
       <ul>
@@ -91,6 +77,23 @@
           <li><b>C-M-Space</b>  :  Make just one space around caret by Ctrl-Cmd-Space.</li>
       </ul>
       <br/>
+
+
+      <p><b>Separate AceJump copy,cut,select command:</b></p>
+      <ul>
+          <li><b>C-i C-c 't' 'm'</b>  :  Copy jump area      </li> | C-i C-c means type C-i then continue type C-c
+          <li><b>C-i C-x 't' 'm'</b>  :  Cut jump area       </li>
+          <li><b>C-i C-i 't' 'm'</b>  :  Select jump area    </li>
+          <li><b>C-i C-f 't' 'm'</b>  :  Basic Jump alias    </li>
+      </ul>
+      <br/>
+
+
+      <p><b>Copy and Replace:</b></p>
+      <ul>
+          <li><b>C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'</b>  :  copy current word/line/paragraph, jump, then replace target word/line/paragraph </li>
+      </ul>
+
     ]]>
   </description>
     <change-notes><![CDATA[
