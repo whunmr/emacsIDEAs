@@ -54,7 +54,7 @@ public class MarkersPanel extends JComponent {
     }
 
     private void drawBackgroundOfMarupChar(Graphics g, Marker marker, double x, double y) {
-        Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds("a", g);
+        Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
 
         if (marker.isMappingToMultipleOffset()) {
             g.setColor(Color.YELLOW);
