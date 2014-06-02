@@ -14,7 +14,7 @@ public class AceJumpAndReplaceRangeAction extends AnAction {
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
         String actionId = e.getActionManager().getId(this);
         String selectorClassName = "org.hunmr.common.selector."
-                                + actionId.substring("emacsIDEAs.AceJumpObtainThenReplace.".length())
+                                + actionId.substring("emacsIDEAs.AceJumpAndReplace.".length())
                                 + "Selector";
 
         try {
