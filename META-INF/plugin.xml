@@ -80,6 +80,21 @@
       </ul>
       <br/>
 
+      <p><b>Cut target (word | line | paragraph), then insert text at current caret:</b></p>
+      <ul>
+          <li><b>C-x C-w 't' 'm'</b>  :  Cut target word, then insert at current caret</li>
+          <li><b>C-x C-s 't' 'm'</b>  :  Cut target string, then insert at current caret</li>
+          <li><b>C-x C-l 't' 'm'</b>  :  Cut target line, then insert at current caret</li>
+          <li><b>C-x C-b 't' 'm'</b>  :  Cut target block            </li>
+          <li><b>C-x C-q 't' 'm'</b>  :  Cut target quote            </li>
+          <li><b>C-x C-a 't' 'm'</b>  :  Cut target to line beginning</li>
+          <li><b>C-x C-e 't' 'm'</b>  :  Cut target char to line end </li>
+          <li><b>C-x C-p 't' 'm'</b>  :  Cut target paragraph        </li>
+          <li><b>C-x C-u 't' 'm'</b>  :  Cut target to paragraph beginning </li>
+          <li><b>C-x C-d 't' 'm'</b>  :  Cut target to paragraph end       </li>
+      </ul>
+      <br/>
+
       <br/>
       <p><b>Highlight symbol:</b></p>
       <ul>
