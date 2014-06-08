@@ -8,14 +8,14 @@ import org.hunmr.common.selector.Selector;
 import org.hunmr.util.AppUtil;
 import org.hunmr.util.EditorUtils;
 
-public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
-
+public class CopyRangeAfterJumpCommand extends CommandAroundJump  {
     private final Class<? extends Selector> _selectorClass;
 
-    public ObtainAndPasteRangeAfterJumpCommand(Editor editor, Class<? extends Selector> selectorClass) {
+    public CopyRangeAfterJumpCommand(Editor editor, Class<? extends Selector> selectorClass) {
         super(editor);
         _selectorClass = selectorClass;
     }
+
 
     @Override
     public void afterJump(final int jumpTargetOffset) {
@@ -23,9 +23,11 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
             @Override
             public void run() {
                 EditorUtils.copyRange(_selectorClass, _editor);
-                _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
+                pasteClipboardToOffset();
+            }
 
-                EditorUtils.selectRangeOf(_selectorClass, _editor);
+            private void pasteClipboardToOffset() {
+                _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
                 TextRange tr = EditorModificationUtil.pasteFromClipboard(_editor);
                 EditorUtils.selectTextRange(_editor, tr);
             }

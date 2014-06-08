@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
-import org.hunmr.acejump.command.ReplaceRangeAfterJumpCommand;
+import org.hunmr.acejump.command.ReplaceAfterJumpCommand;
 import org.hunmr.common.selector.Selector;
 import org.hunmr.util.EditorUtils;
 
@@ -21,11 +21,10 @@ public class AceJumpAndReplaceRangeAction extends AnAction {
             Class<? extends Selector> selectorClass = (Class<? extends Selector>) Class.forName(selectorClassName);
             EditorUtils.copyRange(selectorClass, editor);
 
-            AceJumpAction.getInstance().addCommandAroundJump(new ReplaceRangeAfterJumpCommand(editor, selectorClass));
+            AceJumpAction.getInstance().addCommandAroundJump(new ReplaceAfterJumpCommand(editor, selectorClass));
             AceJumpAction.getInstance().performAction(e);
         } catch (ClassNotFoundException e1) {
             e1.printStackTrace();
         }
     }
-
 }

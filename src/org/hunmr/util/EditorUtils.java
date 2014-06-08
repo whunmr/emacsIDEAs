@@ -1,5 +1,7 @@
 package org.hunmr.util;
 
+import com.intellij.codeInsight.actions.ReformatCodeAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -80,5 +82,16 @@ public class EditorUtils {
         selectRangeOf(selectorClass, editor);
         editor.getSelectionModel().copySelectionToClipboard();
         editor.getSelectionModel().removeSelection();
+    }
+
+    public static void reformatCode(AnActionEvent e) {
+        ReformatCodeAction reformat = new ReformatCodeAction();
+        reformat.actionPerformed(e);
+    }
+
+    public static void selectTextRange(Editor editor, TextRange tr) {
+        if (editor != null && tr != null) {
+            editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+        }
     }
 }
