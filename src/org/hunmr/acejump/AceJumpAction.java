@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.hunmr.acejump.command.CommandAroundJump;
+import org.hunmr.acejump.command.SelectAfterJumpCommand;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 import org.hunmr.acejump.offsets.CharOffsetsFinder;
@@ -124,6 +125,10 @@ public class AceJumpAction extends EmacsIdeasAction {
         return new KeyListener() {
             public void keyTyped(KeyEvent keyEvent) {
                 keyEvent.consume();
+                if (keyEvent.isShiftDown()) {
+                    addCommandAroundJump(new SelectAfterJumpCommand(_editor));
+                }
+
                 boolean jumpFinished = handleJumpToMarkerKey(keyEvent.getKeyChar());
                 if (jumpFinished) {
                     _contentComponent.removeKeyListener(_jumpToMarkerKeyListener);
