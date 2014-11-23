@@ -3,6 +3,7 @@ package org.hunmr.copycutwithoutselection;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.EditorModificationUtil;
+import com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.acejump.AceJumpAction;
 import org.hunmr.common.ChainActionEvent;
@@ -41,7 +42,7 @@ public class CopyAndReplaceAction extends EmacsIdeasAction {
                         TextRange tr = Selection.getTextRangeBy(_editor, cmdCtx);
                         if (tr != null) {
                             _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
-                            EditorModificationUtil.pasteFromClipboard(_editor);
+                            EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
                         }
                     }
                 };

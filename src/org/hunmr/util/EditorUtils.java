@@ -89,9 +89,9 @@ public class EditorUtils {
         reformat.actionPerformed(e);
     }
 
-    public static void selectTextRange(Editor editor, TextRange tr) {
+    public static void selectTextRange(Editor editor, TextRange[] tr) {
         if (editor != null && tr != null) {
-            editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+            editor.getSelectionModel().setSelection(tr[0].getStartOffset(), tr[0].getEndOffset());
         }
     }
 }
