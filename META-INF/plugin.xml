@@ -129,6 +129,9 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.3.2</dt>
+        <dd>1. fix wrong selection issue after "Cut target paragraph" command. C-x C-p 't' 'm'  <br/>
+        <dd>
         <dt>1.3.0</dt>
         <dd>1. C-i C-s 't' 'm': Select jump area  ---changed_to---->  C-i C-i 't' 'm'  <br/>
 
@@ -161,7 +164,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.3.0</version>
+  <version>1.3.2</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
