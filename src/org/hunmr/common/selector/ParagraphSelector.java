@@ -28,6 +28,7 @@ public class ParagraphSelector extends Selector {
 
         while (offset < length - 1) {
             if (charAt(offset) == '\n' && offsetIsAtEmptyLine(offset + 1)) {
+                offset++;
                 break;
             }
 

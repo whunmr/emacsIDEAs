@@ -39,7 +39,7 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
                     pasteClipboardToOffset();
                 } else {
                     pasteClipboardToOffset();
-                    _editor.getCaretModel().moveToOffset(textSourceStartOffset);
+                    _editor.getCaretModel().moveToOffset(jumpTargetOffset);
                     deleteTextSource();
                     _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
                     EditorUtils.selectRangeOf(_selectorClass, _editor);

@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <name>emacsIDEAs</name>
   <description>
-      <![CDATA[
+    <![CDATA[
       <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction.</p>
       <p><b>AceJump</b></p>
       <ul>
@@ -126,7 +126,7 @@
 
     ]]>
   </description>
-    <change-notes><![CDATA[
+  <change-notes><![CDATA[
     <html>
     <dl>
         <dt>1.3.0</dt>
@@ -160,7 +160,7 @@
     </dl>
     </html>
     ]]>
-    </change-notes>
+  </change-notes>
   <version>1.3.0</version>
   <vendor>whunmr@gmail.com</vendor>
 
@@ -177,188 +177,188 @@
   <depends>com.intellij.modules.platform</depends>
 
   <actions>
-      <group id="emacsIDEAs" text="emacsIDEAs" description="emacsIDEAs">
-          <!--<add-to-group group-id="MainMenu" anchor="last"  />-->
-          <action id="emacsIDEAs.AceJumpWord" class="org.hunmr.acejump.AceJumpAction" text="AceJumpWord" description="AceJumpWord" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta L" />
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta F"/>
+    <group id="emacsIDEAs" text="emacsIDEAs" description="emacsIDEAs">
+      <!--<add-to-group group-id="MainMenu" anchor="last"  />-->
+      <action id="emacsIDEAs.AceJumpWord" class="org.hunmr.acejump.AceJumpAction" text="AceJumpWord" description="AceJumpWord" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta L" />
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta F"/>
 
-          </action>
-          <action id="emacsIDEAs.AceJump" class="org.hunmr.acejump.AceJumpCharAction" text="AceJumpChar" description="AceJumpChar" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta J" />
-          </action>
-          <action id="emacsIDEAs.AceJumpSelect" class="org.hunmr.acejump.AceJumpSelectAction" text="AceJumpSelect" description="AceJumpSelect" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta I"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy" class="org.hunmr.acejump.AceJumpCopyAction" text="AceJumpCopy" description="AceJumpCopy" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta C"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCut" class="org.hunmr.acejump.AceJumpCutAction" text="AceJumpCut" description="AceJumpCut" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta X"/>
-          </action>
-
-          <!-- (w | s | l | q | a | e | p | u | d | b) -->
-          <action id="emacsIDEAs.AceJumpAndReplace.Word" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Word" description="AceJumpAndReplace.Word" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta W"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.String" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.String" description="AceJumpAndReplace.String" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta S"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.Line" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Line" description="AceJumpAndReplace.Line" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta L"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.Quote" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Quote" description="AceJumpAndReplace.Quote" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta Q"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.ToLineStart" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToLineStart" description="AceJumpAndReplace.ToLineStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta A"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.ToLineEnd" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToLineEnd" description="AceJumpAndReplace.ToLineEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta E"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.Paragraph" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Paragraph" description="AceJumpAndReplace.Paragraph" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta P"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToParagraphStart" description="AceJumpAndReplace.ToParagraphStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta U"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.ToParagraphEnd" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToParagraphEnd" description="AceJumpAndReplace.ToParagraphEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta D"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpAndReplace.Block" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Block" description="AceJumpAndReplace.Block" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta B"/>
-          </action>
-
-
-          <!-- (w | s | l | q | a | e | p | u | d | b) -->
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.Word" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Word" description="AceJumpObtainThenReplace.Word" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta W"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.String" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.String" description="AceJumpObtainThenReplace.String" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta S"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.Line" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Line" description="AceJumpObtainThenReplace.Line" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta L"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.Quote" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Quote" description="AceJumpObtainThenReplace.Quote" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta Q"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.ToLineStart" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToLineStart" description="AceJumpObtainThenReplace.ToLineStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta A"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.ToLineEnd" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToLineEnd" description="AceJumpObtainThenReplace.ToLineEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta E"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.Paragraph" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Paragraph" description="AceJumpObtainThenReplace.Paragraph" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta P"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToParagraphStart" description="AceJumpObtainThenReplace.ToParagraphStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta U"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.ToParagraphEnd" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToParagraphEnd" description="AceJumpObtainThenReplace.ToParagraphEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta D"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpObtainThenReplace.Block" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Block" description="AceJumpObtainThenReplace.Block" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta B"/>
-          </action>
-
-
-          <!-- (w | s | l | q | a | e | p | u | d | b) -->
-          <action id="emacsIDEAs.AceJumpMove.Word" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Word" description="AceJumpMove.Word" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta W"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.String" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.String" description="AceJumpMove.String" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta S"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.Line" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Line" description="AceJumpMove.Line" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta L"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.Quote" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Quote" description="AceJumpMove.Quote" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta Q"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.ToLineStart" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToLineStart" description="AceJumpMove.ToLineStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta A"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.ToLineEnd" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToLineEnd" description="AceJumpMove.ToLineEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta E"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.Paragraph" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Paragraph" description="AceJumpMove.Paragraph" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta P"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.ToParagraphStart" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToParagraphStart" description="AceJumpMove.ToParagraphStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta U"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.ToParagraphEnd" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToParagraphEnd" description="AceJumpMove.ToParagraphEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta D"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpMove.Block" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Block" description="AceJumpMove.Block" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta B"/>
-          </action>
-
-          <!-- (w | s | l | q | a | e | p | u | d | b) -->
-          <action id="emacsIDEAs.AceJumpCopy.Word" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Word" description="AceJumpCopy.Word" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta W"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.String" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.String" description="AceJumpCopy.String" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta S"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.Line" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Line" description="AceJumpCopy.Line" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta L"/>
-          </action> 
-          <action id="emacsIDEAs.AceJumpCopy.Quote" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Quote" description="AceJumpCopy.Quote" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta Q"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.ToLineStart" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToLineStart" description="AceJumpCopy.ToLineStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta A"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.ToLineEnd" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToLineEnd" description="AceJumpCopy.ToLineEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta E"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.Paragraph" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Paragraph" description="AceJumpCopy.Paragraph" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta P"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.ToParagraphStart" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToParagraphStart" description="AceJumpCopy.ToParagraphStart" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta U"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.ToParagraphEnd" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToParagraphEnd" description="AceJumpCopy.ToParagraphEnd" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta D"/>
-          </action>
-          <action id="emacsIDEAs.AceJumpCopy.Block" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Block" description="AceJumpCopy.Block" >
-              <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta B"/>
-          </action>
-
-      </group>
-
-      <action id="CopyWithoutSelect" class="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction" text="CopyWithoutSelection"
-              description="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction">
-          <add-to-group group-id="emacsIDEAs" anchor="last"/>
-          <keyboard-shortcut keymap="$default" first-keystroke="meta C" />
+      </action>
+      <action id="emacsIDEAs.AceJump" class="org.hunmr.acejump.AceJumpCharAction" text="AceJumpChar" description="AceJumpChar" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta J" />
+      </action>
+      <action id="emacsIDEAs.AceJumpSelect" class="org.hunmr.acejump.AceJumpSelectAction" text="AceJumpSelect" description="AceJumpSelect" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta I"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy" class="org.hunmr.acejump.AceJumpCopyAction" text="AceJumpCopy" description="AceJumpCopy" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta C"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCut" class="org.hunmr.acejump.AceJumpCutAction" text="AceJumpCut" description="AceJumpCut" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta X"/>
       </action>
 
-      <action id="CopyThenJumpPaste" class="org.hunmr.copycutwithoutselection.CopyAndReplaceAction" text="CopyJumpAndReplace"
-              description="org.hunmr.copycutwithoutselection.CopyAndReplaceAction">
-          <add-to-group group-id="emacsIDEAs" anchor="last"/>
-          <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta R" />
-          <keyboard-shortcut keymap="$default" first-keystroke="meta R" />
+      <!-- (w | s | l | q | a | e | p | u | d | b) -->
+      <action id="emacsIDEAs.AceJumpAndReplace.Word" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Word" description="AceJumpAndReplace.Word" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta W"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.String" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.String" description="AceJumpAndReplace.String" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta S"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.Line" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Line" description="AceJumpAndReplace.Line" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta L"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.Quote" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Quote" description="AceJumpAndReplace.Quote" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta Q"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.ToLineStart" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToLineStart" description="AceJumpAndReplace.ToLineStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta A"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.ToLineEnd" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToLineEnd" description="AceJumpAndReplace.ToLineEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta E"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.Paragraph" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Paragraph" description="AceJumpAndReplace.Paragraph" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToParagraphStart" description="AceJumpAndReplace.ToParagraphStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta U"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.ToParagraphEnd" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToParagraphEnd" description="AceJumpAndReplace.ToParagraphEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta D"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.Block" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Block" description="AceJumpAndReplace.Block" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta B"/>
       </action>
 
-      <action id="HighlightNextSymbol" class="org.hunmr.highlightsymbol.HighlightNextSymbolAction" text="HighlightNextSymbol"
-              description="org.hunmr.highlightsymbol.HighlightNextSymbolAction">
-          <add-to-group group-id="emacsIDEAs" anchor="last"/>
-          <keyboard-shortcut keymap="$default" first-keystroke="meta PERIOD" />
+
+      <!-- (w | s | l | q | a | e | p | u | d | b) -->
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Word" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Word" description="AceJumpObtainThenReplace.Word" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta W"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.String" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.String" description="AceJumpObtainThenReplace.String" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta S"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Line" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Line" description="AceJumpObtainThenReplace.Line" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta L"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Quote" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Quote" description="AceJumpObtainThenReplace.Quote" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta Q"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.ToLineStart" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToLineStart" description="AceJumpObtainThenReplace.ToLineStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta A"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.ToLineEnd" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToLineEnd" description="AceJumpObtainThenReplace.ToLineEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta E"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Paragraph" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Paragraph" description="AceJumpObtainThenReplace.Paragraph" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToParagraphStart" description="AceJumpObtainThenReplace.ToParagraphStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta U"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.ToParagraphEnd" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToParagraphEnd" description="AceJumpObtainThenReplace.ToParagraphEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta D"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Block" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Block" description="AceJumpObtainThenReplace.Block" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta B"/>
       </action>
 
-      <action id="HighlightPrevSymbol" class="org.hunmr.highlightsymbol.HighlightPrevSymbolAction" text="HighlightPrevSymbol"
-              description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
-          <add-to-group group-id="emacsIDEAs" anchor="last"/>
-          <keyboard-shortcut keymap="$default" first-keystroke="meta COMMA" />
+
+      <!-- (w | s | l | q | a | e | p | u | d | b) -->
+      <action id="emacsIDEAs.AceJumpMove.Word" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Word" description="AceJumpMove.Word" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta W"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.String" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.String" description="AceJumpMove.String" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta S"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.Line" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Line" description="AceJumpMove.Line" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta L"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.Quote" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Quote" description="AceJumpMove.Quote" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta Q"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.ToLineStart" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToLineStart" description="AceJumpMove.ToLineStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta A"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.ToLineEnd" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToLineEnd" description="AceJumpMove.ToLineEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta E"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.Paragraph" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Paragraph" description="AceJumpMove.Paragraph" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.ToParagraphStart" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToParagraphStart" description="AceJumpMove.ToParagraphStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta U"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.ToParagraphEnd" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToParagraphEnd" description="AceJumpMove.ToParagraphEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta D"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.Block" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Block" description="AceJumpMove.Block" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta B"/>
       </action>
 
-      <action id="JustOneSpace" class="org.hunmr.buildin.JustOneSpace" text="JustOneSpace"
-              description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
-          <add-to-group group-id="emacsIDEAs" anchor="last"/>
-          <keyboard-shortcut keymap="$default" first-keystroke="meta ctrl SPACE" />
+      <!-- (w | s | l | q | a | e | p | u | d | b) -->
+      <action id="emacsIDEAs.AceJumpCopy.Word" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Word" description="AceJumpCopy.Word" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta W"/>
       </action>
+      <action id="emacsIDEAs.AceJumpCopy.String" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.String" description="AceJumpCopy.String" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta S"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.Line" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Line" description="AceJumpCopy.Line" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta L"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.Quote" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Quote" description="AceJumpCopy.Quote" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta Q"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.ToLineStart" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToLineStart" description="AceJumpCopy.ToLineStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta A"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.ToLineEnd" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToLineEnd" description="AceJumpCopy.ToLineEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta E"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.Paragraph" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Paragraph" description="AceJumpCopy.Paragraph" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.ToParagraphStart" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToParagraphStart" description="AceJumpCopy.ToParagraphStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta U"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.ToParagraphEnd" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToParagraphEnd" description="AceJumpCopy.ToParagraphEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta D"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpCopy.Block" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Block" description="AceJumpCopy.Block" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta B"/>
+      </action>
+
+    </group>
+
+    <action id="CopyWithoutSelect" class="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction" text="CopyWithoutSelection"
+            description="org.hunmr.copycutwithoutselection.CopyCutWithoutSelectAction">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="meta C" />
+    </action>
+
+    <action id="CopyThenJumpPaste" class="org.hunmr.copycutwithoutselection.CopyAndReplaceAction" text="CopyJumpAndReplace"
+            description="org.hunmr.copycutwithoutselection.CopyAndReplaceAction">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta R" />
+      <keyboard-shortcut keymap="$default" first-keystroke="meta R" />
+    </action>
+
+    <action id="HighlightNextSymbol" class="org.hunmr.highlightsymbol.HighlightNextSymbolAction" text="HighlightNextSymbol"
+            description="org.hunmr.highlightsymbol.HighlightNextSymbolAction">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="meta PERIOD" />
+    </action>
+
+    <action id="HighlightPrevSymbol" class="org.hunmr.highlightsymbol.HighlightPrevSymbolAction" text="HighlightPrevSymbol"
+            description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="meta COMMA" />
+    </action>
+
+    <action id="JustOneSpace" class="org.hunmr.buildin.JustOneSpace" text="JustOneSpace"
+            description="org.hunmr.highlightsymbol.HighlightPrevSymbolAction">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="meta ctrl SPACE" />
+    </action>
 
   </actions>
 

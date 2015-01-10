@@ -26,6 +26,7 @@ public class WordOffsetsFinder extends OffsetsFinder {
     }
 
     private boolean isCharInDifferentCategory(char c, char charBeforeOffset) {
-        return Character.isLetter(c) ^ Character.isLetter(charBeforeOffset) || Character.isDigit(c) ^ Character.isDigit(charBeforeOffset);
+        return Character.isLetter(c) ^ Character.isLetter(charBeforeOffset)
+                || Character.isDigit(c) ^ Character.isDigit(charBeforeOffset);
     }
 }
