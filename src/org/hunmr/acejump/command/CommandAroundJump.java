@@ -24,9 +24,10 @@ public class CommandAroundJump {
 
     protected void selectJumpArea(int jumpTargetOffset) {
         if (getOffsetBeforeJump() < jumpTargetOffset) {
-            _editor.getSelectionModel().setSelection(getOffsetBeforeJump(), jumpTargetOffset);
+            _editor.getSelectionModel().setSelection(getOffsetBeforeJump(), jumpTargetOffset + 1);
+            _editor.getCaretModel().moveToOffset(jumpTargetOffset + 1);
         } else {
-            _editor.getSelectionModel().setSelection(jumpTargetOffset, getOffsetBeforeJump());
+            _editor.getSelectionModel().setSelection(jumpTargetOffset, getOffsetBeforeJump() + 1);
         }
     }
 
