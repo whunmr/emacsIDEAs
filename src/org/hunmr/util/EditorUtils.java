@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.common.CommandContext;
-import org.hunmr.common.selector.*;
+import org.hunmr.common.selector.Selector;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

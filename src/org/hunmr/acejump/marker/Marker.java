@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Marker {
-    private char _markerChar;
+    private String _marker;
     private ArrayList<Integer> _offsets = new ArrayList<Integer>();
 
-    public Marker(char markerChar, int offset) {
-        _markerChar = markerChar;
+    public Marker(String marker, int offset) {
+        _marker = marker;
         addOffsetToMarker(offset);
     }
 
@@ -23,7 +23,11 @@ public class Marker {
     }
 
     public char getMarkerChar() {
-        return _markerChar;
+        return _marker.charAt(0);
+    }
+
+    public String getMarker() {
+        return _marker;
     }
 
     public int getOffset() {
@@ -32,14 +36,5 @@ public class Marker {
 
     public boolean isMappingToMultipleOffset() {
         return _offsets.size() > 1;
-    }
-
-    public TextRange getTextRange() {
-        Collections.sort(_offsets);
-
-        Integer startOffset = _offsets.get(0);
-        Integer endOffset = _offsets.get(_offsets.size() - 1);
-
-        return new TextRange(startOffset, endOffset);
     }
 }

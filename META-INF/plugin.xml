@@ -129,6 +129,10 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.3.3</dt>
+        <dd>1. Upgrade the jump more like avy-jump. http://emacsredux.com/blog/2015/07/19/ace-jump-mode-is-dead-long-live-avy/  <br/>
+               This also fix issue posted by @jmdodge [AceJump: Show two-letter combos up front], https://github.com/whunmr/emacsIDEAs/issues/3  <br/>
+        <dd>
         <dt>1.3.2</dt>
         <dd>1. fix wrong selection issue after "Cut target paragraph" command. C-x C-p 't' 'm'  <br/>
         <dd>
@@ -164,7 +168,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.3.2</version>
+  <version>1.3.3</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->

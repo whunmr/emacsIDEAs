@@ -12,8 +12,7 @@ import java.util.List;
 
 public class ShowMarkersRunnable implements Runnable {
     public static final char INFINITE_JUMP_CHAR = 'f';
-    private final String _markerCharSet =     "abcdeghiyklmnopqrstuvwj,"; // / .
-    private final String _fullMarkerCharSet = "abcdeghiyklmnopqrstuvwj,"; // / .
+    private static final String MARKER_CHARSET =     "abceghiylmnopqrstuvw/dkj";   //TODO: customizable
     private final List<Integer> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;
@@ -37,7 +36,7 @@ public class ShowMarkersRunnable implements Runnable {
         sortOffsetsToImprovePriorityOfLineEnd(caretOffset);
 
         int twiceJumpGroupCount = calcTwiceJumpGroupCount();
-        int singleJumpCount = Math.min(getMarkerSet().length() - twiceJumpGroupCount, _offsets.size());
+        int singleJumpCount = Math.min(MARKER_CHARSET.length() - twiceJumpGroupCount, _offsets.size());
 
         createSingleJumpMarkers(singleJumpCount);
         if (twiceJumpGroupCount > 0) {
@@ -47,40 +46,46 @@ public class ShowMarkersRunnable implements Runnable {
         _action.showNewMarkersPanel(new MarkersPanel(_editor, _markerCollection));
     }
 
-    private String getMarkerSet() {
-        return _action.isCalledFromOtherAction() ? _fullMarkerCharSet : _markerCharSet;
-    }
-
     private void createSingleJumpMarkers(int singleJumpCount) {
         for (int i = 0; i < singleJumpCount ; i++) {
-            _markerCollection.addMarker(getMarkerSet().charAt(i), _offsets.get(i));
+            String marker = String.valueOf(MARKER_CHARSET.charAt(i));
+            _markerCollection.addMarker(marker, _offsets.get(i));
         }
     }
 
     private void createMultipleJumpMarkers(int singleJumpCount, int groupsNeedsTwiceJump) {
         int i = singleJumpCount;
 
-        int maxMarkersCountNeedsTwiceJump = Math.min(_offsets.size(), groupsNeedsTwiceJump * getMarkerSet().length());
-        for (;i < maxMarkersCountNeedsTwiceJump; i++) {
-            int group = (i - singleJumpCount) / getMarkerSet().length();
-            char markerChar = getMarkerSet().charAt(singleJumpCount + group);
-            _markerCollection.addMarker(markerChar, _offsets.get(i));
+        for (;i < _offsets.size(); i++) {
+            int group = (i - singleJumpCount) / MARKER_CHARSET.length();
+            int markerCharIndex = singleJumpCount + group;
+
+            if (markerCharIndex > MARKER_CHARSET.length() - 1) {
+                break;
+            }
+
+            char markerChar = MARKER_CHARSET.charAt(markerCharIndex);
+            char secondJumpMarkerChar = MARKER_CHARSET.charAt((i - singleJumpCount) % MARKER_CHARSET.length());
+
+            String marker = "" + markerChar + secondJumpMarkerChar;
+            _markerCollection.addMarker(marker, _offsets.get(i));
         }
+
 
         boolean hasMarkersNeedMoreJumps = i < _offsets.size();
         if (hasMarkersNeedMoreJumps) {
             for (; i < _offsets.size(); i++) {
-                _markerCollection.addMarker(INFINITE_JUMP_CHAR, _offsets.get(i));
+                _markerCollection.addMarker(String.valueOf(INFINITE_JUMP_CHAR), _offsets.get(i));
             }
         }
     }
 
     private int calcTwiceJumpGroupCount() {
-        int makerCharSetSize = getMarkerSet().length();
+        int makerCharSetSize = MARKER_CHARSET.length();
 
-        for (int groupsNeedMultipleJump = 0; groupsNeedMultipleJump < makerCharSetSize; groupsNeedMultipleJump++) {
+        for (int groupsNeedMultipleJump = 0; groupsNeedMultipleJump <= makerCharSetSize; groupsNeedMultipleJump++) {
             int oneJumpMarkerCount = makerCharSetSize - groupsNeedMultipleJump;
-            if (groupsNeedMultipleJump * makerCharSetSize + oneJumpMarkerCount > _offsets.size()) {
+            if (groupsNeedMultipleJump * makerCharSetSize + oneJumpMarkerCount >= _offsets.size()) {
                 return groupsNeedMultipleJump;
             }
         }
@@ -92,7 +97,14 @@ public class ShowMarkersRunnable implements Runnable {
         Collections.sort(_offsets, new Comparator<Integer>() {
             @Override
             public int compare(Integer oA, Integer oB) {
-                return Math.abs(oA - caretOffset) - Math.abs(oB - caretOffset);
+                int distA = Math.abs(oA - caretOffset);
+                int distB = Math.abs(oB - caretOffset);
+
+                if (distA == distB) {
+                    return oA - oB;
+                }
+
+                return distA - distB;
             }
         });
     }

@@ -11,7 +11,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.hunmr.common.EmacsIdeasAction;
 
-public class HighlightSymbolAction extends EmacsIdeasAction{
+public class HighlightSymbolAction extends EmacsIdeasAction {
 
     public void actionPerformed(AnActionEvent e, boolean searchForward) {
         Project project = e.getData(PlatformDataKeys.PROJECT);

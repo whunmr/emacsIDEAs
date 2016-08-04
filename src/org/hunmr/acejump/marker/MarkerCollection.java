@@ -1,16 +1,30 @@
 package org.hunmr.acejump.marker;
 
+import com.intellij.openapi.vcs.history.VcsRevisionNumber;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
-public class MarkerCollection extends HashMap<Character, Marker> {
+public class MarkerCollection extends HashMap<String, Marker> {
 
-    public boolean keyMappingToMultipleMarkers(char key) {
-        Marker marker = this.get(key);
-        return marker != null && marker.isMappingToMultipleOffset();
+    public ArrayList<Integer> getOffsetsOfKey(char key) {
+        ArrayList<Integer> ai = new ArrayList<>();
+
+        for (Marker marker : this.values()) {
+            if (marker.getMarkerChar() == key) {
+                ai.addAll(marker.getOffsets());
+            }
+        }
+
+        Collections.reverse(ai);
+        return ai;
     }
 
-    public void addMarker(char key, Integer offset) {
+    public void addMarker(String key, Integer offset) {
         Marker marker = this.get(key);
+
         if (marker == null) {
             this.put(key, new Marker(key, offset));
             return;
@@ -29,5 +43,15 @@ public class MarkerCollection extends HashMap<Character, Marker> {
 
     public boolean hasNoPlaceToJump() {
         return this.isEmpty();
+    }
+
+    public boolean containsMarkerWithKey(char key) {
+        for (Marker marker : this.values()) {
+            if (marker.getMarkerChar() == key) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

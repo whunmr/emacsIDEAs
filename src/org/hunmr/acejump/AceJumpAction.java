@@ -81,19 +81,20 @@ public class AceJumpAction extends EmacsIdeasAction {
     }
 
     private boolean handleJumpToMarkerKey(char key) {
-        if (!_markers.containsKey(key)) {
+        if (!_markers.containsMarkerWithKey(key)) {
             key = Str.getCounterCase(key);
         }
 
-        if (EditorUtils.isPrintableChar(key) && _markers.containsKey(key)) {
-            if (_markers.keyMappingToMultipleMarkers(key)) {
-                ArrayList<Integer> offsets = _markers.get(key).getOffsets();
+        if (EditorUtils.isPrintableChar(key) && _markers.containsMarkerWithKey(key)) {
+            ArrayList<Integer> offsetsOfKey = _markers.getOffsetsOfKey(key);
+
+            if (offsetsOfKey.size() > 1) {
                 _markers.clear();
-                runReadAction(new ShowMarkersRunnable(offsets, (AceJumpAction) _action));
+                runReadAction(new ShowMarkersRunnable(offsetsOfKey, (AceJumpAction) _action));
                 return false;
             }
 
-            jumpToOffset(_markers.get(key).getOffset());
+            jumpToOffset(offsetsOfKey.get(0));
             return true;
         }
 
