@@ -96,7 +96,8 @@ public class MarkersPanel extends JComponent {
     }
 
     private void drawBackgroundOfMarupChar(Graphics g, Marker marker, double x, double y) {
-        Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
+        //Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
+        Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getMaxCharBounds(g);
 
         if (marker.isMappingToMultipleOffset()) {
             g.setColor(Color.YELLOW);
@@ -104,7 +105,7 @@ public class MarkersPanel extends JComponent {
             g.setColor(Color.WHITE);
         }
 
-        g.fillRect((int)x, (int)y, (int) fontRect.getWidth(), (int) fontRect.getHeight());
+        g.fillRect((int)x, (int)y, (int) fontRect.getWidth(), (int) (fontRect.getHeight() * 1.08));
     }
 
 
@@ -114,7 +115,7 @@ public class MarkersPanel extends JComponent {
         g.setColor(Color.WHITE);
         String markerStr = marker.getMarker();
         if (markerStr.length() > 1) {
-            g.fillRect((int)(x + fontRect.getWidth()), (int)y, (int) fontRect.getWidth(), (int) fontRect.getHeight());
+            g.fillRect((int)(x + fontRect.getWidth()), (int)y, (int) fontRect.getWidth(), (int) (fontRect.getHeight() * 1.08));
         }
     }
 
