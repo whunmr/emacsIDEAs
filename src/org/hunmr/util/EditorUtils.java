@@ -4,6 +4,7 @@ import com.intellij.codeInsight.actions.ReformatCodeAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.common.CommandContext;
@@ -82,6 +83,11 @@ public class EditorUtils {
         selectRangeOf(selectorClass, editor);
         editor.getSelectionModel().copySelectionToClipboard();
         editor.getSelectionModel().removeSelection();
+    }
+
+    public static void deleteRange(Class<? extends Selector> selectorClass, Editor editor) {
+        selectRangeOf(selectorClass, editor);
+        EditorModificationUtil.deleteSelectedText(editor);
     }
 
     public static void reformatCode(AnActionEvent e) {
