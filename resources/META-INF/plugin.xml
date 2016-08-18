@@ -96,6 +96,21 @@
       </ul>
       <br/>
 
+      <p><b>Delete target (word | line | paragraph...)</b></p>
+      <ul>
+          <li><b>C-d C-w 't' 'm'</b>  :  delete target word</li>
+          <li><b>C-d C-s 't' 'm'</b>  :  delete target string</li>
+          <li><b>C-d C-l 't' 'm'</b>  :  delete target line</li>
+          <li><b>C-d C-b 't' 'm'</b>  :  delete target block            </li>
+          <li><b>C-d C-q 't' 'm'</b>  :  delete target quote            </li>
+          <li><b>C-d C-a 't' 'm'</b>  :  delete target to line beginning</li>
+          <li><b>C-d C-e 't' 'm'</b>  :  delete target char to line end </li>
+          <li><b>C-d C-p 't' 'm'</b>  :  delete target paragraph        </li>
+          <li><b>C-d C-u 't' 'm'</b>  :  delete target to paragraph beginning </li>
+          <li><b>C-d C-d 't' 'm'</b>  :  delete target to paragraph end       </li>
+      </ul>
+      <br/>
+
       <br/>
       <p><b>Highlight symbol:</b></p>
       <ul>
