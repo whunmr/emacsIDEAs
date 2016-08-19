@@ -145,6 +145,9 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.3.6</dt>
+        <dd>1. fix wrong selection range issue, after using AceJumpMove.* actions. <br/>
+        <dd>
         <dt>1.3.5</dt>
         <dd>1.  Add jump and delete target range action. such as delete target paragraph by: C-d C-p. <br/>
                 so do not need: First jump to target place, then delete paragraph by C-c space p. <br/>
@@ -192,7 +195,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.3.5</version>
+  <version>1.3.6</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
