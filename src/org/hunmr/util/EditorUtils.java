@@ -100,4 +100,10 @@ public class EditorUtils {
             editor.getSelectionModel().setSelection(tr[0].getStartOffset(), tr[0].getEndOffset());
         }
     }
+
+    public static void selectTextRange(Editor editor, int startOffset, int endOffset) {
+        if (editor != null) {
+            editor.getSelectionModel().setSelection(startOffset, endOffset);
+        }
+    }
 }
