@@ -35,7 +35,7 @@ public class MarkersPanel extends JComponent {
         drawPanelBackground(g);
         g.setFont(_fontInEditor);
 
-        HashSet<Integer> firstJumpOffsets = new HashSet<>();
+        HashSet<Integer> firstJumpOffsets = new HashSet<Integer>();
 
         for (Marker marker : _markerCollection.values()) {
             for (int offset : marker.getOffsets()) {

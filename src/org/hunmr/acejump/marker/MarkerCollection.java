@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class MarkerCollection extends HashMap<String, Marker> {
 
     public ArrayList<Integer> getOffsetsOfKey(char key) {
-        ArrayList<Integer> ai = new ArrayList<>();
+        ArrayList<Integer> ai = new ArrayList<Integer>();
 
         for (Marker marker : this.values()) {
             if (marker.getMarkerChar() == key) {
