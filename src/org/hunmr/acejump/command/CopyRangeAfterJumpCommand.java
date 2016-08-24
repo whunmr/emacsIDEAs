@@ -29,7 +29,9 @@ public class CopyRangeAfterJumpCommand extends CommandAroundJump  {
             private void pasteClipboardToOffset() {
                 _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
                 TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
-                EditorUtils.selectTextRange(_editor, tr);
+
+                if (_config._needSelectTextAfterJump)
+                    EditorUtils.selectTextRange(_editor, tr);
             }
         };
 

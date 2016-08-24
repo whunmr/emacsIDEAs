@@ -1,5 +1,6 @@
 package org.hunmr.options;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.ColorPanel;
@@ -7,21 +8,17 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class IdeaConfigurable implements Configurable {
-    private JPanel optionsPanel;
-    private ColorPanel color1;
-    private ColorPanel color2;
-    private ColorPanel color3;
-    private ColorPanel color4;
+    private JPanel _optionsPanel;
+    private ColorPanel _firstJumpBackground;
+    private ColorPanel _firstJumpForeground;
+    private ColorPanel _secondJumpBackground;
+    private ColorPanel _secondJumpForeground;
+    private JCheckBox _needSelectTextAfterJump;
 
-    //bool,  select moved/coped text after jump
-
-    //color  background color of first jump mark char
-    //color  foreground color of first jump mark char
-
-    //color  background color of second jump mark char
-    //color  foreground color of second jump mark char
+    final PluginConfig config = ServiceManager.getService(PluginConfig.class);
 
     @Nls
     @Override
@@ -35,28 +32,51 @@ public class IdeaConfigurable implements Configurable {
         return "preferences.topic";
     }
 
+    private void setFromConfig() {
+        _firstJumpBackground.setSelectedColor(config.getFirstJumpBackground());
+        _firstJumpForeground.setSelectedColor(config.getFirstJumpForeground());
+        _secondJumpBackground.setSelectedColor(config.getSecondJumpBackground());
+        _secondJumpForeground.setSelectedColor(config.getSecondJumpForeground());
+        _needSelectTextAfterJump.setSelected(config._needSelectTextAfterJump);
+    }
+
     @Nullable
     @Override
     public JComponent createComponent() {
-        return optionsPanel;
+        setFromConfig();
+        return _optionsPanel;
     }
 
     @Override
     public boolean isModified() {
-        return false;
+        return      _firstJumpBackground.getSelectedColor() != config.getFirstJumpBackground()
+                ||  _firstJumpForeground.getSelectedColor() != config.getFirstJumpForeground()
+                || _secondJumpBackground.getSelectedColor() != config.getSecondJumpBackground()
+                || _secondJumpForeground.getSelectedColor() != config.getSecondJumpForeground()
+                || _needSelectTextAfterJump.isSelected()    != config._needSelectTextAfterJump;
     }
 
     @Override
     public void apply() throws ConfigurationException {
+        if (!isModified()) {
+            return;
+        }
+
+        config._firstJumpBackground = _firstJumpBackground.getSelectedColor().getRGB();
+        config._firstJumpForeground = _firstJumpForeground.getSelectedColor().getRGB();
+        config._secondJumpBackground = _secondJumpBackground.getSelectedColor().getRGB();
+        config._secondJumpForeground = _secondJumpForeground.getSelectedColor().getRGB();
+        config._needSelectTextAfterJump = _needSelectTextAfterJump.isSelected();
     }
 
     @Override
     public void reset() {
-
+        setFromConfig();
     }
 
     @Override
     public void disposeUIResources() {
-
+        _optionsPanel.removeAll();
+        _optionsPanel.getParent().remove(_optionsPanel);
     }
 }

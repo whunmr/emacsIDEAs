@@ -45,7 +45,10 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
                     deleteTextSource();
                     _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
                     int cur_offset = _editor.getCaretModel().getOffset();
-                    EditorUtils.selectTextRange(_editor, cur_offset - _length, cur_offset);
+
+                    if (_config._needSelectTextAfterJump) {
+                        EditorUtils.selectTextRange(_editor, cur_offset - _length, cur_offset);
+                    }
                 }
             }
 
@@ -57,7 +60,9 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
             private void pasteClipboardToOffset() {
                 _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
                 TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
-                EditorUtils.selectTextRange(_editor, tr);
+                if (_config._needSelectTextAfterJump) {
+                    EditorUtils.selectTextRange(_editor, tr);
+                }
                 _length = tr[0].getEndOffset() - tr[0].getStartOffset();
             }
         };

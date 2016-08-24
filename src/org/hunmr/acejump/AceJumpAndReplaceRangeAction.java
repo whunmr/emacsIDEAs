@@ -23,6 +23,8 @@ public class AceJumpAndReplaceRangeAction extends AnAction {
 
             AceJumpAction.getInstance().addCommandAroundJump(new ReplaceAfterJumpCommand(editor, selectorClass));
             AceJumpAction.getInstance().performAction(e);
+
+
         } catch (ClassNotFoundException e1) {
             e1.printStackTrace();
         }

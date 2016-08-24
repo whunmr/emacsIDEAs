@@ -39,7 +39,10 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
                 }
 
                 TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
-                EditorUtils.selectRangeOf(_selectorClass, _editor);
+
+                if (_config._needSelectTextAfterJump) {
+                    EditorUtils.selectRangeOf(_selectorClass, _editor);
+                }
             }
         };
 

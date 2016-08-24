@@ -1,8 +1,10 @@
 package org.hunmr.acejump.marker;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorFontType;
+import org.hunmr.options.PluginConfig;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +17,8 @@ public class MarkersPanel extends JComponent {
     private MarkerCollection _markerCollection;
     private JComponent _parent;
     private Font _fontInEditor;
+
+    final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
 
     public MarkersPanel(Editor editor, MarkerCollection markerCollection) {
         _editor = editor;
@@ -78,7 +82,7 @@ public class MarkersPanel extends JComponent {
         if (marker.isMappingToMultipleOffset()) {
             g.setColor(Color.BLACK);
         } else {
-            g.setColor(Color.RED);
+            g.setColor(_config.getFirstJumpForeground());
         }
 
         ((Graphics2D)g).drawString(String.valueOf(marker.getMarkerChar()), (float)x, buttomYOfMarkerChar);
@@ -89,7 +93,7 @@ public class MarkersPanel extends JComponent {
 
         String markerStr = marker.getMarker();
         if (markerStr.length() > 1) {
-            g.setColor(Color.blue);
+            g.setColor(_config.getSecondJumpForeground());
             Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
             ((Graphics2D)g).drawString(String.valueOf(markerStr.charAt(1)), (float)(x + fontRect.getWidth()), buttomYOfMarkerChar);
         }
@@ -102,7 +106,7 @@ public class MarkersPanel extends JComponent {
         if (marker.isMappingToMultipleOffset()) {
             g.setColor(Color.YELLOW);
         } else {
-            g.setColor(Color.WHITE);
+            g.setColor(_config.getFirstJumpBackground());
         }
 
         g.fillRect((int)x, (int)y, (int) fontRect.getWidth(), (int) (fontRect.getHeight() * 1.08));
@@ -112,7 +116,7 @@ public class MarkersPanel extends JComponent {
     private void drawBackgroundOfSecondMarupChar(Graphics g, Marker marker, double x, double y) {
         Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
 
-        g.setColor(Color.WHITE);
+        g.setColor(_config.getSecondJumpBackground());
         String markerStr = marker.getMarker();
         if (markerStr.length() > 1) {
             g.fillRect((int)(x + fontRect.getWidth()), (int)y, (int) fontRect.getWidth(), (int) (fontRect.getHeight() * 1.08));

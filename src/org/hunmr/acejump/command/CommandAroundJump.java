@@ -1,10 +1,14 @@
 package org.hunmr.acejump.command;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
+import org.hunmr.options.PluginConfig;
 
 public class CommandAroundJump {
     protected Editor _editor;
     private int _offsetBeforeJump;
+
+    final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
 
     public CommandAroundJump(Editor editor) {
         _editor = editor;

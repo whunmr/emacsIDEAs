@@ -27,7 +27,10 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
 
                 EditorUtils.selectRangeOf(_selectorClass, _editor);
                 TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
-                EditorUtils.selectTextRange(_editor, tr);
+
+                if (_config._needSelectTextAfterJump) {
+                    EditorUtils.selectTextRange(_editor, tr);
+                }
             }
         };
 
