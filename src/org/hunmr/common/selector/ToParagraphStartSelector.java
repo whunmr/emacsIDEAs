@@ -13,7 +13,6 @@ public class ToParagraphStartSelector extends ParagraphSelector {
     public TextRange getRange(CommandContext cmdCtx) {
         final int caretOffset = getNearestStringEndOffset(_editor);
         int paraStart = getParagraphStartOffset(caretOffset);
-
         return caretOffset > paraStart ? new TextRange(paraStart, caretOffset) : null;
     }
 }

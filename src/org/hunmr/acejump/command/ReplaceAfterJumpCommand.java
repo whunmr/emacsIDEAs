@@ -36,7 +36,7 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
                 if (_addNewLineBeforePaste) {
                     _editor.getDocument().insertString(_editor.getCaretModel().getOffset(), "\n");
                     _editor.getCaretModel().moveToOffset(_editor.getCaretModel().getOffset() + 1);
-                }
+                } 
 
                 TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
 

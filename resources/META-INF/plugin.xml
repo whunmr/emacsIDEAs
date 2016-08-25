@@ -145,6 +145,9 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.4.0</dt>
+        <dd>--- fix post selection error, in C-O C-A command. <br/>
+        <dd>
         <dt>1.3.9</dt>
         <dd>--- Add plugin settings panel in the Prefereces -> Other Settings -> emacsIDEAs.<br/>
                 to config jump marker char's color, and whether select the moved text. <br/>
@@ -205,7 +208,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.3.9</version>
+  <version>1.4.0</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->

@@ -26,6 +26,7 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
                 _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
 
                 EditorUtils.selectRangeOf(_selectorClass, _editor);
+                EditorUtils.deleteRange(_selectorClass, _editor);
                 TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
 
                 if (_config._needSelectTextAfterJump) {
