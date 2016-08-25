@@ -312,6 +312,9 @@
       <action id="emacsIDEAs.AceJumpObtainThenReplace.Paragraph" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Paragraph" description="AceJumpObtainThenReplace.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta P"/>
       </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Group" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Group" description="AceJumpObtainThenReplace.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta G"/>
+      </action>
       <action id="emacsIDEAs.AceJumpObtainThenReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToParagraphStart" description="AceJumpObtainThenReplace.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta U"/>
       </action>
@@ -345,6 +348,9 @@
       <action id="emacsIDEAs.AceJumpMove.Paragraph" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Paragraph" description="AceJumpMove.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta P"/>
       </action>
+      <action id="emacsIDEAs.AceJumpMove.Group" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Group" description="AceJumpMove.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta G"/>
+      </action>
       <action id="emacsIDEAs.AceJumpMove.ToParagraphStart" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToParagraphStart" description="AceJumpMove.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta U"/>
       </action>
@@ -377,6 +383,9 @@
       <action id="emacsIDEAs.AceJumpCopy.Paragraph" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Paragraph" description="AceJumpCopy.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta P"/>
       </action>
+      <action id="emacsIDEAs.AceJumpCopy.Group" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Group" description="AceJumpCopy.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta G"/>
+      </action>
       <action id="emacsIDEAs.AceJumpCopy.ToParagraphStart" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToParagraphStart" description="AceJumpCopy.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta U"/>
       </action>
@@ -408,6 +417,9 @@
       </action>
       <action id="emacsIDEAs.AceJumpDelete.Paragraph" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Paragraph" description="AceJumpDelete.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.Group" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Group" description="AceJumpDelete.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta G"/>
       </action>
       <action id="emacsIDEAs.AceJumpDelete.ToParagraphStart" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.ToParagraphStart" description="AceJumpDelete.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta U"/>
