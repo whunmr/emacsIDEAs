@@ -106,4 +106,9 @@ public class EditorUtils {
             editor.getSelectionModel().setSelection(startOffset, endOffset);
         }
     }
+
+    public static void deleteRange(TextRange tr, Editor editor) {
+        selectTextRange(editor, new TextRange[] {tr} );
+        EditorModificationUtil.deleteSelectedText(editor);
+    }
 }

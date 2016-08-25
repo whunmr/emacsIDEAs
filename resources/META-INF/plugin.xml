@@ -29,10 +29,11 @@
           <li><b>C-c  e  </b>  :  Copy to line end</li>
           <li><b>C-c  E  </b>  :  Copy to file end</li>
           <li><b>C-c  p  </b>  :  Copy paragraph</li>
+          <li><b>C-c  g  </b>  :  Copy paragraph group (e.g.: entire function including white lines) </li>
           <li><b>C-c  u  </b>  :  Copy to paragraph begining</li>
           <li><b>C-c  d  </b>  :  Copy to paragraph end</li>
-          <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | u | d | b)   </b>  :  Type one space to cut related area</li>
-          <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | u | d | b)   </b>  :  Type two space to select related area</li>
+          <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | g | u | d | b)   </b>  :  Type one space to cut related area</li>
+          <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b)   </b>  :  Type two space to select related area</li>
       </ul>
       <br/>
 
@@ -46,6 +47,7 @@
           <li><b>C-i C-a 't' 'm'</b>  :  replace target to line begining </li>
           <li><b>C-i C-e 't' 'm'</b>  :  replace target char to line end </li>
           <li><b>C-i C-p 't' 'm'</b>  :  replace target paragraph        </li>
+          <li><b>C-i C-g 't' 'm'</b>  :  replace target paragraph group  </li>
           <li><b>C-i C-u 't' 'm'</b>  :  replace target to paragraph beginning </li>
           <li><b>C-i C-d 't' 'm'</b>  :  replace target to paragraph end       </li>
       </ul>
@@ -61,6 +63,7 @@
           <li><b>C-o C-a 't' 'm'</b>  :  obtain target to line beginning</li>
           <li><b>C-o C-e 't' 'm'</b>  :  obtain target char to line end </li>
           <li><b>C-o C-p 't' 'm'</b>  :  obtain target paragraph        </li>
+          <li><b>C-o C-g 't' 'm'</b>  :  obtain target paragraph group  </li>
           <li><b>C-o C-u 't' 'm'</b>  :  obtain target to paragraph beginning </li>
           <li><b>C-o C-d 't' 'm'</b>  :  obtain target to paragraph end       </li>
       </ul>
@@ -76,6 +79,7 @@
           <li><b>C-w C-a 't' 'm'</b>  :  Copy target to line beginning</li>
           <li><b>C-w C-e 't' 'm'</b>  :  Copy target char to line end </li>
           <li><b>C-w C-p 't' 'm'</b>  :  Copy target paragraph        </li>
+          <li><b>C-w C-g 't' 'm'</b>  :  Copy target paragraph group  </li>
           <li><b>C-w C-u 't' 'm'</b>  :  Copy target to paragraph beginning </li>
           <li><b>C-w C-d 't' 'm'</b>  :  Copy target to paragraph end       </li>
       </ul>
@@ -91,6 +95,7 @@
           <li><b>C-x C-a 't' 'm'</b>  :  Cut target to line beginning</li>
           <li><b>C-x C-e 't' 'm'</b>  :  Cut target char to line end </li>
           <li><b>C-x C-p 't' 'm'</b>  :  Cut target paragraph        </li>
+          <li><b>C-x C-g 't' 'm'</b>  :  Cut target paragraph group  </li>
           <li><b>C-x C-u 't' 'm'</b>  :  Cut target to paragraph beginning </li>
           <li><b>C-x C-d 't' 'm'</b>  :  Cut target to paragraph end       </li>
       </ul>
@@ -106,6 +111,7 @@
           <li><b>C-d C-a 't' 'm'</b>  :  delete target to line beginning</li>
           <li><b>C-d C-e 't' 'm'</b>  :  delete target char to line end </li>
           <li><b>C-d C-p 't' 'm'</b>  :  delete target paragraph        </li>
+          <li><b>C-d C-g 't' 'm'</b>  :  delete target paragraph group  </li>
           <li><b>C-d C-u 't' 'm'</b>  :  delete target to paragraph beginning </li>
           <li><b>C-d C-d 't' 'm'</b>  :  delete target to paragraph end       </li>
       </ul>
@@ -137,7 +143,7 @@
 
       <p><b>Copy and Replace:</b></p>
       <ul>
-          <li><b>C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'</b>  :  copy current word/line/paragraph, jump, then replace target word/line/paragraph </li>
+          <li><b>C-I C-R (w | s | l | q | a | A | e | E | p | g | u | d) 't' 'm'</b>  :  copy current word/line/paragraph, jump, then replace target word/line/paragraph </li>
       </ul>
 
     ]]>
@@ -145,6 +151,10 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.4.1</dt>
+        <dd>--- Add `paragraph group' concept, which denotes the `paragraph' including white lines. <br/>
+                Useful when you need copy/cut/move/delete function with white lines inside. <br/>
+        <dd>
         <dt>1.4.0</dt>
         <dd>--- fix post selection error, in C-O C-A command. <br/>
         <dd>
@@ -208,7 +218,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.4.0</version>
+  <version>1.4.1</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
@@ -265,6 +275,9 @@
       </action>
       <action id="emacsIDEAs.AceJumpAndReplace.Paragraph" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Paragraph" description="AceJumpAndReplace.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.Group"     class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Group" description="AceJumpAndReplace.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta G"/>
       </action>
       <action id="emacsIDEAs.AceJumpAndReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToParagraphStart" description="AceJumpAndReplace.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta U"/>
