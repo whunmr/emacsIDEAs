@@ -21,8 +21,7 @@
           <li><b>C-c  w  </b>  :  Copy word</li>
           <li><b>C-c  s  </b>  :  Copy string</li>
           <li><b>C-c  l  </b>  :  Copy line</li>
-          <li><b>C-c  b  </b>  :  Copy block between balanced { nel
-          and } </li>
+          <li><b>C-c  b  </b>  :  Copy block between balanced { and } </li>
           <li><b>C-c  q  </b>  :  Copy quoted, such as abcd in "abcd"</li>
           <li><b>C-c  a  </b>  :  Copy to line beginning</li>
           <li><b>C-c  A  </b>  :  Copy to file beginning</li>
