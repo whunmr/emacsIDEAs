@@ -67,6 +67,6 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
             }
         };
 
-        ApplicationManager.getApplication().runWriteAction(AppUtil.getRunnableWrapper(runnable, _editor));
+        AppUtil.runWriteAction(runnable, _editor);
     }
 }

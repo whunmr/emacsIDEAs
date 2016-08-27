@@ -1,6 +1,5 @@
 package org.hunmr.acejump.command;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import org.hunmr.util.AppUtil;
 
@@ -25,6 +24,6 @@ public class CopyAfterJumpCommand extends CommandAroundJump {
             }
         };
 
-        ApplicationManager.getApplication().runWriteAction(AppUtil.getRunnableWrapper(runnable, _editor));
+        AppUtil.runWriteAction(runnable, _editor);
     }
 }

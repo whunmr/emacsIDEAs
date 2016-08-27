@@ -34,7 +34,7 @@ public class JustOneSpace extends EmacsIdeasAction {
                 EditorModificationUtil.insertStringAtCaret(_editor, " ");
             }
         };
-        ApplicationManager.getApplication().runWriteAction(AppUtil.getRunnableWrapper(runnable, _editor));
+        AppUtil.runWriteAction(runnable, _editor);
     }
 
     private int forwardToEndOffset(int end, String doc, int textLength) {

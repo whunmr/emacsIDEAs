@@ -100,7 +100,7 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
             }
         };
 
-        ApplicationManager.getApplication().runWriteAction(AppUtil.getRunnableWrapper(cutRunnable, _editor));
+        AppUtil.runWriteAction(cutRunnable, _editor);
     }
 
     private void copySelection(TextRange tr) {
