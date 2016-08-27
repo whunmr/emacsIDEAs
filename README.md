@@ -10,6 +10,10 @@ plugin page: http://plugins.jetbrains.com/plugin/?idea_ce&pluginId=7163
 
 ---
 
+Inline-style: 
+![usage sample](https://plugins.jetbrains.com/files/7163/screenshot_16062.png)
+
+
 
 ```
 AceJump
