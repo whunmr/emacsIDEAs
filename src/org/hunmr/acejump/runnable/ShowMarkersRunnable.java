@@ -3,9 +3,11 @@ package org.hunmr.acejump.runnable;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import org.hunmr.acejump.AceJumpAction;
+import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -13,14 +15,16 @@ import java.util.List;
 public class ShowMarkersRunnable implements Runnable {
     public static final char INFINITE_JUMP_CHAR = '/';
     private static final String MARKER_CHARSET =     "asdfjeghiybcmnopqrtuvwkl";   //TODO: customizable
-    private final List<Integer> _offsets;
+    private final List<JOffset> _offsets;
     private final AceJumpAction _action;
     private final Editor _editor;
+    private final ArrayList<Editor> _editors;
     private MarkerCollection _markerCollection;
 
-    public ShowMarkersRunnable(List<Integer> offsets, AceJumpAction currentExecutingAction) {
+    public ShowMarkersRunnable(List<JOffset> offsets, AceJumpAction currentExecutingAction) {
         _offsets = offsets;
         _editor = currentExecutingAction.getEditor();
+        _editors = currentExecutingAction.getEditors();
         this._action = currentExecutingAction;
         _markerCollection = _action.getMarkerCollection();
     }
@@ -33,17 +37,23 @@ public class ShowMarkersRunnable implements Runnable {
 
         int caretOffset = _editor.getCaretModel().getOffset();
         sortOffsetsByDistanceToCaret(caretOffset);
-        sortOffsetsToImprovePriorityOfLineEnd(caretOffset);
+        sortOffsetsToImprovePriorityOfLineEnd();
 
         int twiceJumpGroupCount = calcTwiceJumpGroupCount();
         int singleJumpCount = Math.min(MARKER_CHARSET.length() - twiceJumpGroupCount, _offsets.size());
 
         createSingleJumpMarkers(singleJumpCount);
         if (twiceJumpGroupCount > 0) {
-            createMultipleJumpMarkers(singleJumpCount, twiceJumpGroupCount);
+            createMultipleJumpMarkers(singleJumpCount);
         }
 
-        _action.showNewMarkersPanel(new MarkersPanel(_editor, _markerCollection));
+        ArrayList<MarkersPanel> panels = new ArrayList<MarkersPanel>();
+        for (Editor editor : _editors) {
+            MarkersPanel markersPanel = new MarkersPanel(editor, _markerCollection);
+            panels.add(markersPanel);
+        }
+
+        _action.showNewMarkersPanel(panels);
     }
 
     private void createSingleJumpMarkers(int singleJumpCount) {
@@ -53,7 +63,7 @@ public class ShowMarkersRunnable implements Runnable {
         }
     }
 
-    private void createMultipleJumpMarkers(int singleJumpCount, int groupsNeedsTwiceJump) {
+    private void createMultipleJumpMarkers(int singleJumpCount) {
         int i = singleJumpCount;
 
         for (;i < _offsets.size(); i++) {
@@ -94,9 +104,16 @@ public class ShowMarkersRunnable implements Runnable {
     }
 
     private void sortOffsetsByDistanceToCaret(final int caretOffset) {
-        Collections.sort(_offsets, new Comparator<Integer>() {
+        Collections.sort(_offsets, new Comparator<JOffset>() {
             @Override
-            public int compare(Integer oA, Integer oB) {
+            public int compare(JOffset joA, JOffset joB) {
+                if (joA.editor != joB.editor) {
+                    return joA.editor.hashCode() - joB.editor.hashCode();
+                }
+
+                Integer oA = joA.offset;
+                Integer oB = joB.offset;
+
                 int distA = Math.abs(oA - caretOffset);
                 int distB = Math.abs(oB - caretOffset);
 
@@ -109,13 +126,17 @@ public class ShowMarkersRunnable implements Runnable {
         });
     }
 
-    private void sortOffsetsToImprovePriorityOfLineEnd(final int caretOffset) {
-        Collections.sort(_offsets, new Comparator<Integer>() {
+    private void sortOffsetsToImprovePriorityOfLineEnd() {
+        Collections.sort(_offsets, new Comparator<JOffset>() {
             @Override
-            public int compare(Integer oA, Integer oB) {
-                Document document = _editor.getDocument();
-                boolean oAIsLineEndOffset = isLineEndOffset(oA, document);
-                boolean oBIsLineEndOffset = isLineEndOffset(oB, document);
+            public int compare(JOffset joA, JOffset joB) {
+                if (joA.editor != joB.editor) {
+                    return joA.editor.hashCode() - joB.editor.hashCode();
+                }
+
+                Document document = joA.editor.getDocument();
+                boolean oAIsLineEndOffset = isLineEndOffset(joA.offset, document);
+                boolean oBIsLineEndOffset = isLineEndOffset(joB.offset, document);
 
                 if (!(oAIsLineEndOffset ^ oBIsLineEndOffset)) {
                     return 0;

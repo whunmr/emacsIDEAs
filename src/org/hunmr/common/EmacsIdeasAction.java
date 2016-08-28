@@ -2,26 +2,31 @@ package org.hunmr.common;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.project.Project;
 import org.hunmr.acejump.runnable.ShowMarkersRunnable;
 
 import javax.swing.*;
 import java.awt.event.KeyListener;
+import java.util.*;
 
 public abstract class EmacsIdeasAction extends AnAction {
     protected volatile boolean _isStillRunning = false;
     protected EmacsIdeasAction _action;
     protected Editor _editor;
+    protected ArrayList<Editor> _editors;
     protected JComponent _contentComponent;
     protected Document _document;
     protected KeyListener[] _keyListeners;
     protected AnActionEvent _event;
     protected Project _project;
-
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
         restoreOldKeyListeners();
@@ -71,6 +76,22 @@ public abstract class EmacsIdeasAction extends AnAction {
         }
 
         _editor = newEditor;
+        _editors = collect_active_editors(e);
+    }
+
+    private ArrayList<Editor> collect_active_editors(AnActionEvent e) {
+        ArrayList<Editor> editors = new ArrayList<Editor>();
+
+        final Project project = e.getData(CommonDataKeys.PROJECT);
+        final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+        FileEditor[] selectedEditors = fileEditorManager.getSelectedEditors();
+
+        for (FileEditor selectedEditor : selectedEditors) {
+            Editor editor = ((TextEditor)selectedEditor).getEditor();
+            editors.add(editor);
+        }
+
+        return editors;
     }
 
     protected void initMemberVariableForConvenientAccess(AnActionEvent e) {
@@ -91,6 +112,10 @@ public abstract class EmacsIdeasAction extends AnAction {
 
     public Editor getEditor() {
         return _editor;
+    }
+
+    public ArrayList<Editor> getEditors() {
+        return _editors;
     }
 
     protected void runReadAction(ShowMarkersRunnable action) {

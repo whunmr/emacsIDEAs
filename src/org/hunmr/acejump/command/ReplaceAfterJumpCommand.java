@@ -1,9 +1,9 @@
 package org.hunmr.acejump.command;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.common.selector.Selector;
 import org.hunmr.util.AppUtil;
 import org.hunmr.util.EditorUtils;
@@ -21,15 +21,16 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
     }
 
     @Override
-    public void beforeJump(final int jumpTargetOffset) {
+    public void beforeJump(final JOffset jumpTargetOffset) {
         super.beforeJump(jumpTargetOffset);
         EditorUtils.selectRangeOf(_selectorClass, _editor);
-        _caretOffsetFromSelectRangeStartBeforeJump = getOffsetBeforeJump() - _editor.getSelectionModel().getSelectionStart();
-        _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
+        _caretOffsetFromSelectRangeStartBeforeJump = getOffsetBeforeJump().offset - _editor.getSelectionModel().getSelectionStart();
+        //editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
+        getOffsetBeforeJump().restoreCaret();
     }
 
     @Override
-    public void afterJump(final int jumpTargetOffset) {
+    public void afterJump(final JOffset jumpTargetOffset) {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {

@@ -1,10 +1,10 @@
 package org.hunmr.acejump.command;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.common.selector.Selector;
 import org.hunmr.util.AppUtil;
 import org.hunmr.util.EditorUtils;
@@ -21,29 +21,34 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
 
 
     @Override
-    public void afterJump(final int jumpTargetOffset) {
+    public void afterJump(final JOffset jumpTargetOffset) {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                TextRange sourceRange = EditorUtils.getRangeOf(_selectorClass, _editor);
+                TextRange sourceRange = EditorUtils.getRangeOf(_selectorClass, jumpTargetOffset.editor);
 
-                boolean noNeedToMove = sourceRange.contains(getOffsetBeforeJump());
-                if (noNeedToMove) {
-                    _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
-                    return;
+                if (inSameEditor(jumpTargetOffset)) {
+                    boolean noNeedToMove = sourceRange.contains(getOffsetBeforeJump().offset);
+                    if (noNeedToMove) {
+                        _editor.getCaretModel().moveToOffset(getOffsetBeforeJump().offset);
+                        return;
+                    }
                 }
 
                 int textSourceStartOffset = sourceRange.getStartOffset();
 
-                EditorUtils.copyRange(_selectorClass, _editor);
-                if (textSourceStartOffset > getOffsetBeforeJump()) {
+                EditorUtils.copyRange(_selectorClass, jumpTargetOffset.editor);
+
+                if ( !inSameEditor(jumpTargetOffset) || textSourceStartOffset > getOffsetBeforeJump().offset) {
                     deleteTextSource();
                     pasteClipboardToOffset();
                 } else {
                     pasteClipboardToOffset();
-                    _editor.getCaretModel().moveToOffset(jumpTargetOffset);
+
+                    jumpTargetOffset.restoreCaret();
                     deleteTextSource();
-                    _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
+                    getOffsetBeforeJump().restoreCaret();
+
                     int cur_offset = _editor.getCaretModel().getOffset();
 
                     if (_config._needSelectTextAfterJump) {
@@ -58,7 +63,8 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
             }
 
             private void pasteClipboardToOffset() {
-                _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
+                getOffsetBeforeJump().restoreCaret();
+
                 TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
                 if (_config._needSelectTextAfterJump) {
                     EditorUtils.selectTextRange(_editor, tr);

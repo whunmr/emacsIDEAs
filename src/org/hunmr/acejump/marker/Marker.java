@@ -1,24 +1,21 @@
 package org.hunmr.acejump.marker;
 
-import com.intellij.openapi.util.TextRange;
-
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Marker {
     private String _marker;
-    private ArrayList<Integer> _offsets = new ArrayList<Integer>();
+    private ArrayList<JOffset> _offsets = new ArrayList<JOffset>();
 
-    public Marker(String marker, int offset) {
+    public Marker(String marker, JOffset offset) {
         _marker = marker;
         addOffsetToMarker(offset);
     }
 
-    public void addOffsetToMarker(int offset) {
+    public void addOffsetToMarker(JOffset offset) {
         _offsets.add(offset);
     }
 
-    public ArrayList<Integer> getOffsets() {
+    public ArrayList<JOffset> getOffsets() {
         return _offsets;
     }
 
@@ -30,7 +27,7 @@ public class Marker {
         return _marker;
     }
 
-    public int getOffset() {
+    public JOffset getOffset() {
         return _offsets.get(0);
     }
 

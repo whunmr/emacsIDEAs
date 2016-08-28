@@ -1,16 +1,13 @@
 package org.hunmr.acejump.marker;
 
-import com.intellij.openapi.vcs.history.VcsRevisionNumber;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
 public class MarkerCollection extends HashMap<String, Marker> {
 
-    public ArrayList<Integer> getOffsetsOfKey(char key) {
-        ArrayList<Integer> ai = new ArrayList<Integer>();
+    public ArrayList<JOffset> getOffsetsOfKey(char key) {
+        ArrayList<JOffset> ai = new ArrayList<JOffset>();
 
         for (Marker marker : this.values()) {
             if (marker.getMarkerChar() == key) {
@@ -22,7 +19,7 @@ public class MarkerCollection extends HashMap<String, Marker> {
         return ai;
     }
 
-    public void addMarker(String key, Integer offset) {
+    public void addMarker(String key, JOffset offset) {
         Marker marker = this.get(key);
 
         if (marker == null) {
@@ -33,7 +30,7 @@ public class MarkerCollection extends HashMap<String, Marker> {
         marker.addOffsetToMarker(offset);
     }
 
-    public int getFirstOffset() {
+    public JOffset getFirstOffset() {
         return this.values().iterator().next().getOffset();
     }
 

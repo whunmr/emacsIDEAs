@@ -2,7 +2,7 @@
   <name>emacsIDEAs</name>
   <description>
     <![CDATA[
-      <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction.</p>
+      <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction. And new created EditWithoutSelection (Cut/Move/Replace without selection). </p>
       <p><b>AceJump</b></p>
       <ul>
           <li><b>C-L 't' 'm'</b>  :  <b>Basic Word Jump       </b>| Type C-L, then type target char (eg. 't') to jump to, then type marker char (eg. 'm') to move caret.</li>

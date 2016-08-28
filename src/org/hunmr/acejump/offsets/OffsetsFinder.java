@@ -10,15 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OffsetsFinder {
-    public List<Integer> getOffsets(char key, Editor editor, Document document) {
+    public List<Integer> getOffsets(char key, Editor editor, Editor selectedEditor) {
+        Document document = editor.getDocument();
         TextRange visibleRange = EditorUtils.getVisibleTextRange(editor);
-        List<Integer> offsets = getOffsetsOfCharIgnoreCase(String.valueOf(key), visibleRange, document, editor);
+        List<Integer> offsets = getOffsetsOfCharIgnoreCase(String.valueOf(key), visibleRange, document, editor, selectedEditor);
 
         if (key == KeyEvent.VK_SPACE) {
-            offsets.addAll(getOffsetsOfCharIgnoreCase("\t\r\n", visibleRange, document, editor));
+            offsets.addAll(getOffsetsOfCharIgnoreCase("\t\r\n", visibleRange, document, editor, selectedEditor));
             addStartLineOffsetsTo(offsets, editor);
         } else if (key == ',') {
-            offsets.addAll(getOffsetsOfCharIgnoreCase("|`/\\;.{}()[]<>?_=-+'\"!@#$%^&*", visibleRange, document, editor));
+            offsets.addAll(getOffsetsOfCharIgnoreCase("|`/\\;.{}()[]<>?_=-+'\"!@#$%^&*", visibleRange, document, editor, selectedEditor));
         }
 
         return offsets;
@@ -33,7 +34,7 @@ public class OffsetsFinder {
         }
     }
 
-    protected ArrayList<Integer> getOffsetsOfCharIgnoreCase(String charSet, TextRange markerRange, Document document, Editor editor) {
+    protected ArrayList<Integer> getOffsetsOfCharIgnoreCase(String charSet, TextRange markerRange, Document document, Editor editor, Editor selectedEditor) {
         ArrayList<Integer> offsets = new ArrayList<Integer>();
         String visibleText = document.getText(markerRange);
 
@@ -41,16 +42,16 @@ public class OffsetsFinder {
             char lowCase = Character.toLowerCase(charToFind);
             char upperCase = Character.toUpperCase(charToFind);
 
-            offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), lowCase, visibleText, editor));
+            offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), lowCase, visibleText, editor, selectedEditor));
             if (upperCase != lowCase) {
-                offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), upperCase, visibleText, editor));
+                offsets.addAll(getOffsetsOfChar(markerRange.getStartOffset(), upperCase, visibleText, editor, selectedEditor));
             }
         }
 
         return offsets;
     }
 
-    private ArrayList<Integer> getOffsetsOfChar(int startOffset, char c, String visibleText, Editor editor) {
+    private ArrayList<Integer> getOffsetsOfChar(int startOffset, char c, String visibleText, Editor editor, Editor selectedEditor) {
         int caretOffset = editor.getCaretModel().getOffset();
 
         ArrayList<Integer> offsets = new ArrayList<Integer>();
@@ -59,8 +60,9 @@ public class OffsetsFinder {
         while (index >= 0) {
             int offset = startOffset + index;
 
-            if (isValidOffset(c, visibleText, index, offset, caretOffset) && (offset != caretOffset)) {
-                offsets.add(offset);
+            if (isValidOffset(c, visibleText, index, offset, caretOffset)) {
+                if (editor != selectedEditor || offset != caretOffset)
+                    offsets.add(offset);
             }
 
             index = visibleText.indexOf(c, index + 1);

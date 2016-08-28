@@ -19,9 +19,10 @@ public class AceJumpCopyRangeAction extends AnAction {
 
         try {
             Class<? extends Selector> selectorClass = (Class<? extends Selector>) Class.forName(selectorClassName);
-            EditorUtils.copyRange(selectorClass, editor);
+            //EditorUtils.copyRange(selectorClass, editor);
 
             AceJumpAction.getInstance().addCommandAroundJump(new CopyRangeAfterJumpCommand(editor, selectorClass));
+
             AceJumpAction.getInstance().performAction(e);
         } catch (ClassNotFoundException e1) {
             e1.printStackTrace();

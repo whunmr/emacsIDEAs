@@ -1,9 +1,9 @@
 package org.hunmr.acejump.command;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl;
 import com.intellij.openapi.util.TextRange;
+import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.common.selector.Selector;
 import org.hunmr.util.AppUtil;
 import org.hunmr.util.EditorUtils;
@@ -18,20 +18,22 @@ public class CopyRangeAfterJumpCommand extends CommandAroundJump  {
 
 
     @Override
-    public void afterJump(final int jumpTargetOffset) {
+    public void afterJump(final JOffset jumpTargetOffset) {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                EditorUtils.copyRange(_selectorClass, _editor);
+                EditorUtils.copyRange(_selectorClass, jumpTargetOffset.editor);
                 pasteClipboardToOffset();
             }
 
             private void pasteClipboardToOffset() {
-                _editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
-                TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
+                getOffsetBeforeJump().restoreCaret();
+
+                Editor editor = getOffsetBeforeJump().editor;
+                TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(editor);
 
                 if (_config._needSelectTextAfterJump)
-                    EditorUtils.selectTextRange(_editor, tr);
+                    EditorUtils.selectTextRange(editor, tr);
             }
         };
 

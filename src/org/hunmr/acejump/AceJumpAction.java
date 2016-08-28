@@ -2,10 +2,12 @@ package org.hunmr.acejump;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.hunmr.acejump.command.CommandAroundJump;
 import org.hunmr.acejump.command.SelectAfterJumpCommand;
+import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.acejump.marker.MarkerCollection;
 import org.hunmr.acejump.marker.MarkersPanel;
 import org.hunmr.acejump.offsets.CharOffsetsFinder;
@@ -17,6 +19,7 @@ import org.hunmr.common.EmacsIdeasAction;
 import org.hunmr.util.EditorUtils;
 import org.hunmr.util.Str;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ import java.util.Stack;
 
 public class AceJumpAction extends EmacsIdeasAction {
     private MarkerCollection _markers;
-    private MarkersPanel _markersPanel;
+    private ArrayList<MarkersPanel> _markersPanels;
     private KeyListener _showMarkersKeyListener;
     private KeyListener _jumpToMarkerKeyListener;
     private Stack<CommandAroundJump> _commandsAroundJump = new Stack<CommandAroundJump>();
@@ -86,7 +89,7 @@ public class AceJumpAction extends EmacsIdeasAction {
         }
 
         if (EditorUtils.isPrintableChar(key) && _markers.containsMarkerWithKey(key)) {
-            ArrayList<Integer> offsetsOfKey = _markers.getOffsetsOfKey(key);
+            ArrayList<JOffset> offsetsOfKey = _markers.getOffsetsOfKey(key);
 
             if (offsetsOfKey.size() > 1) {
                 _markers.clear();
@@ -148,15 +151,28 @@ public class AceJumpAction extends EmacsIdeasAction {
         };
     }
 
-    private List<Integer> getOffsetsOfCharInVisibleArea(char key) {
+    private List<JOffset> getOffsetsOfCharInVisibleArea(char key) {
         if (_markers.get(key) != null) {
             return _markers.get(key).getOffsets();
         }
 
-        return _offsetsFinder.getOffsets(key, _editor, _document);
+        return findOffsetsInEditors(key);
     }
 
-    private void jumpToOffset(final int jumpOffset) {
+    private List<JOffset> findOffsetsInEditors(char key) {
+        List<JOffset> joffsets = new ArrayList<JOffset>();
+
+        for (Editor editor : _editors) {
+            List<Integer> offsets = _offsetsFinder.getOffsets(key, editor, _editor);
+            for (Integer offset : offsets) {
+                joffsets.add(new JOffset(editor, offset));
+            }
+        }
+
+        return joffsets;
+    }
+
+    private void jumpToOffset(final JOffset jumpOffset) {
         for (CommandAroundJump cmd : _commandsAroundJump) {
             cmd.beforeJump(jumpOffset);
         }
@@ -181,8 +197,12 @@ public class AceJumpAction extends EmacsIdeasAction {
             _showMarkersKeyListener = null;
         }
 
-        if (_markersPanel != null) {
-            _contentComponent.remove(_markersPanel);
+        if (_markersPanels != null) {
+            for (MarkersPanel markersPanel : _markersPanels) {
+                if (markersPanel.getParent() != null) {
+                    markersPanel.getParent().remove(markersPanel);
+                }
+            }
         }
 
         _commandsAroundJump = new Stack<CommandAroundJump>();
@@ -198,15 +218,23 @@ public class AceJumpAction extends EmacsIdeasAction {
         _jumpToMarkerKeyListener = createJumpToMarkupKeyListener();
     }
 
-    public void showNewMarkersPanel(MarkersPanel markersPanel) {
-        if (_markersPanel != null) {
-            _contentComponent.remove(_markersPanel);
-            _contentComponent.repaint();
+    public void showNewMarkersPanel(ArrayList<MarkersPanel> markersPanels) {
+        if (_markersPanels != null) {
+            for (MarkersPanel markersPanel : _markersPanels) {
+                Container parent = markersPanel.getParent();
+                if (parent != null) {
+                    parent.remove(markersPanel);
+                    parent.repaint();
+                }
+            }
         }
 
-        _markersPanel = markersPanel;
-        _contentComponent.add(markersPanel);
-        _contentComponent.repaint();
+        _markersPanels = markersPanels;
+
+        for (MarkersPanel markersPanel : markersPanels) {
+            markersPanel._editor.getContentComponent().add(markersPanel);
+            markersPanel._editor.getContentComponent().repaint();
+        }
     }
 
     public MarkerCollection getMarkerCollection() {

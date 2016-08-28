@@ -1,8 +1,8 @@
 package org.hunmr.acejump.command;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
+import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.util.AppUtil;
 
 public class CutAfterJumpCommand extends CommandAroundJump {
@@ -11,12 +11,12 @@ public class CutAfterJumpCommand extends CommandAroundJump {
     }
 
     @Override
-    public void beforeJump(final int jumpTargetOffset) {
+    public void beforeJump(final JOffset jumpTargetOffset) {
         super.beforeJump(jumpTargetOffset);
     }
 
     @Override
-    public void afterJump(final int jumpTargetOffset) {
+    public void afterJump(final JOffset jumpTargetOffset) {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
