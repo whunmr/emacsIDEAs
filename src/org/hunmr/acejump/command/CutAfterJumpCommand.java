@@ -11,24 +11,20 @@ public class CutAfterJumpCommand extends CommandAroundJump {
     }
 
     @Override
-    public void beforeJump(final JOffset jumpTargetOffset) {
-        super.beforeJump(jumpTargetOffset);
-    }
-
-    @Override
-    public void afterJump(final JOffset jumpTargetOffset) {
+    public void afterJump() {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if (inSameEditor(jumpTargetOffset)) {
-                    selectJumpArea(jumpTargetOffset);
-                    _editor.getSelectionModel().copySelectionToClipboard();
-                    EditorModificationUtil.deleteSelectedText(_editor);
-                    _editor.getSelectionModel().removeSelection();
+                if (inSameEditor()) {
+                    selectJumpArea();
+
+                    _se.getSelectionModel().copySelectionToClipboard();
+                    EditorModificationUtil.deleteSelectedText(_se);
+                    _se.getSelectionModel().removeSelection();
                 }
             }
         };
 
-        AppUtil.runWriteAction(runnable, _editor);
+        AppUtil.runWriteAction(runnable, _se);
     }
 }

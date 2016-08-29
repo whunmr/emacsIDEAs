@@ -1,5 +1,6 @@
 package org.hunmr.acejump.command;
 
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl;
 import com.intellij.openapi.util.TextRange;
@@ -23,45 +24,41 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
     @Override
     public void beforeJump(final JOffset jumpTargetOffset) {
         super.beforeJump(jumpTargetOffset);
-        EditorUtils.selectRangeOf(_selectorClass, _editor);
-        _caretOffsetFromSelectRangeStartBeforeJump = getOffsetBeforeJump().offset - _editor.getSelectionModel().getSelectionStart();
-        getOffsetBeforeJump().restoreCaret();
+        EditorUtils.selectRangeOf(_selectorClass, _se);
+        _caretOffsetFromSelectRangeStartBeforeJump = _soff - _se.getSelectionModel().getSelectionStart();
+        focusSourceCaret();
     }
 
     @Override
-    public void afterJump(final JOffset jumpTargetOffset) {
+    public void afterJump() {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Editor targetEditor = jumpTargetOffset.editor;
 
-                TextRange tr = getTextRangeToReplace(targetEditor);
+                TextRange tr = EditorUtils.getRangeOf(_selectorClass, _te);
                 if (tr != null)
                 {
-                    targetEditor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
-                    EditorUtils.deleteRange(tr, targetEditor);
+                    _te.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+                    EditorUtils.deleteRange(tr, _te);
                 }
+
+                CaretModel targetCaret = _te.getCaretModel();
 
                 if (_addNewLineBeforePaste) {
-                    targetEditor.getDocument().insertString(targetEditor.getCaretModel().getOffset(), "\n");
-                    targetEditor.getCaretModel().moveToOffset(targetEditor.getCaretModel().getOffset() + 1);
+                    _te.getDocument().insertString(targetCaret.getOffset(), "\n");
+                    targetCaret.moveToOffset(targetCaret.getOffset() + 1);
                 }
 
-                TextRange[] textRanges = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(targetEditor);
+                TextRange[] textRanges = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_te);
 
                 if (_config._needSelectTextAfterJump) {
                     int caret = textRanges[0].getStartOffset() + _caretOffsetFromSelectRangeStartBeforeJump;
-                    targetEditor.getCaretModel().moveToOffset(caret);
-                    EditorUtils.selectRangeOf(_selectorClass, targetEditor);
+                    targetCaret.moveToOffset(caret);
+                    EditorUtils.selectRangeOf(_selectorClass, _te);
                 }
             }
         };
 
-        AppUtil.runWriteAction(runnable, _editor);
-    }
-
-    public TextRange getTextRangeToReplace(Editor targetEditor)
-    {
-        return EditorUtils.getRangeOf(_selectorClass, targetEditor);
+        AppUtil.runWriteAction(runnable, _se);
     }
 }

@@ -11,23 +11,16 @@ public class CopyAfterJumpCommand extends CommandAroundJump {
     }
 
     @Override
-    public void beforeJump(final JOffset jumpTargetOffset) {
-        super.beforeJump(jumpTargetOffset);
-    }
-
-    @Override
-    public void afterJump(final JOffset jumpTargetOffset) {
+    public void afterJump() {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                selectJumpArea(jumpTargetOffset);
-
-                SelectionModel selectionModel = jumpTargetOffset.editor.getSelectionModel();
-                selectionModel.copySelectionToClipboard();
-                selectionModel.removeSelection();
+                selectJumpArea();
+                _te.getSelectionModel().copySelectionToClipboard();
+                _te.getSelectionModel().removeSelection();
             }
         };
 
-        AppUtil.runWriteAction(runnable, _editor);
+        AppUtil.runWriteAction(runnable, _se);
     }
 }

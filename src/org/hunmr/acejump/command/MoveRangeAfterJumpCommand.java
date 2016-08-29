@@ -21,39 +21,39 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
 
 
     @Override
-    public void afterJump(final JOffset jumpTargetOffset) {
+    public void afterJump() {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                TextRange sourceRange = EditorUtils.getRangeOf(_selectorClass, jumpTargetOffset.editor);
+                TextRange sourceRange = EditorUtils.getRangeOf(_selectorClass, _te);
 
-                if (inSameEditor(jumpTargetOffset)) {
-                    boolean noNeedToMove = sourceRange.contains(getOffsetBeforeJump().offset);
+                if (inSameEditor()) {
+                    boolean noNeedToMove = sourceRange.contains(_soff);
                     if (noNeedToMove) {
-                        _editor.getCaretModel().moveToOffset(getOffsetBeforeJump().offset);
+                        _se.getCaretModel().moveToOffset(_soff);
                         return;
                     }
                 }
 
                 int textSourceStartOffset = sourceRange.getStartOffset();
 
-                EditorUtils.copyRange(_selectorClass, jumpTargetOffset.editor);
+                EditorUtils.copyRange(_selectorClass, _te);
 
-                if ( !inSameEditor(jumpTargetOffset) || textSourceStartOffset > getOffsetBeforeJump().offset) {
-                    deleteTextSource(jumpTargetOffset.editor);
+                if ( !inSameEditor() || textSourceStartOffset > _soff) {
+                    deleteTextSource(_te);
 
                     pasteClipboardToOffset();
                 } else {
                     pasteClipboardToOffset();
 
-                    jumpTargetOffset.restoreCaret();
-                    deleteTextSource(jumpTargetOffset.editor);
-                    getOffsetBeforeJump().restoreCaret();
+                    focusTargetCaret();
+                    deleteTextSource(_te);
+                    focusSourceCaret();
 
-                    int cur_offset = _editor.getCaretModel().getOffset();
+                    int cur_offset = _se.getCaretModel().getOffset();
 
                     if (_config._needSelectTextAfterJump) {
-                        EditorUtils.selectTextRange(_editor, cur_offset - _length, cur_offset);
+                        EditorUtils.selectTextRange(_se, cur_offset - _length, cur_offset);
                     }
                 }
             }
@@ -64,16 +64,16 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
             }
 
             private void pasteClipboardToOffset() {
-                getOffsetBeforeJump().restoreCaret();
+                focusSourceCaret();
 
-                TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(getOffsetBeforeJump().editor);
+                TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_se);
                 if (_config._needSelectTextAfterJump) {
-                    EditorUtils.selectTextRange(getOffsetBeforeJump().editor, tr);
+                    EditorUtils.selectTextRange(_se, tr);
                 }
                 _length = tr[0].getEndOffset() - tr[0].getStartOffset();
             }
         };
 
-        AppUtil.runWriteAction(runnable, _editor);
+        AppUtil.runWriteAction(runnable, _se);
     }
 }

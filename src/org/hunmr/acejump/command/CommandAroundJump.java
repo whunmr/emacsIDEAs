@@ -6,39 +6,51 @@ import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.options.PluginConfig;
 
 public class CommandAroundJump {
-    protected Editor _editor;
-    private JOffset _offsetBeforeJump;
+    protected Editor _se; /*source editor*/
+    protected int _soff;
+
+    protected Editor _te; /*target editor*/
+    protected int _toff;
 
     final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
 
     public CommandAroundJump(Editor editor) {
-        _editor = editor;
+        _se = editor;
     }
 
     public void beforeJump(final JOffset jumpTargetOffset) {
-        _offsetBeforeJump = new JOffset(_editor, _editor.getCaretModel().getOffset());
+        _soff = _se.getCaretModel().getOffset();
     }
 
-    public void afterJump(final JOffset jumpTargetOffset) {
-
+    public void preAfterJump(final JOffset jumpTargetOffset) {
+        _te = jumpTargetOffset.editor;
+        _toff = jumpTargetOffset.offset;
     }
 
-    public JOffset getOffsetBeforeJump() {
-        return _offsetBeforeJump;
+    public void afterJump() {
     }
 
-    protected void selectJumpArea(JOffset jumpTargetOffset) {
-        if (_editor == jumpTargetOffset.editor) {
-            if (getOffsetBeforeJump().offset < jumpTargetOffset.offset) {
-                _editor.getSelectionModel().setSelection(getOffsetBeforeJump().offset, jumpTargetOffset.offset);
-            } else {
-                _editor.getSelectionModel().setSelection(jumpTargetOffset.offset, getOffsetBeforeJump().offset);
-            }
+    public void focusSourceCaret() {
+        _se.getContentComponent().requestFocus();
+        _se.getCaretModel().moveToOffset(_soff);
+    }
+
+    public void focusTargetCaret() {
+        _te.getContentComponent().requestFocus();
+        _te.getCaretModel().moveToOffset(_toff);
+    }
+
+    protected void selectJumpArea() {
+        if (inSameEditor()) {
+            if (_soff < _toff)
+                _se.getSelectionModel().setSelection(_soff, _toff);
+            else
+                _se.getSelectionModel().setSelection(_toff, _soff);
         }
     }
 
-    public boolean inSameEditor(JOffset jumpTargetOffset) {
-        return _offsetBeforeJump.editor == jumpTargetOffset.editor;
+    public boolean inSameEditor() {
+        return _se == _te;
     }
 }
 

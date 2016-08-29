@@ -14,7 +14,7 @@ public class SelectAfterJumpCommand extends CommandAroundJump {
     }
 
     @Override
-    public void afterJump(final JOffset jumpTargetOffset) {
-        selectJumpArea(jumpTargetOffset);
+    public void afterJump() {
+        selectJumpArea();
     }
 }

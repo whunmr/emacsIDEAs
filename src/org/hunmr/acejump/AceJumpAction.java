@@ -182,7 +182,8 @@ public class AceJumpAction extends EmacsIdeasAction {
         ApplicationManager.getApplication().runReadAction(new JumpRunnable(jumpOffset, this));
 
         for (CommandAroundJump cmd : _commandsAroundJump) {
-            cmd.afterJump(jumpOffset);
+            cmd.preAfterJump(jumpOffset);
+            cmd.afterJump();
         }
 
         cleanupSetupsInAndBackToNormalEditingMode();
@@ -201,8 +202,10 @@ public class AceJumpAction extends EmacsIdeasAction {
 
         if (_markersPanels != null) {
             for (MarkersPanel markersPanel : _markersPanels) {
-                if (markersPanel.getParent() != null) {
-                    markersPanel.getParent().remove(markersPanel);
+                Container parent = markersPanel.getParent();
+                if (parent != null) {
+                    parent.remove(markersPanel);
+                    parent.repaint();
                 }
             }
         }

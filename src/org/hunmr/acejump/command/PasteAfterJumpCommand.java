@@ -29,25 +29,25 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
     }
 
     @Override
-    public void afterJump(final JOffset jumpTargetOffset) {
+    public void afterJump() {
         TextRange tr = getTextRangeToReplace();
         if (tr != null)
         {
-            _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+            _se.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
         }
 
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 if (_addNewLineBeforePaste) {
-                    _editor.getDocument().insertString(_editor.getCaretModel().getOffset(), "\n");
-                    _editor.getCaretModel().moveToOffset(_editor.getCaretModel().getOffset() + 1);
+                    _se.getDocument().insertString(_se.getCaretModel().getOffset(), "\n");
+                    _se.getCaretModel().moveToOffset(_se.getCaretModel().getOffset() + 1);
                 }
 
-                EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
+                EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_se);
             }
         };
 
-        AppUtil.runWriteAction(runnable, _editor);
+        AppUtil.runWriteAction(runnable, _se);
     }
 }

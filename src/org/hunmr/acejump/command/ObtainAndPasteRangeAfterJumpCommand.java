@@ -18,23 +18,23 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
     }
 
     @Override
-    public void afterJump(final JOffset jumpTargetOffset) {
+    public void afterJump() {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                EditorUtils.copyRange(_selectorClass, jumpTargetOffset.editor);
-                getOffsetBeforeJump().restoreCaret();
+                EditorUtils.copyRange(_selectorClass, _te);
+                focusSourceCaret();
 
-                EditorUtils.selectRangeOf(_selectorClass, _editor);
-                EditorUtils.deleteRange(_selectorClass, _editor);
-                TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
+                EditorUtils.selectRangeOf(_selectorClass, _se);
+                EditorUtils.deleteRange(_selectorClass, _se);
+                TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_se);
 
                 if (_config._needSelectTextAfterJump) {
-                    EditorUtils.selectTextRange(_editor, tr);
+                    EditorUtils.selectTextRange(_se, tr);
                 }
             }
         };
 
-        AppUtil.runWriteAction(runnable, _editor);
+        AppUtil.runWriteAction(runnable, _se);
     }
 }
