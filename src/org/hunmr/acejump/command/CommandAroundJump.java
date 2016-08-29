@@ -41,3 +41,4 @@ public class CommandAroundJump {
         return _offsetBeforeJump.editor == jumpTargetOffset.editor;
     }
 }
+

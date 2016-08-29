@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import org.hunmr.acejump.command.CopyRangeAfterJumpCommand;
 import org.hunmr.common.selector.Selector;
-import org.hunmr.util.EditorUtils;
 
 public class AceJumpCopyRangeAction extends AnAction {
     @Override
@@ -21,6 +20,7 @@ public class AceJumpCopyRangeAction extends AnAction {
             Class<? extends Selector> selectorClass = (Class<? extends Selector>) Class.forName(selectorClassName);
             //EditorUtils.copyRange(selectorClass, editor);
 
+            AceJumpAction.getInstance().switchEditorIfNeed(e);
             AceJumpAction.getInstance().addCommandAroundJump(new CopyRangeAfterJumpCommand(editor, selectorClass));
 
             AceJumpAction.getInstance().performAction(e);

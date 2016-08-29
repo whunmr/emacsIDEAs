@@ -19,6 +19,7 @@ public class AceJumpDeleteRangeAction extends AnAction {
 
         try {
             Class<? extends Selector> selectorClass = (Class<? extends Selector>) Class.forName(selectorClassName);
+            AceJumpAction.getInstance().switchEditorIfNeed(e);
             AceJumpAction.getInstance().addCommandAroundJump(new DeleteRangeAfterJumpCommand(editor, selectorClass));
             AceJumpAction.getInstance().performAction(e);
         } catch (ClassNotFoundException e1) {

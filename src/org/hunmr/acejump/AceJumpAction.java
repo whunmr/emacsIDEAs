@@ -48,7 +48,9 @@ public class AceJumpAction extends EmacsIdeasAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        _isCalledFromOtherAction = false;
+        if (isCalledFromOtherAction()) {
+            _offsetsFinder = new CharOffsetsFinder();
+        }
 
         Project p = getProjectFrom(e);
 
@@ -125,7 +127,7 @@ public class AceJumpAction extends EmacsIdeasAction {
         };
     }
 
-    private KeyListener createJumpToMarkupKeyListener() {
+    private KeyListener createJumpToMarkupKeyListener(final AnActionEvent e) {
         return new KeyListener() {
             public void keyTyped(KeyEvent keyEvent) {
                 keyEvent.consume();
@@ -207,6 +209,7 @@ public class AceJumpAction extends EmacsIdeasAction {
 
         _commandsAroundJump = new Stack<CommandAroundJump>();
         _offsetsFinder = new WordOffsetsFinder();
+        _isCalledFromOtherAction = false;
         super.cleanupSetupsInAndBackToNormalEditingMode();
     }
 
@@ -215,7 +218,7 @@ public class AceJumpAction extends EmacsIdeasAction {
 
         _markers = new MarkerCollection();
         _showMarkersKeyListener = createShowMarkersKeyListener();
-        _jumpToMarkerKeyListener = createJumpToMarkupKeyListener();
+        _jumpToMarkerKeyListener = createJumpToMarkupKeyListener(e);
     }
 
     public void showNewMarkersPanel(ArrayList<MarkersPanel> markersPanels) {

@@ -11,6 +11,7 @@ public class AceJumpCutAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
 
+        AceJumpAction.getInstance().switchEditorIfNeed(e);
         AceJumpAction.getInstance().addCommandAroundJump(new CutAfterJumpCommand(editor));
         AceJumpAction.getInstance().performAction(e);
     }

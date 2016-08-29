@@ -150,6 +150,9 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.4.2</dt>
+        <dd>--- Add support for jump/move/copy/cut texts cross Split pane editors.<br/>
+        <dd>
         <dt>1.4.1</dt>
         <dd>--- Add `paragraph group' concept, which denotes the `paragraph' including white lines. <br/>
                 Useful when you need copy/cut/move/delete function with white lines inside. <br/>
@@ -217,7 +220,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.4.1</version>
+  <version>1.4.2</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->

@@ -38,7 +38,7 @@ public class MarkersPanel extends JComponent {
 
     @Override
     public void paint(Graphics g) {
-        //drawPanelBackground(g); //TODO: draw panel in editors
+        drawPanelBackground(g); //TODO: draw panel in editors
 
         HashSet<JOffset> firstJumpOffsets = new HashSet<JOffset>();
 

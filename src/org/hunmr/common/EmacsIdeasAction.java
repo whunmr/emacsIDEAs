@@ -69,7 +69,7 @@ public abstract class EmacsIdeasAction extends AnAction {
         return e.getData(PlatformDataKeys.EDITOR);
     }
 
-    protected void switchEditorIfNeed(AnActionEvent e) {
+    public void switchEditorIfNeed(AnActionEvent e) {
         Editor newEditor = getEditorFrom(e);
         if (_editor != null && _editor != newEditor) {
             cleanupSetupsInAndBackToNormalEditingMode();

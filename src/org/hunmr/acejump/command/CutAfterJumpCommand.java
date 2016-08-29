@@ -20,10 +20,12 @@ public class CutAfterJumpCommand extends CommandAroundJump {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                selectJumpArea(jumpTargetOffset);
-                _editor.getSelectionModel().copySelectionToClipboard();
-                EditorModificationUtil.deleteSelectedText(_editor);
-                _editor.getSelectionModel().removeSelection();
+                if (inSameEditor(jumpTargetOffset)) {
+                    selectJumpArea(jumpTargetOffset);
+                    _editor.getSelectionModel().copySelectionToClipboard();
+                    EditorModificationUtil.deleteSelectedText(_editor);
+                    _editor.getSelectionModel().removeSelection();
+                }
             }
         };
 

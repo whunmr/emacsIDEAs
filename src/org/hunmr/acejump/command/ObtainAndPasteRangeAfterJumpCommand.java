@@ -22,7 +22,7 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                EditorUtils.copyRange(_selectorClass, _editor);
+                EditorUtils.copyRange(_selectorClass, jumpTargetOffset.editor);
                 getOffsetBeforeJump().restoreCaret();
 
                 EditorUtils.selectRangeOf(_selectorClass, _editor);

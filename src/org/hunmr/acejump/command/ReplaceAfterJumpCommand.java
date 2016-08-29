@@ -25,7 +25,6 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
         super.beforeJump(jumpTargetOffset);
         EditorUtils.selectRangeOf(_selectorClass, _editor);
         _caretOffsetFromSelectRangeStartBeforeJump = getOffsetBeforeJump().offset - _editor.getSelectionModel().getSelectionStart();
-        //editor.getCaretModel().moveToOffset(getOffsetBeforeJump());
         getOffsetBeforeJump().restoreCaret();
     }
 
@@ -34,24 +33,26 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                TextRange tr = getTextRangeToReplace();
+                Editor targetEditor = jumpTargetOffset.editor;
+
+                TextRange tr = getTextRangeToReplace(targetEditor);
                 if (tr != null)
                 {
-                    _editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
-                    EditorUtils.deleteRange(tr, _editor);
+                    targetEditor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
+                    EditorUtils.deleteRange(tr, targetEditor);
                 }
 
                 if (_addNewLineBeforePaste) {
-                    _editor.getDocument().insertString(_editor.getCaretModel().getOffset(), "\n");
-                    _editor.getCaretModel().moveToOffset(_editor.getCaretModel().getOffset() + 1);
+                    targetEditor.getDocument().insertString(targetEditor.getCaretModel().getOffset(), "\n");
+                    targetEditor.getCaretModel().moveToOffset(targetEditor.getCaretModel().getOffset() + 1);
                 }
 
-                TextRange[] textRanges = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_editor);
+                TextRange[] textRanges = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(targetEditor);
 
                 if (_config._needSelectTextAfterJump) {
                     int caret = textRanges[0].getStartOffset() + _caretOffsetFromSelectRangeStartBeforeJump;
-                    _editor.getCaretModel().moveToOffset(caret);
-                    EditorUtils.selectRangeOf(_selectorClass, _editor);
+                    targetEditor.getCaretModel().moveToOffset(caret);
+                    EditorUtils.selectRangeOf(_selectorClass, targetEditor);
                 }
             }
         };
@@ -59,8 +60,8 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
         AppUtil.runWriteAction(runnable, _editor);
     }
 
-    public TextRange getTextRangeToReplace()
+    public TextRange getTextRangeToReplace(Editor targetEditor)
     {
-        return EditorUtils.getRangeOf(_selectorClass, _editor);
+        return EditorUtils.getRangeOf(_selectorClass, targetEditor);
     }
 }

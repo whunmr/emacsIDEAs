@@ -1,6 +1,7 @@
 package org.hunmr.acejump.command;
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.SelectionModel;
 import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.util.AppUtil;
 
@@ -20,8 +21,10 @@ public class CopyAfterJumpCommand extends CommandAroundJump {
             @Override
             public void run() {
                 selectJumpArea(jumpTargetOffset);
-                _editor.getSelectionModel().copySelectionToClipboard();
-                _editor.getSelectionModel().removeSelection();
+
+                SelectionModel selectionModel = jumpTargetOffset.editor.getSelectionModel();
+                selectionModel.copySelectionToClipboard();
+                selectionModel.removeSelection();
             }
         };
 
