@@ -23,3 +23,4 @@ public class ToLineStartSelector extends Selector {
         return endOffset > startOffset ? new TextRange(startOffset, endOffset) : null;
     }
 }
+
