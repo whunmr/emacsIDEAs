@@ -10,7 +10,7 @@ plugin page: http://plugins.jetbrains.com/plugin/?idea_ce&pluginId=7163
 
 ---
 
-![usage sample](https://plugins.jetbrains.com/files/7163/screenshot_16062.png)
+![usage sample](https://plugins.jetbrains.com/files/7163/screenshot_16138.png)
 
 
 
