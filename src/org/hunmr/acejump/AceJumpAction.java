@@ -210,6 +210,10 @@ public class AceJumpAction extends EmacsIdeasAction {
             }
         }
 
+        for (Editor editor : _editors) {
+            editor.getComponent().repaint();
+        }
+
         _commandsAroundJump = new Stack<CommandAroundJump>();
         _offsetsFinder = new WordOffsetsFinder();
         _isCalledFromOtherAction = false;

@@ -150,6 +150,9 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.4.3</dt>
+        <dd>--- fix https://github.com/whunmr/emacsIDEAs/issues/14 overlay and markers in splitted panes not get cleared after jump.<br/>
+        <dd>
         <dt>1.4.2</dt>
         <dd>--- Add support for jump/move/copy/cut texts cross Split pane editors.<br/>
         <dd>
@@ -220,7 +223,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.4.2</version>
+  <version>1.4.3</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
