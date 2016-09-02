@@ -36,57 +36,49 @@ public class MarkersPanel extends JComponent {
     @Override
     public void paint(Graphics g) {
         Font font = _editor.getColorsScheme().getFont(EditorFontType.BOLD);
-        g.setFont(font);
-
         Rectangle2D fontRect = _editor.getContentComponent().getFontMetrics(font).getMaxCharBounds(g);
-        Point parentLocation = _editor.getContentComponent().getLocation();
 
+        g.setFont(font);
         drawPanelBackground(g);
 
         HashSet<JOffset> firstJumpOffsets = new HashSet<JOffset>();
         for (Marker marker : _markerCollection.values()) {
-            if (marker.getOffset().editor != _editor) {
-                continue;
-            }
+            if (marker.getOffset().editor != _editor) continue;
 
             for (JOffset offset : marker.getOffsets()) {
                 firstJumpOffsets.add(offset);
-
-                double x = getVisiblePosition(offset).getX() + parentLocation.getX();
-                double y = getVisiblePosition(offset).getY() + parentLocation.getY();
-
-                drawBackground(g, x, y, _config.getFirstJumpBackground(), fontRect);
-                drawMarkerChar(g, x, y + font.getSize(), marker.getMarkerChar(), _config.getFirstJumpForeground());
+                drawBackground(g, __x(offset), __y(offset), _config.getFirstJumpBackground(), fontRect);
+                drawMarkerChar(g, __x(offset), __y(offset) + font.getSize(), marker.getMarkerChar(), _config.getFirstJumpForeground());
             }
         }
 
         for (Marker marker : _markerCollection.values()) {
-            if (marker.getOffset().editor != _editor) {
-                continue;
-            }
-
-            if (marker.getMarker().length() == 1 || marker.isMappingToMultipleOffset()) {
-                continue;
-            }
-
-            JOffset o = new JOffset(marker.getOffset().editor, marker.getOffset().offset + 1);
-            boolean alreadyHasFirstJumpCharInPlace = firstJumpOffsets.contains(o);
-            boolean isAtLineEnd = isLineEndOffset(marker);
-
-            if (alreadyHasFirstJumpCharInPlace && !isAtLineEnd) {
-                continue;
-            }
+            if (marker.getOffset().editor != _editor)                                                   continue;
+            if (marker.getMarker().length() == 1 || marker.isMappingToMultipleOffset())                 continue;
+            if (isAlreadyHasFirstJumpCharInPlace(firstJumpOffsets, marker) && !isLineEndOffset(marker)) continue;
 
             for (JOffset offset : marker.getOffsets()) {
-                double x = getVisiblePosition(offset).getX() + parentLocation.getX();
-                double y = getVisiblePosition(offset).getY() + parentLocation.getY();
-
-                drawBackground(g, x + fontRect.getWidth(), y, _config.getSecondJumpBackground(), fontRect);
-                drawMarkerChar(g, x + fontRect.getWidth(), y + font.getSize(), marker.getMarker().charAt(1), _config.getSecondJumpForeground());
+                drawBackground(g, __x(offset) + fontRect.getWidth(), __y(offset), _config.getSecondJumpBackground(), fontRect);
+                drawMarkerChar(g, __x(offset) + fontRect.getWidth(), __y(offset) + font.getSize(), marker.getMarker().charAt(1), _config.getSecondJumpForeground());
             }
         }
 
         super.paint(g);
+    }
+
+    private boolean isAlreadyHasFirstJumpCharInPlace(HashSet<JOffset> firstJumpOffsets, Marker marker) {
+        JOffset o = new JOffset(marker.getOffset().editor, marker.getOffset().offset + 1);
+        return firstJumpOffsets.contains(o);
+    }
+
+    private double __y(JOffset offset) {
+        Point parentLocation = _editor.getContentComponent().getLocation();
+        return getVisiblePosition(offset).getY() + parentLocation.getY();
+    }
+
+    private double __x(JOffset offset) {
+        Point parentLocation = _editor.getContentComponent().getLocation();
+        return getVisiblePosition(offset).getX() + parentLocation.getX();
     }
 
     private void drawMarkerChar(Graphics g, double x, double y, char markerChar, Color firstJumpForeground) {
