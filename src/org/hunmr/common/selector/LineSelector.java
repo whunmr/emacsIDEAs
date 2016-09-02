@@ -14,14 +14,10 @@ public class LineSelector extends Selector {
         int lineEnd = _document.getLineEndOffset(lineNumber);
 
         int lineStart = _document.getLineStartOffset(lineNumber);
-        if (needCopyNewLine(cmdCtx) && lineStart > 0) {
+        if (lineStart > 0) {
             lineStart--;
         }
 
         return lineEnd > lineStart ? new TextRange(lineStart, lineEnd) : null;
-    }
-
-    private boolean needCopyNewLine(CommandContext cmdCtx) {
-        return cmdCtx.getLastCmdKey() == 'L';
     }
 }

@@ -14,15 +14,12 @@ public class MarkersPanel extends JComponent {
     public static final Color PANEL_BACKGROUND_COLOR = new Color(128, 138, 142);
     public Editor _editor;
     private MarkerCollection _markerCollection;
-    //private JComponent _parent;
-    //private Font _fontInEditor;
 
     final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
 
     public MarkersPanel(Editor editor, MarkerCollection markerCollection) {
         _editor = editor;
         _markerCollection = markerCollection;
-        //_parent = editor.getContentComponent();
         setupLocationAndBoundsOfPanel(editor);
     }
 
@@ -38,10 +35,15 @@ public class MarkersPanel extends JComponent {
 
     @Override
     public void paint(Graphics g) {
-        drawPanelBackground(g); //TODO: draw panel in editors
+        Font font = _editor.getColorsScheme().getFont(EditorFontType.BOLD);
+        g.setFont(font);
+
+        Rectangle2D fontRect = _editor.getContentComponent().getFontMetrics(font).getMaxCharBounds(g);
+        Point parentLocation = _editor.getContentComponent().getLocation();
+
+        drawPanelBackground(g);
 
         HashSet<JOffset> firstJumpOffsets = new HashSet<JOffset>();
-
         for (Marker marker : _markerCollection.values()) {
             if (marker.getOffset().editor != _editor) {
                 continue;
@@ -50,12 +52,11 @@ public class MarkersPanel extends JComponent {
             for (JOffset offset : marker.getOffsets()) {
                 firstJumpOffsets.add(offset);
 
-                Point parentLocation = offset.editor.getContentComponent().getLocation();
                 double x = getVisiblePosition(offset).getX() + parentLocation.getX();
                 double y = getVisiblePosition(offset).getY() + parentLocation.getY();
 
-                drawBackgroundOfMarupChar(g, marker, x, y);
-                drawMarkerChar(g, marker, x, y);
+                drawBackground(g, x, y, _config.getFirstJumpBackground(), fontRect);
+                drawMarkerChar(g, x, y + font.getSize(), marker.getMarkerChar(), _config.getFirstJumpForeground());
             }
         }
 
@@ -70,7 +71,6 @@ public class MarkersPanel extends JComponent {
 
             JOffset o = new JOffset(marker.getOffset().editor, marker.getOffset().offset + 1);
             boolean alreadyHasFirstJumpCharInPlace = firstJumpOffsets.contains(o);
-
             boolean isAtLineEnd = isLineEndOffset(marker);
 
             if (alreadyHasFirstJumpCharInPlace && !isAtLineEnd) {
@@ -78,73 +78,25 @@ public class MarkersPanel extends JComponent {
             }
 
             for (JOffset offset : marker.getOffsets()) {
-                Point parentLocation = offset.editor.getContentComponent().getLocation();
                 double x = getVisiblePosition(offset).getX() + parentLocation.getX();
                 double y = getVisiblePosition(offset).getY() + parentLocation.getY();
-                drawBackgroundOfSecondMarupChar(g, marker, x, y);
-                drawSecondMarkerChar(g, marker, x, y);
+
+                drawBackground(g, x + fontRect.getWidth(), y, _config.getSecondJumpBackground(), fontRect);
+                drawMarkerChar(g, x + fontRect.getWidth(), y + font.getSize(), marker.getMarker().charAt(1), _config.getSecondJumpForeground());
             }
         }
 
         super.paint(g);
     }
 
-    private void drawMarkerChar(Graphics g, Marker marker, double x, double y) {
-        Font font = marker.getOffset().editor.getColorsScheme().getFont(EditorFontType.BOLD);
-        g.setFont(font); //todo: set font for each editor
-        float buttomYOfMarkerChar = (float) (y + font.getSize());
-
-        if (marker.isMappingToMultipleOffset()) {
-            g.setColor(Color.BLACK);
-        } else {
-            g.setColor(_config.getFirstJumpForeground());
-        }
-
-        ((Graphics2D)g).drawString(String.valueOf(marker.getMarkerChar()), (float)x, buttomYOfMarkerChar);
+    private void drawMarkerChar(Graphics g, double x, double y, char markerChar, Color firstJumpForeground) {
+        g.setColor(firstJumpForeground);
+        ((Graphics2D)g).drawString(String.valueOf(markerChar), (float)x, (float)y);
     }
 
-    private void drawSecondMarkerChar(Graphics g, Marker marker, double x, double y) {
-        Font font = marker.getOffset().editor.getColorsScheme().getFont(EditorFontType.BOLD);
-        float buttomYOfMarkerChar = (float) (y + font.getSize());
-
-        String markerStr = marker.getMarker();
-        if (markerStr.length() > 1) {
-            g.setColor(_config.getSecondJumpForeground());
-            JComponent parent = marker.getOffset().editor.getContentComponent();
-            Rectangle2D fontRect = parent.getFontMetrics(font).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
-            ((Graphics2D)g).drawString(String.valueOf(markerStr.charAt(1)), (float)(x + fontRect.getWidth()), buttomYOfMarkerChar);
-        }
-    }
-
-    private void drawBackgroundOfMarupChar(Graphics g, Marker marker, double x, double y) {
-        //Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
-        Editor editor = marker.getOffset().editor;
-        JComponent parent = editor.getContentComponent();
-        Font font = editor.getColorsScheme().getFont(EditorFontType.BOLD);
-        Rectangle2D fontRect = parent.getFontMetrics(font).getMaxCharBounds(g);
-
-        if (marker.isMappingToMultipleOffset()) {
-            g.setColor(Color.YELLOW);
-        } else {
-            g.setColor(_config.getFirstJumpBackground());
-        }
-
-        g.fillRect((int)x, (int)y, (int) fontRect.getWidth(), (int) (fontRect.getHeight() * 1.08));
-    }
-
-
-    private void drawBackgroundOfSecondMarupChar(Graphics g, Marker marker, double x, double y) {
-        //Rectangle2D fontRect = _parent.getFontMetrics(_fontInEditor).getStringBounds(String.valueOf(marker.getMarkerChar()), g);
-        Editor editor = marker.getOffset().editor;
-        JComponent parent = editor.getContentComponent();
-        Font font = editor.getColorsScheme().getFont(EditorFontType.BOLD);
-        Rectangle2D fontRect = parent.getFontMetrics(font).getMaxCharBounds(g);
-
-        g.setColor(_config.getSecondJumpBackground());
-        String markerStr = marker.getMarker();
-        if (markerStr.length() > 1) {
-            g.fillRect((int)(x + fontRect.getWidth()), (int)y, (int) fontRect.getWidth(), (int) (fontRect.getHeight() * 1.08));
-        }
+    private void drawBackground(Graphics g, double x, double y, Color firstJumpBackground, Rectangle2D fontRect) {
+        g.setColor(firstJumpBackground);
+        g.fillRect((int)x, (int)y, (int) (fontRect.getWidth() * 1.02), (int) (fontRect.getHeight() * 1.08));
     }
 
     private Point getVisiblePosition(JOffset offset) {

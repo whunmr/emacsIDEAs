@@ -19,6 +19,11 @@ public class ParagraphSelector extends Selector {
             offset--;
         }
 
+        //include the leading newline char
+        if (offset > 0) {
+            offset--;
+        }
+
         return offset;
     }
 
