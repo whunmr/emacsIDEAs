@@ -36,7 +36,7 @@ public class MarkersPanel extends JComponent {
     @Override
     public void paint(Graphics g) {
         Font font = _editor.getColorsScheme().getFont(EditorFontType.BOLD);
-        Rectangle2D fontRect = _editor.getContentComponent().getFontMetrics(font).getMaxCharBounds(g);
+        FontMetrics fontMetrics = _editor.getContentComponent().getFontMetrics(font);
 
         g.setFont(font);
         drawPanelBackground(g);
@@ -47,8 +47,10 @@ public class MarkersPanel extends JComponent {
 
             for (JOffset offset : marker.getOffsets()) {
                 firstJumpOffsets.add(offset);
+
+                Rectangle2D fontRect = fontMetrics.getStringBounds(String.valueOf(marker.getMarkerChar()), g);
                 drawBackground(g, __x(offset), __y(offset), _config.getFirstJumpBackground(), fontRect);
-                drawMarkerChar(g, __x(offset), __y(offset) + font.getSize(), marker.getMarkerChar(), _config.getFirstJumpForeground());
+                drawMarkerChar(g, __x(offset), __y(offset) + font.getSize() * 0.9, marker.getMarkerChar(), _config.getFirstJumpForeground());
             }
         }
 
@@ -58,8 +60,9 @@ public class MarkersPanel extends JComponent {
             if (isAlreadyHasFirstJumpCharInPlace(firstJumpOffsets, marker) && !isLineEndOffset(marker)) continue;
 
             for (JOffset offset : marker.getOffsets()) {
+                Rectangle2D fontRect = fontMetrics.getStringBounds(String.valueOf(marker.getMarker().charAt(1)), g);
                 drawBackground(g, __x(offset) + fontRect.getWidth(), __y(offset), _config.getSecondJumpBackground(), fontRect);
-                drawMarkerChar(g, __x(offset) + fontRect.getWidth(), __y(offset) + font.getSize(), marker.getMarker().charAt(1), _config.getSecondJumpForeground());
+                drawMarkerChar(g, __x(offset) + fontRect.getWidth(), __y(offset) + font.getSize() * 0.9, marker.getMarker().charAt(1), _config.getSecondJumpForeground());
             }
         }
 

@@ -1,5 +1,6 @@
 package org.hunmr.copycutwithoutselection;
 
+import com.intellij.codeInsight.highlighting.HighlightManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.EditorModificationUtil;

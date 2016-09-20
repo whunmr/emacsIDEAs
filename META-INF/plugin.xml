@@ -2,7 +2,7 @@
   <name>emacsIDEAs</name>
   <description>
     <![CDATA[
-      <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction.</p>
+      <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction. And new created EditWithoutSelection (Cut/Move/Replace without selection). </p>
       <p><b>AceJump</b></p>
       <ul>
           <li><b>C-L 't' 'm'</b>  :  <b>Basic Word Jump       </b>| Type C-L, then type target char (eg. 't') to jump to, then type marker char (eg. 'm') to move caret.</li>
@@ -28,10 +28,11 @@
           <li><b>C-c  e  </b>  :  Copy to line end</li>
           <li><b>C-c  E  </b>  :  Copy to file end</li>
           <li><b>C-c  p  </b>  :  Copy paragraph</li>
+          <li><b>C-c  g  </b>  :  Copy paragraph group (e.g.: entire function including white lines) </li>
           <li><b>C-c  u  </b>  :  Copy to paragraph begining</li>
           <li><b>C-c  d  </b>  :  Copy to paragraph end</li>
-          <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | u | d | b)   </b>  :  Type one space to cut related area</li>
-          <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | u | d | b)   </b>  :  Type two space to select related area</li>
+          <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | g | u | d | b)   </b>  :  Type one space to cut related area</li>
+          <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b)   </b>  :  Type two space to select related area</li>
       </ul>
       <br/>
 
@@ -45,6 +46,7 @@
           <li><b>C-i C-a 't' 'm'</b>  :  replace target to line begining </li>
           <li><b>C-i C-e 't' 'm'</b>  :  replace target char to line end </li>
           <li><b>C-i C-p 't' 'm'</b>  :  replace target paragraph        </li>
+          <li><b>C-i C-g 't' 'm'</b>  :  replace target paragraph group  </li>
           <li><b>C-i C-u 't' 'm'</b>  :  replace target to paragraph beginning </li>
           <li><b>C-i C-d 't' 'm'</b>  :  replace target to paragraph end       </li>
       </ul>
@@ -60,6 +62,7 @@
           <li><b>C-o C-a 't' 'm'</b>  :  obtain target to line beginning</li>
           <li><b>C-o C-e 't' 'm'</b>  :  obtain target char to line end </li>
           <li><b>C-o C-p 't' 'm'</b>  :  obtain target paragraph        </li>
+          <li><b>C-o C-g 't' 'm'</b>  :  obtain target paragraph group  </li>
           <li><b>C-o C-u 't' 'm'</b>  :  obtain target to paragraph beginning </li>
           <li><b>C-o C-d 't' 'm'</b>  :  obtain target to paragraph end       </li>
       </ul>
@@ -75,6 +78,7 @@
           <li><b>C-w C-a 't' 'm'</b>  :  Copy target to line beginning</li>
           <li><b>C-w C-e 't' 'm'</b>  :  Copy target char to line end </li>
           <li><b>C-w C-p 't' 'm'</b>  :  Copy target paragraph        </li>
+          <li><b>C-w C-g 't' 'm'</b>  :  Copy target paragraph group  </li>
           <li><b>C-w C-u 't' 'm'</b>  :  Copy target to paragraph beginning </li>
           <li><b>C-w C-d 't' 'm'</b>  :  Copy target to paragraph end       </li>
       </ul>
@@ -90,8 +94,25 @@
           <li><b>C-x C-a 't' 'm'</b>  :  Cut target to line beginning</li>
           <li><b>C-x C-e 't' 'm'</b>  :  Cut target char to line end </li>
           <li><b>C-x C-p 't' 'm'</b>  :  Cut target paragraph        </li>
+          <li><b>C-x C-g 't' 'm'</b>  :  Cut target paragraph group  </li>
           <li><b>C-x C-u 't' 'm'</b>  :  Cut target to paragraph beginning </li>
           <li><b>C-x C-d 't' 'm'</b>  :  Cut target to paragraph end       </li>
+      </ul>
+      <br/>
+
+      <p><b>Delete target (word | line | paragraph...)</b></p>
+      <ul>
+          <li><b>C-d C-w 't' 'm'</b>  :  delete target word</li>
+          <li><b>C-d C-s 't' 'm'</b>  :  delete target string</li>
+          <li><b>C-d C-l 't' 'm'</b>  :  delete target line</li>
+          <li><b>C-d C-b 't' 'm'</b>  :  delete target block            </li>
+          <li><b>C-d C-q 't' 'm'</b>  :  delete target quote            </li>
+          <li><b>C-d C-a 't' 'm'</b>  :  delete target to line beginning</li>
+          <li><b>C-d C-e 't' 'm'</b>  :  delete target char to line end </li>
+          <li><b>C-d C-p 't' 'm'</b>  :  delete target paragraph        </li>
+          <li><b>C-d C-g 't' 'm'</b>  :  delete target paragraph group  </li>
+          <li><b>C-d C-u 't' 'm'</b>  :  delete target to paragraph beginning </li>
+          <li><b>C-d C-d 't' 'm'</b>  :  delete target to paragraph end       </li>
       </ul>
       <br/>
 
@@ -121,7 +142,7 @@
 
       <p><b>Copy and Replace:</b></p>
       <ul>
-          <li><b>C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'</b>  :  copy current word/line/paragraph, jump, then replace target word/line/paragraph </li>
+          <li><b>C-I C-R (w | s | l | q | a | A | e | E | p | g | u | d) 't' 'm'</b>  :  copy current word/line/paragraph, jump, then replace target word/line/paragraph </li>
       </ul>
 
     ]]>
@@ -129,12 +150,49 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.4.4</dt>
+        <dd>--- fix wrong width of the jump marker background.<br/>
+        <dd>
+        <dt>1.4.3</dt>
+        <dd>--- fix https://github.com/whunmr/emacsIDEAs/issues/14 overlay and markers in splitted panes not get cleared after jump.<br/>
+        <dd>
+        <dt>1.4.2</dt>
+        <dd>--- Add support for jump/move/copy/cut texts cross Split pane editors.<br/>
+        <dd>
+        <dt>1.4.1</dt>
+        <dd>--- Add `paragraph group' concept, which denotes the `paragraph' including white lines. <br/>
+                Useful when you need copy/cut/move/delete function with white lines inside. <br/>
+        <dd>
+        <dt>1.4.0</dt>
+        <dd>--- fix post selection error, in C-O C-A command. <br/>
+        <dd>
+        <dt>1.3.9</dt>
+        <dd>--- Add plugin settings panel in the Prefereces -> Other Settings -> emacsIDEAs.<br/>
+                to config jump marker char's color, and whether select the moved text. <br/>
+        <dd>
+        <dt>1.3.8</dt>
+        <dd>--- zap-to-char and copy-to-char. Can be done by  C-I C-X   and  C-I C-C <br/>
+        <dd>
+        <dt>1.3.7</dt>
+        <dd>--- compile based on JDK 1.6. to fix error when running in Android Studio 2.1.3. <br/>
+        <dd>
+        <dt>1.3.6</dt>
+        <dd>--- fix wrong selection range issue, after using AceJumpMove.* actions. <br/>
+        <dd>
+        <dt>1.3.5</dt>
+        <dd>--- Add jump and delete target range action. such as delete target paragraph by: C-d C-p. <br/>
+                so do not need: First jump to target place, then delete paragraph by C-c space p. <br/>
+                also apply to other range like (w | s | l | q | a | A | e | E | p | u | d). <br/>
+        <dd>
+        <dt>1.3.4</dt>
+        <dd>--- adjust mark char order to make the two level jump markers generates from easy press chars like 'lkasdfj'. <br/>
+        <dd>
         <dt>1.3.3</dt>
-        <dd>1. Upgrade the jump more like avy-jump. http://emacsredux.com/blog/2015/07/19/ace-jump-mode-is-dead-long-live-avy/  <br/>
-               This also fix issue posted by @jmdodge [AceJump: Show two-letter combos up front], https://github.com/whunmr/emacsIDEAs/issues/3  <br/>
+        <dd>--- Upgrade the jump more like avy-jump. http://emacsredux.com/blog/2015/07/19/ace-jump-mode-is-dead-long-live-avy/  <br/>
+                This also fix issue posted by @jmdodge [AceJump: Show two-letter combos up front], https://github.com/whunmr/emacsIDEAs/issues/3  <br/>
         <dd>
         <dt>1.3.2</dt>
-        <dd>1. fix wrong selection issue after "Cut target paragraph" command. C-x C-p 't' 'm'  <br/>
+        <dd>--- fix wrong selection issue after "Cut target paragraph" command. C-x C-p 't' 'm'  <br/>
         <dd>
         <dt>1.3.0</dt>
         <dd>1. C-i C-s 't' 'm': Select jump area  ---changed_to---->  C-i C-i 't' 'm'  <br/>
@@ -145,30 +203,30 @@
             3. extend C-i C-(w|l|p)  to   C-I C-(w | s | l | q | a | e | p | u | d | b)
         <dd>
         <dt>1.2.0</dt>
-        <dd>1. Remove support for command: C-L 't' (c, x, p, P, s)  'm' <br/>
-               instead using the command: C-i C-(c,x,s) 't' 'm'<br/>
+        <dd>--- Remove support for command: C-L 't' (c, x, p, P, s)  'm' <br/>
+                instead using the command: C-i C-(c,x,s) 't' 'm'<br/>
         <dd>
         <dt>1.1.9</dt>
-        <dd>Add action to copy current word | line | paragraph, jump, then replace target word/line/paragraph.<br/>
-            C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'
+        <dd>--- Add action to copy current word | line | paragraph, jump, then replace target word/line/paragraph.<br/>
+                C-I C-R (w | s | l | q | a | A | e | E | p | u | d) 't' 'm'
         <dd>
         <dt>1.1.8</dt>
-        <dd>Add hightlight-symbol-prev and hightlight-symbol-next<dd>
+        <dd>--- Add hightlight-symbol-prev and hightlight-symbol-next<dd>
         <dt>1.1.7</dt>
-        <dd>Let cut to paragraph end(C-c ' ' d) and cut paragraph (C-c ' ' p) skip ending brackets.<dd>
+        <dd>--- Let cut to paragraph end(C-c ' ' d) and cut paragraph (C-c ' ' p) skip ending brackets.<dd>
         <dt>1.1.6</dt>
-        <dd>Add Jump Word Action, and assigned to C-L.  Jump Char Action assigned to C-J.<dd>
+        <dd>--- Add Jump Word Action, and assigned to C-L.  Jump Char Action assigned to C-J.<dd>
         <dt>1.1.5</dt>
-        <dd>Changed AceJump's keymap to be more intuitive one. such as "C-L C-s" for select jump area. <dd>
+        <dd>--- Changed AceJump's keymap to be more intuitive one. such as "C-L C-s" for select jump area. <dd>
         <dt>1.1.0</dt>
-        <dd>Add copy without selection<dd>
+        <dd>--- Add copy without selection<dd>
         <dt>1.0</dt>
-        <dd>Add basic AceJump function<dd>
+        <dd>--- Add basic AceJump function<dd>
     </dl>
     </html>
     ]]>
   </change-notes>
-  <version>1.3.3</version>
+  <version>1.4.4</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
@@ -226,6 +284,9 @@
       <action id="emacsIDEAs.AceJumpAndReplace.Paragraph" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Paragraph" description="AceJumpAndReplace.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta P"/>
       </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.Group"     class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Group" description="AceJumpAndReplace.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta G"/>
+      </action>
       <action id="emacsIDEAs.AceJumpAndReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.ToParagraphStart" description="AceJumpAndReplace.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta U"/>
       </action>
@@ -258,6 +319,9 @@
       </action>
       <action id="emacsIDEAs.AceJumpObtainThenReplace.Paragraph" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Paragraph" description="AceJumpObtainThenReplace.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Group" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Group" description="AceJumpObtainThenReplace.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta G"/>
       </action>
       <action id="emacsIDEAs.AceJumpObtainThenReplace.ToParagraphStart" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.ToParagraphStart" description="AceJumpObtainThenReplace.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta U"/>
@@ -292,6 +356,9 @@
       <action id="emacsIDEAs.AceJumpMove.Paragraph" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Paragraph" description="AceJumpMove.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta P"/>
       </action>
+      <action id="emacsIDEAs.AceJumpMove.Group" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Group" description="AceJumpMove.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta G"/>
+      </action>
       <action id="emacsIDEAs.AceJumpMove.ToParagraphStart" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.ToParagraphStart" description="AceJumpMove.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta U"/>
       </action>
@@ -324,6 +391,9 @@
       <action id="emacsIDEAs.AceJumpCopy.Paragraph" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Paragraph" description="AceJumpCopy.Paragraph" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta P"/>
       </action>
+      <action id="emacsIDEAs.AceJumpCopy.Group" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Group" description="AceJumpCopy.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta G"/>
+      </action>
       <action id="emacsIDEAs.AceJumpCopy.ToParagraphStart" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.ToParagraphStart" description="AceJumpCopy.ToParagraphStart" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta U"/>
       </action>
@@ -332,6 +402,41 @@
       </action>
       <action id="emacsIDEAs.AceJumpCopy.Block" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Block" description="AceJumpCopy.Block" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta B"/>
+      </action>
+
+      <!-- Delete target range. (w | s | l | q | a | e | p | u | d | b) -->
+      <action id="emacsIDEAs.AceJumpDelete.Word" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Word" description="AceJumpDelete.Word" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta W"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.String" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.String" description="AceJumpDelete.String" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta S"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.Line" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Line" description="AceJumpDelete.Line" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta L"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.Quote" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Quote" description="AceJumpDelete.Quote" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta Q"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.ToLineStart" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.ToLineStart" description="AceJumpDelete.ToLineStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta A"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.ToLineEnd" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.ToLineEnd" description="AceJumpDelete.ToLineEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta E"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.Paragraph" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Paragraph" description="AceJumpDelete.Paragraph" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta P"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.Group" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Group" description="AceJumpDelete.Group" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta G"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.ToParagraphStart" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.ToParagraphStart" description="AceJumpDelete.ToParagraphStart" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta U"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.ToParagraphEnd" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.ToParagraphEnd" description="AceJumpDelete.ToParagraphEnd" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta D"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.Block" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Block" description="AceJumpDelete.Block" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta B"/>
       </action>
 
     </group>
@@ -370,6 +475,7 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <applicationService serviceImplementation="org.hunmr.options.PluginConfig"/>
+    <applicationConfigurable instance="org.hunmr.options.IdeaConfigurable"></applicationConfigurable>
   </extensions>
 </idea-plugin>
