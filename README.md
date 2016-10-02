@@ -28,7 +28,9 @@ AceJump, jump to special place
 
 C-L ' ' 'm' : Jump to line end or start. | To show marker on line end and line start, type space ' ' as target char
 C-L ',' 'm' : Jump to symbol key | Show markers on .{}(|`/\;.{}()[]?_=-+'"!@#$%^&*)_=
+```
 
+```
 Copy without selection:
 
 C-c w : Copy word
@@ -46,7 +48,10 @@ C-c u : Copy to paragraph begining
 C-c d : Copy to paragraph end
 C-c ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b) : Type one space to cut related area
 C-c ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b) : Type two space to select related area
+```
 
+
+```
 Replace target (word | line | paragraph) with text at current caret:
 
 C-i C-w 't' 'm' : replace target word
