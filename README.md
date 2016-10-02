@@ -68,7 +68,7 @@ C-c ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b) : Type two space
 
 ```
 Replace target (word | line | paragraph) with text at current caret:
-*Tips: To help remember, consider i in C-i means "input to target" or "replace into" or "invade". *
+*Tips: Consider i in C-i means "input to target" or "replace into" or "invade". *
 
 C-i C-w 't' 'm' : replace target word
 C-i C-s 't' 'm' : replace target string
@@ -87,6 +87,7 @@ C-i C-d 't' 'm' : replace target to paragraph end
 
 ```
 Obtain target (word | line | paragraph), then replace text at current caret:
+*Tips: Consider o in C-o means "output from target" or "obtain from target". *
 
 C-o C-w 't' 'm' : obtain target word, then replace current word
 C-o C-s 't' 'm' : obtain target string, then replace current string
@@ -99,7 +100,11 @@ C-o C-p 't' 'm' : obtain target paragraph
 C-o C-g 't' 'm' : obtain target paragraph group
 C-o C-u 't' 'm' : obtain target to paragraph beginning
 C-o C-d 't' 'm' : obtain target to paragraph end
+```
+![Obtain target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/4_obtain_target_range.gif?raw=true)
 
+
+```
 Copy target (word | line | paragraph), then insert text at current caret:
 
 C-w C-w 't' 'm' : Copy target word, then insert at current caret
