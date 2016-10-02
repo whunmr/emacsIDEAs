@@ -70,7 +70,7 @@ C-c ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b) : Type two space
 Replace target (word | line | paragraph) with text at current caret:
 *Tips: Consider i in C-i means "input to target" or "replace into" or "invade". *
 
-C-i C-w 't' 'm' : replace target word
+C-i C-w 't' 'm' : replace target word                 | C-i C-w means type C-i then continue type C-w
 C-i C-s 't' 'm' : replace target string
 C-i C-l 't' 'm' : replace target line
 C-i C-b 't' 'm' : replace target block
@@ -155,21 +155,25 @@ C-d C-p 't' 'm' : delete target paragraph
 C-d C-g 't' 'm' : delete target paragraph group
 C-d C-u 't' 'm' : delete target to paragraph beginning
 C-d C-d 't' 'm' : delete target to paragraph end
+```
 
-
+```
 Highlight symbol:
 
 C-, : hightlight-symbol-prev | Jump to prev occurrence of symbol that around caret
 C-. : hightlight-symbol-next | Jump to next occurrence of symbol that around caret
+```
 
+```
 Just one space:
 
 C-M-Space : Make just one space around caret by Ctrl-Cmd-Space.
+```
 
+```
 Separate AceJump copy,cut,select command:
 
 C-i C-c 't' 'm' : Copy jump area
-| C-i C-c means type C-i then continue type C-c
 C-i C-x 't' 'm' : Cut jump area
 C-i C-i 't' 'm' : Select jump area
 C-i C-f 't' 'm' : Basic Jump alias
