@@ -137,7 +137,11 @@ C-x C-p 't' 'm' : Cut target paragraph
 C-x C-g 't' 'm' : Cut target paragraph group
 C-x C-u 't' 'm' : Cut target to paragraph beginning
 C-x C-d 't' 'm' : Cut target to paragraph end
+```
+![Cut target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/6_cut_target_range.gif?raw=true)
 
+
+```
 Delete target (word | line | paragraph...)
 
 C-d C-w 't' 'm' : delete target word
