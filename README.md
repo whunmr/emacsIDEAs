@@ -106,6 +106,7 @@ C-o C-d 't' 'm' : obtain target to paragraph end
 
 ```
 Copy target (word | line | paragraph), then insert text at current caret:
+*Tips: Consider w in C-w  follows emacs' command "Alt-w" as copy, or "with target". *
 
 C-w C-w 't' 'm' : Copy target word, then insert at current caret
 C-w C-s 't' 'm' : Copy target string, then insert at current caret
@@ -118,7 +119,11 @@ C-w C-p 't' 'm' : Copy target paragraph
 C-w C-g 't' 'm' : Copy target paragraph group
 C-w C-u 't' 'm' : Copy target to paragraph beginning
 C-w C-d 't' 'm' : Copy target to paragraph end
+```
+![Copy target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/5_copy_target_range.gif?raw=true)
 
+
+```
 Cut target (word | line | paragraph), then insert text at current caret:
 
 C-x C-w 't' 'm' : Cut target word, then insert at current caret
