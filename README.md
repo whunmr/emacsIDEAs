@@ -20,6 +20,10 @@ AceJump
 C-L 't' 'm' : Basic Word Jump | Type C-L, then type target char (eg. 't') to jump to, then type marker char (eg. 'm') to move caret.
 C-J 't' 'm' : Basic Char Jump
 
+![basic word jump](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/1_basic_word_jump.gif?raw=true)
+
+---
+
 AceJump, jump to special place
 
 C-L ' ' 'm' : Jump to line end or start. | To show marker on line end and line start, type space ' ' as target char
