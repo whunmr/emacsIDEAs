@@ -19,9 +19,8 @@ AceJump
 
 C-L 't' 'm' : Basic Word Jump | Type C-L, then type target char (eg. 't') to jump to, then type marker char (eg. 'm') to move caret.
 C-J 't' 'm' : Basic Char Jump
-
-![basic word jump](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/1_basic_word_jump.gif?raw=true)
 ```
+![basic word jump](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/1_basic_word_jump.gif?raw=true)
 
 
 ```
