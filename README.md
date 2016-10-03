@@ -156,6 +156,8 @@ C-d C-g 't' 'm' : delete target paragraph group
 C-d C-u 't' 'm' : delete target to paragraph beginning
 C-d C-d 't' 'm' : delete target to paragraph end
 ```
+![Delete target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/7_delete_target_range.gif?raw=true)
+
 
 ```
 Highlight symbol:
