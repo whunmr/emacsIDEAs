@@ -13,7 +13,7 @@ plugin page: http://plugins.jetbrains.com/plugin/?idea_ce&pluginId=7163
 ![usage sample](https://plugins.jetbrains.com/files/7163/screenshot_16138.png)
 
 
-
+---
 ```
 AceJump
 
@@ -30,6 +30,7 @@ C-L ' ' 'm' : Jump to line end or start. | To show marker on line end and line s
 C-L ',' 'm' : Jump to symbol key | Show markers on .{}(|`/\;.{}()[]?_=-+'"!@#$%^&*)_=
 ```
 
+---
 ```
 Copy without selection:
 
@@ -65,7 +66,7 @@ C-c ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b) : Type two space
 ```
 
 
-
+---
 ```
 Replace target (word | line | paragraph) with text at current caret:
 *Tips: Consider i in C-i means "input to target" or "replace into" or "invade". *
@@ -84,7 +85,7 @@ C-i C-d 't' 'm' : replace target to paragraph end
 ```
 ![Replace target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/3_replace_target_range.gif?raw=true)
 
-
+---
 ```
 Obtain target (word | line | paragraph), then replace text at current caret:
 *Tips: Consider o in C-o means "output from target" or "obtain from target". *
@@ -103,7 +104,7 @@ C-o C-d 't' 'm' : obtain target to paragraph end
 ```
 ![Obtain target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/4_obtain_target_range.gif?raw=true)
 
-
+---
 ```
 Copy target (word | line | paragraph), then insert text at current caret:
 *Tips: Consider w in C-w  follows emacs' command "Alt-w" as copy, or "with target". *
@@ -123,6 +124,7 @@ C-w C-d 't' 'm' : Copy target to paragraph end
 ![Copy target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/5_copy_target_range.gif?raw=true)
 
 
+---
 ```
 Cut target (word | line | paragraph), then insert text at current caret:
 
@@ -141,6 +143,7 @@ C-x C-d 't' 'm' : Cut target to paragraph end
 ![Cut target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/6_cut_target_range.gif?raw=true)
 
 
+---
 ```
 Delete target (word | line | paragraph...)
 
@@ -159,6 +162,7 @@ C-d C-d 't' 'm' : delete target to paragraph end
 ![Delete target range gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/7_delete_target_range.gif?raw=true)
 
 
+---
 ```
 Highlight symbol:
 
@@ -166,12 +170,14 @@ C-, : hightlight-symbol-prev | Jump to prev occurrence of symbol that around car
 C-. : hightlight-symbol-next | Jump to next occurrence of symbol that around caret
 ```
 
+---
 ```
 Just one space:
 
 C-M-Space : Make just one space around caret by Ctrl-Cmd-Space.
 ```
 
+---
 ```
 Separate AceJump copy,cut,select command:
 
