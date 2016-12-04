@@ -87,8 +87,10 @@ public abstract class EmacsIdeasAction extends AnAction {
         FileEditor[] selectedEditors = fileEditorManager.getSelectedEditors();
 
         for (FileEditor selectedEditor : selectedEditors) {
-            Editor editor = ((TextEditor)selectedEditor).getEditor();
-            editors.add(editor);
+            if (selectedEditor instanceof TextEditor) {
+                Editor editor = ((TextEditor) selectedEditor).getEditor();
+                editors.add(editor);
+            }
         }
 
         return editors;
