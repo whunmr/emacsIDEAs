@@ -131,6 +131,11 @@ public class AceJumpAction extends EmacsIdeasAction {
         return new KeyListener() {
             public void keyTyped(KeyEvent keyEvent) {
                 keyEvent.consume();
+
+                if (KeyEvent.VK_SPACE == keyEvent.getKeyChar() || KeyEvent.VK_SEMICOLON == keyEvent.getKeyChar()) {
+                    cleanupSetupsInAndBackToNormalEditingMode();
+                }
+
                 if (keyEvent.isShiftDown()) {
                     addCommandAroundJump(new SelectAfterJumpCommand(_editor));
                 }

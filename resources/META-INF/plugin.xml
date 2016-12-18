@@ -150,6 +150,17 @@
   <change-notes><![CDATA[
     <html>
     <dl>
+        <dt>1.4.6</dt>
+        <dd>--- fix 'esc' key can not exit jump mode if ideaVim is activated and in visual mode. <br/>
+        <dd>--- To exit jump mode now we can press, ESC, SEMICOLON, or SPACE.<br/>
+        <dd>--- reported by @xdidi3r https://github.com/whunmr/emacsIDEAs/issues/19 <br/>
+        <dd>
+        <dt>1.4.5</dt>
+        <dd>--- fix issue in WebStorm reported by @Centaur.https://github.com/whunmr/emacsIDEAs/issues/18 <br/>
+        <dd>
+        <dt>1.4.4</dt>
+        <dd>--- fix wrong width of the jump marker background.<br/>
+        <dd>
         <dt>1.4.3</dt>
         <dd>--- fix https://github.com/whunmr/emacsIDEAs/issues/14 overlay and markers in splitted panes not get cleared after jump.<br/>
         <dd>
@@ -223,7 +234,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.4.3</version>
+  <version>1.4.6</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
