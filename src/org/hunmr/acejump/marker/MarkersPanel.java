@@ -42,6 +42,7 @@ public class MarkersPanel extends JComponent {
         drawPanelBackground(g);
 
         HashSet<JOffset> firstJumpOffsets = new HashSet<JOffset>();
+
         for (Marker marker : _markerCollection.values()) {
             if (marker.getOffset().editor != _editor) continue;
 

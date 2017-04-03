@@ -21,16 +21,18 @@ public abstract class EmacsIdeasAction extends AnAction {
     protected volatile boolean _isStillRunning = false;
     protected EmacsIdeasAction _action;
     protected Editor _editor;
-    protected ArrayList<Editor> _editors;
+    protected ArrayList<Editor> _editors = new ArrayList<Editor>();
     protected JComponent _contentComponent;
     protected Document _document;
-    protected KeyListener[] _keyListeners;
+    protected KeyListener[] _keyListeners = new KeyListener[0];
     protected AnActionEvent _event;
     protected Project _project;
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
         restoreOldKeyListeners();
-        _contentComponent.repaint();
+        if (_contentComponent != null) {
+            _contentComponent.repaint();
+        }
         _isStillRunning = false;
     }
 
@@ -48,7 +50,7 @@ public abstract class EmacsIdeasAction extends AnAction {
         switchEditorIfNeed(e);
 
         if (_isStillRunning) {
-            cleanupSetupsInAndBackToNormalEditingMode();
+            _isStillRunning = false;
         }
 
         initMemberVariableForConvenientAccess(e);

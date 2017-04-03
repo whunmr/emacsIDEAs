@@ -18,9 +18,9 @@ public class AceJumpCopyRangeAction extends AnAction {
 
         try {
             Class<? extends Selector> selectorClass = (Class<? extends Selector>) Class.forName(selectorClassName);
-            //EditorUtils.copyRange(selectorClass, editor);
 
             AceJumpAction.getInstance().switchEditorIfNeed(e);
+            AceJumpAction.getInstance().clearCommandAroundJump();
             AceJumpAction.getInstance().addCommandAroundJump(new CopyRangeAfterJumpCommand(editor, selectorClass));
 
             AceJumpAction.getInstance().performAction(e);
