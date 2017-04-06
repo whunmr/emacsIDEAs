@@ -149,7 +149,16 @@
   </description>
   <change-notes><![CDATA[
     <html>
-    <dl>
+    <dl><dt>1.4.9</dt>
+        <dd>--- revert recent unstable changes.<br/>
+        <dd>
+        <dt>1.4.8</dt>
+        <dd>--- due to bugs, in 1.4.8 cancel support for: `C-c b' do not support text between `<' and `>', like it works for `(' and `)'  <br/>
+        <dd>
+        <dt>1.4.7</dt>
+        <dd>--- fix bug: `C-c b' do not support text between `<' and `>', like it works for `(' and `)' : https://github.com/whunmr/emacsIDEAs/issues/22 <br/>
+        <dd>--- fix bug: can not handle pipelined commands: https://github.com/whunmr/emacsIDEAs/issues/21 <br/>
+        <dd>
         <dt>1.4.6</dt>
         <dd>--- fix 'esc' key can not exit jump mode if ideaVim is activated and in visual mode. <br/>
         <dd>--- To exit jump mode now we can press, ESC, SEMICOLON, or SPACE.<br/>
@@ -234,7 +243,7 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.4.6</version>
+  <version>1.4.9</version>
   <vendor>whunmr@gmail.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
