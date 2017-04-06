@@ -186,7 +186,6 @@ public class AceJumpAction extends EmacsIdeasAction {
 
         ApplicationManager.getApplication().runReadAction(new JumpRunnable(jumpOffset, this));
 
-
         for (CommandAroundJump cmd : _commandsAroundJump) {
             cmd.preAfterJump(jumpOffset);
             cmd.afterJump();
@@ -262,10 +261,6 @@ public class AceJumpAction extends EmacsIdeasAction {
             _instance = new AceJumpAction();
         }
         return _instance;
-    }
-
-    public void clearCommandAroundJump() {
-        _commandsAroundJump.clear();
     }
 
     public void addCommandAroundJump(CommandAroundJump commandAroundJump) {

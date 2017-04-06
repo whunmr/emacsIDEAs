@@ -22,7 +22,6 @@ public class AceJumpAndReplaceRangeAction extends AnAction {
             EditorUtils.copyRange(selectorClass, editor);
 
             AceJumpAction.getInstance().switchEditorIfNeed(e);
-            AceJumpAction.getInstance().clearCommandAroundJump();
             AceJumpAction.getInstance().addCommandAroundJump(new ReplaceAfterJumpCommand(editor, selectorClass));
             AceJumpAction.getInstance().performAction(e);
 

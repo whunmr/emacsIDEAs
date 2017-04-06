@@ -22,7 +22,6 @@ public class AceJumpMoveRangeAction extends AnAction {
             EditorUtils.copyRange(selectorClass, editor);
 
             AceJumpAction.getInstance().switchEditorIfNeed(e);
-            AceJumpAction.getInstance().clearCommandAroundJump();
             AceJumpAction.getInstance().addCommandAroundJump(new MoveRangeAfterJumpCommand(editor, selectorClass));
             AceJumpAction.getInstance().performAction(e);
         } catch (ClassNotFoundException e1) {

@@ -12,7 +12,6 @@ public class AceJumpCopyAction extends AnAction {
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
 
         AceJumpAction.getInstance().switchEditorIfNeed(e);
-        AceJumpAction.getInstance().clearCommandAroundJump();
         AceJumpAction.getInstance().addCommandAroundJump(new CopyAfterJumpCommand(editor));
         AceJumpAction.getInstance().performAction(e);
     }
