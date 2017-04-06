@@ -7,8 +7,8 @@ import org.hunmr.common.CommandContext;
 public class BlockSelector extends Selector {
 
     public static final int NOT_FOUND = -1;
-    public static final String OPEN_BRACKETS = "{[(";
-    public static final String CLOSE_BRACKETS = "}])";
+    public static final String OPEN_BRACKETS = "{[(<";
+    public static final String CLOSE_BRACKETS = "}])>";
 
     public BlockSelector(Editor editor) {
         super(editor);
