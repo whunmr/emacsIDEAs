@@ -1,19 +1,30 @@
 package org.hunmr.acejump.marker;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
+import org.hunmr.options.PluginConfig;
 
 public class JOffset {
     public Editor editor;
     public int offset;
+    final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
 
     public JOffset(Editor editor, int offset) {
         this.editor = editor;
-        this.offset = offset;
+        if (_config._markBehindChar) {
+            this.offset = offset + 1;
+        } else {
+            this.offset = offset;
+        }
     }
 
     public void restoreCaret() {
         editor.getContentComponent().requestFocus();
-        editor.getCaretModel().moveToOffset(offset);
+        if (_config._jumpBehindChar) {
+            editor.getCaretModel().moveToOffset(offset + 1);
+        } else {
+            editor.getCaretModel().moveToOffset(offset);
+        }
     }
 
     @Override
