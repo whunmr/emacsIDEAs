@@ -7,11 +7,11 @@ import org.hunmr.options.PluginConfig;
 public class JOffset {
     public Editor editor;
     public int offset;
-    final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
+    private final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
 
     public JOffset(Editor editor, int offset) {
         this.editor = editor;
-        if (_config._markBehindChar) {
+        if (_config._jumpBehindChar) {
             this.offset = offset + 1;
         } else {
             this.offset = offset;
@@ -20,11 +20,7 @@ public class JOffset {
 
     public void restoreCaret() {
         editor.getContentComponent().requestFocus();
-        if (_config._jumpBehindChar) {
-            editor.getCaretModel().moveToOffset(offset + 1);
-        } else {
-            editor.getCaretModel().moveToOffset(offset);
-        }
+        editor.getCaretModel().moveToOffset(offset);
     }
 
     @Override

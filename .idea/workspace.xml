@@ -8,9 +8,8 @@
   <component name="ChangeListManager">
     <list default="true" id="34ee9239-fb1c-4a3c-aed7-8de5e197c40a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/META-INF/plugin.xml" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/META-INF/plugin_windows.xml" afterPath="$PROJECT_DIR$/META-INF/plugin_windows.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hunmr/acejump/marker/JOffset.java" afterPath="$PROJECT_DIR$/src/org/hunmr/acejump/marker/JOffset.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hunmr/acejump/runnable/JumpRunnable.java" afterPath="$PROJECT_DIR$/src/org/hunmr/acejump/runnable/JumpRunnable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.form" afterPath="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.form" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.java" afterPath="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hunmr/options/PluginConfig.java" afterPath="$PROJECT_DIR$/src/org/hunmr/options/PluginConfig.java" />
@@ -33,24 +32,51 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="AceJumpAction.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/AceJumpAction.java">
+      <file leaf-file-name="JumpRunnable.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/runnable/JumpRunnable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="188" column="34" lean-forward="false" selection-start-line="188" selection-start-column="34" selection-end-line="188" selection-end-column="34" />
-              <folding>
-                <element signature="e#1362#1381#0" expanded="true" />
-                <element signature="e#5869#5878#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="442">
+              <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JOffset.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ParagraphSelector.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/selector/ParagraphSelector.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="765">
+              <caret line="49" column="67" lean-forward="false" selection-start-line="47" selection-start-column="8" selection-end-line="49" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Selector.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/selector/Selector.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="11" column="29" lean-forward="false" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CaretModel.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/openapi/editor/CaretModel.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="20" column="9" lean-forward="false" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JOffset.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/JOffset.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" column="33" lean-forward="true" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+            <state relative-caret-position="153">
+              <caret line="11" column="18" lean-forward="false" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="18" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -61,13 +87,9 @@
       <file leaf-file-name="IdeaConfigurable.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="952">
-              <caret line="68" column="9" lean-forward="false" selection-start-line="68" selection-start-column="9" selection-end-line="68" selection-end-column="9" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#3142#3143#0" expanded="false" />
-                <element signature="e#3173#3174#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="187">
+              <caret line="18" column="37" lean-forward="false" selection-start-line="18" selection-start-column="22" selection-end-line="18" selection-end-column="37" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -75,20 +97,11 @@
       <file leaf-file-name="PluginConfig.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/hunmr/options/PluginConfig.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="24" column="34" lean-forward="false" selection-start-line="24" selection-start-column="19" selection-end-line="24" selection-end-column="34" />
+            <state relative-caret-position="306">
+              <caret line="23" column="36" lean-forward="false" selection-start-line="23" selection-start-column="36" selection-end-line="23" selection-end-column="36" />
               <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#941#942#0" expanded="false" />
-                <element signature="e#995#996#0" expanded="false" />
-                <element signature="e#1040#1041#0" expanded="false" />
-                <element signature="e#1094#1095#0" expanded="false" />
-                <element signature="e#1241#1242#0" expanded="false" />
-                <element signature="e#1296#1297#0" expanded="false" />
-                <element signature="e#1362#1363#0" expanded="false" />
-                <element signature="e#1389#1390#0" expanded="false" />
-                <element signature="e#1453#1454#0" expanded="false" />
-                <element signature="e#1509#1510#0" expanded="false" />
+                <element signature="e#1136#1137#0" expanded="true" />
+                <element signature="e#1191#1192#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -101,57 +114,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="plugin.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
+      <file leaf-file-name="OffsetsFinder.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/offsets/OffsetsFinder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
+            <state relative-caret-position="884">
+              <caret line="59" column="28" lean-forward="false" selection-start-line="59" selection-start-column="28" selection-end-line="59" selection-end-column="28" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="plugin_windows.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/META-INF/plugin_windows.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="27" lean-forward="false" selection-start-line="14" selection-start-column="27" selection-end-line="14" selection-end-column="27" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CommandAroundJump.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/command/CommandAroundJump.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="7" lean-forward="false" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-              <folding>
-                <element signature="e#513#514#0" expanded="false" />
-                <element signature="e#541#542#0" expanded="false" />
-                <element signature="e#603#604#0" expanded="false" />
-                <element signature="e#658#659#0" expanded="false" />
-                <element signature="e#1437#1438#0" expanded="false" />
-                <element signature="e#1470#1471#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MarkerCollection.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/MarkerCollection.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="13" column="37" lean-forward="false" selection-start-line="13" selection-start-column="37" selection-end-line="13" selection-end-column="37" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#823#824#0" expanded="false" />
-                <element signature="e#889#890#0" expanded="false" />
-                <element signature="e#935#936#0" expanded="false" />
-                <element signature="e#974#975#0" expanded="false" />
-                <element signature="e#1015#1016#0" expanded="false" />
-                <element signature="e#1052#1053#0" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -160,9 +128,18 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>jump</find>
       <find>emacsIDEAs</find>
       <find>_needSelectTextAfterJump</find>
+      <find>==</find>
+      <find>jump</find>
+      <find>jumpto</find>
+      <find>jumpToOffset</find>
+      <find>linee</find>
+      <find>lineen</find>
+      <find>lineend</find>
+      <find>line</find>
+      <find>e</find>
+      <find>end</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -177,13 +154,15 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/letsedit.properties" />
-        <option value="$PROJECT_DIR$/src/org/hunmr/acejump/runnable/JumpRunnable.java" />
         <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
         <option value="$PROJECT_DIR$/META-INF/plugin_windows.xml" />
-        <option value="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.form" />
-        <option value="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.java" />
-        <option value="$PROJECT_DIR$/src/org/hunmr/options/PluginConfig.java" />
+        <option value="$PROJECT_DIR$/src/org/hunmr/acejump/offsets/OffsetsFinder.java" />
         <option value="$PROJECT_DIR$/src/org/hunmr/acejump/marker/JOffset.java" />
+        <option value="$PROJECT_DIR$/src/org/hunmr/acejump/AceJumpAction.java" />
+        <option value="$PROJECT_DIR$/src/org/hunmr/options/PluginConfig.java" />
+        <option value="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.java" />
+        <option value="$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.form" />
+        <option value="$PROJECT_DIR$/src/org/hunmr/acejump/runnable/JumpRunnable.java" />
       </list>
     </option>
   </component>
@@ -214,7 +193,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -247,36 +225,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="hunmr" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="emacsIDEAs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="emacsIDEAs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="org" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hunmr" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="options" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IdeaConfigurable" />
-              <option name="myItemType" value="com.intellij.uiDesigner.projectView.FormNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -409,7 +357,67 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="runnable" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="emacsIDEAs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="emacsIDEAs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="org" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hunmr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="acejump" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="offsets" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="emacsIDEAs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="emacsIDEAs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="org" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hunmr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="acejump" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="marker" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -429,6 +437,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="Scratches" />
     </panes>
@@ -446,10 +455,10 @@
     <property name="options.lastSelected" value="configurable.group.appearance" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/META-INF/plugin_windows.xml" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="settings.editor.selected.configurable" value="org.hunmr.options.IdeaConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -934,7 +943,12 @@
       <updated>1417003056039</updated>
       <workItem from="1496305643208" duration="1264000" />
       <workItem from="1496307044604" duration="1203000" />
-      <workItem from="1496308325379" duration="1661000" />
+      <workItem from="1496308325379" duration="2553000" />
+      <workItem from="1496314602665" duration="211000" />
+      <workItem from="1496314877418" duration="705000" />
+      <workItem from="1496315675687" duration="1514000" />
+      <workItem from="1496543712876" duration="1294000" />
+      <workItem from="1496545066766" duration="31000" />
     </task>
     <task id="LOCAL-00001" summary="jdk and maven repository">
       <created>1496305849156</created>
@@ -943,11 +957,18 @@
       <option name="project" value="LOCAL" />
       <updated>1496305849156</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="something works, but not perfect">
+      <created>1496313701815</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1496313701815</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4128000" />
+    <option name="totallyTimeSpent" value="8775000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="32" width="1936" height="1056" extended-state="6" />
@@ -960,19 +981,18 @@
       <window_info id="JRebel Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="JRebel Executor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16311301" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17110874" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="JRebel" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -983,6 +1003,7 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293247" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1001,7 +1022,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="jdk and maven repository" />
-    <option name="LAST_COMMIT_MESSAGE" value="jdk and maven repository" />
+    <MESSAGE value="something works, but not perfect" />
+    <option name="LAST_COMMIT_MESSAGE" value="something works, but not perfect" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1015,87 +1037,7 @@
     <entry file="file://$PROJECT_DIR$/letsedit.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="22" column="27" lean-forward="false" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="97" column="11" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="375" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/letsedit.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/letsedit.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/emacsideas.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/emacsideas.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/emacsideas.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/emacsIDEAs.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="8" column="9" lean-forward="false" selection-start-line="8" selection-start-column="9" selection-end-line="8" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/letsedit.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="1" column="29" lean-forward="false" selection-start-line="1" selection-start-column="29" selection-end-line="1" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/letsedit.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
           <caret line="12" column="44" lean-forward="false" selection-start-line="12" selection-start-column="44" selection-end-line="12" selection-end-column="44" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1131,7 +1073,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="12" column="44" lean-forward="false" selection-start-line="12" selection-start-column="44" selection-end-line="12" selection-end-column="44" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1160,7 +1101,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1168,7 +1108,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="13" column="33" lean-forward="false" selection-start-line="13" selection-start-column="33" selection-end-line="13" selection-end-column="33" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1233,7 +1172,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1513">
           <caret line="22" column="27" lean-forward="false" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1248,7 +1186,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="16" column="2" lean-forward="true" selection-start-line="16" selection-start-column="2" selection-end-line="16" selection-end-column="2" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1259,57 +1196,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/offsets/OffsetsFinder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="60" column="36" lean-forward="false" selection-start-line="60" selection-start-column="25" selection-end-line="60" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/Marker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="39" lean-forward="false" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/EmacsIdeasAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="23" column="41" lean-forward="false" selection-start-line="23" selection-start-column="41" selection-end-line="23" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/CommandContext.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
           <caret line="2" column="13" lean-forward="false" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/MarkerCollection.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="13" column="37" lean-forward="false" selection-start-line="13" selection-start-column="37" selection-end-line="13" selection-end-column="37" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#823#824#0" expanded="false" />
-            <element signature="e#889#890#0" expanded="false" />
-            <element signature="e#935#936#0" expanded="false" />
-            <element signature="e#974#975#0" expanded="false" />
-            <element signature="e#1015#1016#0" expanded="false" />
-            <element signature="e#1052#1053#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/openapi/application/Application.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="19" column="9" lean-forward="false" selection-start-line="19" selection-start-column="9" selection-end-line="19" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -1324,7 +1214,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="14" column="27" lean-forward="false" selection-start-line="14" selection-start-column="27" selection-end-line="14" selection-end-column="27" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1332,15 +1221,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/runnable/JumpRunnable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="12" column="31" lean-forward="true" selection-start-line="12" selection-start-column="31" selection-end-line="12" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1348,14 +1228,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
           <caret line="2" column="7" lean-forward="false" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-          <folding>
-            <element signature="e#513#514#0" expanded="false" />
-            <element signature="e#541#542#0" expanded="false" />
-            <element signature="e#603#604#0" expanded="false" />
-            <element signature="e#658#659#0" expanded="false" />
-            <element signature="e#1437#1438#0" expanded="false" />
-            <element signature="e#1470#1471#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1366,45 +1238,77 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/MarkerCollection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/MarkersPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="32" column="24" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/Marker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="39" lean-forward="false" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/idea.jar!/com/intellij/openapi/application/impl/ApplicationImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="152" column="16" lean-forward="false" selection-start-line="152" selection-start-column="16" selection-end-line="152" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/idea.jar!/com/intellij/mock/MockApplication.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="116" column="35" lean-forward="false" selection-start-line="116" selection-start-column="19" selection-end-line="116" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/openapi/application/Application.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="19" column="22" lean-forward="false" selection-start-line="19" selection-start-column="9" selection-end-line="19" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/offsets/CharOffsetsFinder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="28" lean-forward="true" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/offsets/WordOffsetsFinder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hunmr/options/IdeaConfigurable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="952">
-          <caret line="68" column="9" lean-forward="false" selection-start-line="68" selection-start-column="9" selection-end-line="68" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#3142#3143#0" expanded="false" />
-            <element signature="e#3173#3174#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="187">
+          <caret line="18" column="37" lean-forward="false" selection-start-line="18" selection-start-column="22" selection-end-line="18" selection-end-column="37" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hunmr/options/PluginConfig.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="24" column="34" lean-forward="false" selection-start-line="24" selection-start-column="19" selection-end-line="24" selection-end-column="34" />
+        <state relative-caret-position="306">
+          <caret line="23" column="36" lean-forward="false" selection-start-line="23" selection-start-column="36" selection-end-line="23" selection-end-column="36" />
           <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#941#942#0" expanded="false" />
-            <element signature="e#995#996#0" expanded="false" />
-            <element signature="e#1040#1041#0" expanded="false" />
-            <element signature="e#1094#1095#0" expanded="false" />
-            <element signature="e#1241#1242#0" expanded="false" />
-            <element signature="e#1296#1297#0" expanded="false" />
-            <element signature="e#1362#1363#0" expanded="false" />
-            <element signature="e#1389#1390#0" expanded="false" />
-            <element signature="e#1453#1454#0" expanded="false" />
-            <element signature="e#1509#1510#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/AceJumpAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="188" column="34" lean-forward="false" selection-start-line="188" selection-start-column="34" selection-end-line="188" selection-end-column="34" />
-          <folding>
-            <element signature="e#1362#1381#0" expanded="true" />
-            <element signature="e#5869#5878#0" expanded="true" />
+            <element signature="e#1136#1137#0" expanded="true" />
+            <element signature="e#1191#1192#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1414,21 +1318,99 @@
         <state />
       </provider>
     </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/openapi/editor/CaretModel.class">
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/offsets/OffsetsFinder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="20" column="18" lean-forward="false" selection-start-line="20" selection-start-column="18" selection-end-line="20" selection-end-column="18" />
+        <state relative-caret-position="884">
+          <caret line="59" column="28" lean-forward="false" selection-start-line="59" selection-start-column="28" selection-end-line="59" selection-end-column="28" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/selector/ToLineEndSelector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="7" column="13" lean-forward="false" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/idea.jar!/com/intellij/openapi/editor/impl/CaretModelImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="42" column="28" lean-forward="false" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/idea.jar!/com/intellij/openapi/editor/textarea/TextComponentCaretModel.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="19" column="28" lean-forward="false" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/openapi/editor/Editor.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="5" column="36" lean-forward="true" selection-start-line="5" selection-start-column="36" selection-end-line="6" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/marker/JOffset.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="33" lean-forward="true" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+        <state relative-caret-position="153">
+          <caret line="11" column="18" lean-forward="false" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="18" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/EmacsIdeasAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="59" column="19" lean-forward="false" selection-start-line="59" selection-start-column="19" selection-end-line="59" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/AceJumpAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="171" column="32" lean-forward="false" selection-start-line="171" selection-start-column="32" selection-end-line="171" selection-end-column="32" />
+          <folding>
+            <element signature="e#1362#1381#0" expanded="true" />
+            <element signature="e#5869#5878#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/openapi/editor/CaretModel.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="20" column="9" lean-forward="false" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/selector/Selector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="11" column="29" lean-forward="false" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/common/selector/ParagraphSelector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="49" column="67" lean-forward="false" selection-start-line="47" selection-start-column="8" selection-end-line="49" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hunmr/acejump/runnable/JumpRunnable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

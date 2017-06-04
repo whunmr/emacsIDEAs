@@ -22,7 +22,7 @@ public class PluginConfig implements PersistentStateComponent<PluginConfig> {
     public int _secondJumpForeground = Color.white.getRGB();
     public boolean _needSelectTextAfterJump = true;
     public boolean _jumpBehindChar = true;
-    public boolean _markBehindChar = true;
+    public boolean _jumpBehind = true;
 
     public Color getFirstJumpBackground() {
         return new Color(_firstJumpBackground);

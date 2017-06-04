@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class IdeaConfigurable implements Configurable {
     private JPanel _optionsPanel;
@@ -18,7 +17,7 @@ public class IdeaConfigurable implements Configurable {
     private ColorPanel _secondJumpForeground;
     private JCheckBox _needSelectTextAfterJump;
     private JCheckBox _jumpBehindChar;
-    private JCheckBox _markBehindChar;
+    private JCheckBox _jumpBehind;
 
     final PluginConfig config = ServiceManager.getService(PluginConfig.class);
 
@@ -41,7 +40,7 @@ public class IdeaConfigurable implements Configurable {
         _secondJumpForeground.setSelectedColor(config.getSecondJumpForeground());
         _needSelectTextAfterJump.setSelected(config._needSelectTextAfterJump);
         _jumpBehindChar.setSelected(config._jumpBehindChar);
-        _markBehindChar.setSelected(config._markBehindChar);
+        _jumpBehind.setSelected(config._jumpBehind);
     }
 
     @Nullable
@@ -59,7 +58,7 @@ public class IdeaConfigurable implements Configurable {
                 || _secondJumpForeground.getSelectedColor() != config.getSecondJumpForeground()
                 || _needSelectTextAfterJump.isSelected() != config._needSelectTextAfterJump
                 || _jumpBehindChar.isSelected() != config._jumpBehindChar
-                || _markBehindChar.isSelected() != config._markBehindChar;
+                || _jumpBehind.isSelected() != config._jumpBehind;
     }
 
     @Override
@@ -74,7 +73,7 @@ public class IdeaConfigurable implements Configurable {
         config._secondJumpForeground = _secondJumpForeground.getSelectedColor().getRGB();
         config._needSelectTextAfterJump = _needSelectTextAfterJump.isSelected();
         config._jumpBehindChar = _jumpBehindChar.isSelected();
-        config._markBehindChar = _markBehindChar.isSelected();
+        config._jumpBehind = _jumpBehind.isSelected();
     }
 
     @Override
