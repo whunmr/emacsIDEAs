@@ -16,7 +16,6 @@ public class IdeaConfigurable implements Configurable {
     private ColorPanel _secondJumpBackground;
     private ColorPanel _secondJumpForeground;
     private JCheckBox _needSelectTextAfterJump;
-    private JCheckBox _jumpBehindChar;
     private JCheckBox _jumpBehind;
 
     final PluginConfig config = ServiceManager.getService(PluginConfig.class);
@@ -39,7 +38,6 @@ public class IdeaConfigurable implements Configurable {
         _secondJumpBackground.setSelectedColor(config.getSecondJumpBackground());
         _secondJumpForeground.setSelectedColor(config.getSecondJumpForeground());
         _needSelectTextAfterJump.setSelected(config._needSelectTextAfterJump);
-        _jumpBehindChar.setSelected(config._jumpBehindChar);
         _jumpBehind.setSelected(config._jumpBehind);
     }
 
@@ -57,7 +55,6 @@ public class IdeaConfigurable implements Configurable {
                 || _secondJumpBackground.getSelectedColor() != config.getSecondJumpBackground()
                 || _secondJumpForeground.getSelectedColor() != config.getSecondJumpForeground()
                 || _needSelectTextAfterJump.isSelected() != config._needSelectTextAfterJump
-                || _jumpBehindChar.isSelected() != config._jumpBehindChar
                 || _jumpBehind.isSelected() != config._jumpBehind;
     }
 
@@ -72,7 +69,6 @@ public class IdeaConfigurable implements Configurable {
         config._secondJumpBackground = _secondJumpBackground.getSelectedColor().getRGB();
         config._secondJumpForeground = _secondJumpForeground.getSelectedColor().getRGB();
         config._needSelectTextAfterJump = _needSelectTextAfterJump.isSelected();
-        config._jumpBehindChar = _jumpBehindChar.isSelected();
         config._jumpBehind = _jumpBehind.isSelected();
     }
 
@@ -85,5 +81,9 @@ public class IdeaConfigurable implements Configurable {
     public void disposeUIResources() {
         _optionsPanel.removeAll();
         _optionsPanel.getParent().remove(_optionsPanel);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }

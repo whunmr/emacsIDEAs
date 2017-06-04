@@ -11,11 +11,7 @@ public class JOffset {
 
     public JOffset(Editor editor, int offset) {
         this.editor = editor;
-        if (_config._jumpBehindChar) {
-            this.offset = offset + 1;
-        } else {
-            this.offset = offset;
-        }
+        this.offset = offset;
     }
 
     public void restoreCaret() {
