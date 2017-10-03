@@ -1,5 +1,5 @@
-<idea-plugin version="2">
-    <name>emacsIDEAs</name>
+<idea-plugin>
+    <name>emacsIDEAs beta</name>
     <description>
         <![CDATA[
       <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction. And new created EditWithoutSelection (Cut/Move/Replace without selection). </p>

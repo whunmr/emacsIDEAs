@@ -1,10 +1,13 @@
 package org.hunmr.acejump.marker;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
+import org.hunmr.options.PluginConfig;
 
 public class JOffset {
     public Editor editor;
     public int offset;
+    private final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
 
     public JOffset(Editor editor, int offset) {
         this.editor = editor;

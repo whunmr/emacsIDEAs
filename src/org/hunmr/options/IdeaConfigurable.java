@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class IdeaConfigurable implements Configurable {
     private JPanel _optionsPanel;
@@ -17,6 +16,7 @@ public class IdeaConfigurable implements Configurable {
     private ColorPanel _secondJumpBackground;
     private ColorPanel _secondJumpForeground;
     private JCheckBox _needSelectTextAfterJump;
+    private JCheckBox _jumpBehind;
 
     final PluginConfig config = ServiceManager.getService(PluginConfig.class);
 
@@ -38,6 +38,7 @@ public class IdeaConfigurable implements Configurable {
         _secondJumpBackground.setSelectedColor(config.getSecondJumpBackground());
         _secondJumpForeground.setSelectedColor(config.getSecondJumpForeground());
         _needSelectTextAfterJump.setSelected(config._needSelectTextAfterJump);
+        _jumpBehind.setSelected(config._jumpBehind);
     }
 
     @Nullable
@@ -49,11 +50,12 @@ public class IdeaConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        return      _firstJumpBackground.getSelectedColor() != config.getFirstJumpBackground()
-                ||  _firstJumpForeground.getSelectedColor() != config.getFirstJumpForeground()
+        return _firstJumpBackground.getSelectedColor() != config.getFirstJumpBackground()
+                || _firstJumpForeground.getSelectedColor() != config.getFirstJumpForeground()
                 || _secondJumpBackground.getSelectedColor() != config.getSecondJumpBackground()
                 || _secondJumpForeground.getSelectedColor() != config.getSecondJumpForeground()
-                || _needSelectTextAfterJump.isSelected()    != config._needSelectTextAfterJump;
+                || _needSelectTextAfterJump.isSelected() != config._needSelectTextAfterJump
+                || _jumpBehind.isSelected() != config._jumpBehind;
     }
 
     @Override
@@ -67,6 +69,7 @@ public class IdeaConfigurable implements Configurable {
         config._secondJumpBackground = _secondJumpBackground.getSelectedColor().getRGB();
         config._secondJumpForeground = _secondJumpForeground.getSelectedColor().getRGB();
         config._needSelectTextAfterJump = _needSelectTextAfterJump.isSelected();
+        config._jumpBehind = _jumpBehind.isSelected();
     }
 
     @Override
@@ -78,5 +81,9 @@ public class IdeaConfigurable implements Configurable {
     public void disposeUIResources() {
         _optionsPanel.removeAll();
         _optionsPanel.getParent().remove(_optionsPanel);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }
