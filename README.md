@@ -188,7 +188,8 @@ C-i C-f 't' 'm' : Basic Jump alias
 ```
 
 ---
-donate BTC if you like this plugin:
-![BTC receive address](https://localbitcoins.com/django_bitcoin/qrcode/bitcoin%3A1NrCrdeCg1YbPNqJ4cy9PtdnKqMcmWR56K%3Frecv%3DLocalBitcoins.com)
+Donation:
+BTC: 1NrCrdeCg1YbPNqJ4cy9PtdnKqMcmWR56K
+
 
 
