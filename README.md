@@ -192,11 +192,6 @@ Download statistics:
 ![download_per_day](https://raw.githubusercontent.com/whunmr/emacsIDEAs-status/master/download_per_day.png)
 ![download_per_product](https://raw.githubusercontent.com/whunmr/emacsIDEAs-status/master/download_per_product.png)
 
----
-Donation:
-BTC: 1G49oddxE3v3HGQ15uWu3vw4HYgZ6Vjte
-
-
 
 
 
