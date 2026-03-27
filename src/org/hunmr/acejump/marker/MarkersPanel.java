@@ -1,6 +1,5 @@
 package org.hunmr.acejump.marker;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import org.hunmr.options.PluginConfig;
@@ -8,14 +7,14 @@ import org.hunmr.options.PluginConfig;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.HashSet;
 
 public class MarkersPanel extends JComponent {
     public static final Color PANEL_BACKGROUND_COLOR = new Color(128, 138, 142);
     public Editor _editor;
     private MarkerCollection _markerCollection;
 
-    final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
+    final PluginConfig _config = PluginConfig.getInstance();
 
     public MarkersPanel(Editor editor, MarkerCollection markerCollection) {
         _editor = editor;
@@ -34,7 +33,8 @@ public class MarkersPanel extends JComponent {
     }
 
     @Override
-    public void paint(Graphics g) {
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
         Font font = _editor.getColorsScheme().getFont(EditorFontType.BOLD);
         FontMetrics fontMetrics = _editor.getContentComponent().getFontMetrics(font);
 
@@ -65,8 +65,6 @@ public class MarkersPanel extends JComponent {
                 drawMarkerChar(g, __x(offset) + fontRect.getWidth(), __y(offset) + font.getSize() * 0.9, marker.getMarker().charAt(1), _config.getSecondJumpForeground());
             }
         }
-
-        super.paint(g);
     }
 
     private boolean isAlreadyHasFirstJumpCharInPlace(HashSet<JOffset> firstJumpOffsets, Marker marker) {

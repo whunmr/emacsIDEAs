@@ -1,7 +1,6 @@
 package org.hunmr.buildin;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import org.hunmr.common.EmacsIdeasAction;
 import org.hunmr.util.AppUtil;

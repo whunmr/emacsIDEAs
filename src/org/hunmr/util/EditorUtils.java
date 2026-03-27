@@ -96,7 +96,7 @@ public class EditorUtils {
     }
 
     public static void selectTextRange(Editor editor, TextRange[] tr) {
-        if (editor != null && tr != null) {
+        if (editor != null && tr != null && tr.length > 0) {
             editor.getSelectionModel().setSelection(tr[0].getStartOffset(), tr[0].getEndOffset());
         }
     }

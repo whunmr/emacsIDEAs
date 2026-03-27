@@ -1,6 +1,5 @@
 package org.hunmr.copycutwithoutselection;
 
-import com.intellij.codeInsight.highlighting.HighlightManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.EditorModificationUtil;
@@ -50,8 +49,11 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
                 keyEvent.consume();
                 boolean copyFinished  = handleKey(keyEvent.getKeyChar());
                 if (copyFinished) {
+                    Runnable pendingAction = getPendingAction();
                     cleanupSetupsInAndBackToNormalEditingMode();
-                    handlePendingActionOnSuccess();
+                    if (pendingAction != null) {
+                        pendingAction.run();
+                    }
                 }
             }
 

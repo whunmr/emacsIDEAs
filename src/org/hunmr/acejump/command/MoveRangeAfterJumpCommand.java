@@ -2,11 +2,11 @@ package org.hunmr.acejump.command;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
-import com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.common.selector.Selector;
 import org.hunmr.util.AppUtil;
+import org.hunmr.util.ClipboardEditorUtil;
 import org.hunmr.util.EditorUtils;
 
 public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
@@ -66,11 +66,11 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
             private void pasteClipboardToOffset() {
                 focusSourceCaret();
 
-                TextRange[] tr = EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_se);
-                if (_config._needSelectTextAfterJump) {
+                TextRange[] tr = ClipboardEditorUtil.pasteFromClipboard(_se);
+                if (_config._needSelectTextAfterJump && tr.length > 0) {
                     EditorUtils.selectTextRange(_se, tr);
                 }
-                _length = tr[0].getEndOffset() - tr[0].getStartOffset();
+                _length = tr.length == 0 ? 0 : tr[0].getEndOffset() - tr[0].getStartOffset();
             }
         };
 

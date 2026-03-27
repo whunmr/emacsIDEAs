@@ -1,4 +1,5 @@
 <idea-plugin version="2">
+  <id>org.hunmr.emacsideas</id>
   <name>emacsIDEAs</name>
   <description>
     <![CDATA[
@@ -149,7 +150,24 @@
   </description>
   <change-notes><![CDATA[
     <html>
-    <dl>
+    <dl><dt>1.4.9</dt>
+        <dd>--- revert recent unstable changes.<br/>
+        <dd>
+        <dt>1.4.8</dt>
+        <dd>--- due to bugs, in 1.4.8 cancel support for: `C-c b' do not support text between `<' and `>', like it works for `(' and `)'  <br/>
+        <dd>
+        <dt>1.4.7</dt>
+        <dd>--- fix bug: `C-c b' do not support text between `<' and `>', like it works for `(' and `)' : https://github.com/whunmr/emacsIDEAs/issues/22 <br/>
+        <dd>--- fix bug: can not handle pipelined commands: https://github.com/whunmr/emacsIDEAs/issues/21 <br/>
+        <dd>
+        <dt>1.4.6</dt>
+        <dd>--- fix 'esc' key can not exit jump mode if ideaVim is activated and in visual mode. <br/>
+        <dd>--- To exit jump mode now we can press, ESC, SEMICOLON, or SPACE.<br/>
+        <dd>--- reported by @xdidi3r https://github.com/whunmr/emacsIDEAs/issues/19 <br/>
+        <dd>
+        <dt>1.4.5</dt>
+        <dd>--- fix issue in WebStorm reported by @Centaur.https://github.com/whunmr/emacsIDEAs/issues/18 <br/>
+        <dd>
         <dt>1.4.4</dt>
         <dd>--- fix wrong width of the jump marker background.<br/>
         <dd>
@@ -226,20 +244,12 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.4.4</version>
-  <vendor>whunmr@gmail.com</vendor>
+  <version>1.5.0</version>
+  <vendor email="whunmr@gmail.com">whunmr</vendor>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
-
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
-
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+  <idea-version since-build="253"/>
   <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
 
   <actions>
     <group id="emacsIDEAs" text="emacsIDEAs" description="emacsIDEAs">
@@ -476,6 +486,9 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="org.hunmr.options.PluginConfig"/>
-    <applicationConfigurable instance="org.hunmr.options.IdeaConfigurable"></applicationConfigurable>
+    <applicationConfigurable
+        id="org.hunmr.emacsideas.settings"
+        displayName="emacsIDEAs"
+        instance="org.hunmr.options.IdeaConfigurable"/>
   </extensions>
 </idea-plugin>

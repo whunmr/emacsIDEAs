@@ -1,4 +1,5 @@
 <idea-plugin version="2">
+  <id>org.hunmr.emacsideas</id>
   <name>emacsIDEAs</name>
   <description>
     <![CDATA[
@@ -243,20 +244,12 @@
     </html>
     ]]>
   </change-notes>
-  <version>1.4.9</version>
-  <vendor>whunmr@gmail.com</vendor>
+  <version>1.5.0</version>
+  <vendor email="whunmr@gmail.com">whunmr</vendor>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
-
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
-
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+  <idea-version since-build="253"/>
   <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
 
   <actions>
     <group id="emacsIDEAs" text="emacsIDEAs" description="emacsIDEAs">
@@ -493,6 +486,9 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="org.hunmr.options.PluginConfig"/>
-    <applicationConfigurable instance="org.hunmr.options.IdeaConfigurable"></applicationConfigurable>
+    <applicationConfigurable
+        id="org.hunmr.emacsideas.settings"
+        displayName="emacsIDEAs"
+        instance="org.hunmr.options.IdeaConfigurable"/>
   </extensions>
 </idea-plugin>

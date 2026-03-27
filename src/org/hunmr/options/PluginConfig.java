@@ -1,25 +1,25 @@
 package org.hunmr.options;
 
-import com.intellij.openapi.components.*;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
 @State(
         name = "emacsIDEAsPluginConfig",
-        storages = {
-                @Storage(
-                        id = "other",
-                        file = "$APP_CONFIG$/emacsIDEAs_plugin.xml")
-        }
+        storages = @Storage(value = "emacsIDEAs_plugin.xml", roamingType = RoamingType.DISABLED)
 )
 public class PluginConfig implements PersistentStateComponent<PluginConfig> {
-    public int _firstJumpBackground = Color.blue.getRGB();
-    public int _firstJumpForeground = Color.white.getRGB();
-    public int _secondJumpBackground = Color.red.getRGB();
-    public int _secondJumpForeground = Color.white.getRGB();
+    public int _firstJumpBackground = Color.BLUE.getRGB();
+    public int _firstJumpForeground = Color.WHITE.getRGB();
+    public int _secondJumpBackground = Color.RED.getRGB();
+    public int _secondJumpForeground = Color.WHITE.getRGB();
     public boolean _needSelectTextAfterJump = true;
 
     public Color getFirstJumpBackground() {
@@ -45,13 +45,11 @@ public class PluginConfig implements PersistentStateComponent<PluginConfig> {
     }
 
     @Override
-    public void loadState(PluginConfig config) {
+    public void loadState(@NotNull PluginConfig config) {
         XmlSerializerUtil.copyBean(config, this);
     }
 
-    @Nullable
-    public static PluginConfig getInstance(Project project) {
-        return ServiceManager.getService(project, PluginConfig.class);
+    public static PluginConfig getInstance() {
+        return ApplicationManager.getApplication().getService(PluginConfig.class);
     }
-
 }

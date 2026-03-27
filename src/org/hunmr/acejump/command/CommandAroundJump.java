@@ -1,6 +1,5 @@
 package org.hunmr.acejump.command;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.options.PluginConfig;
@@ -12,7 +11,7 @@ public class CommandAroundJump {
     protected Editor _te; /*target editor*/
     protected int _toff;
 
-    final PluginConfig _config = ServiceManager.getService(PluginConfig.class);
+    final PluginConfig _config = PluginConfig.getInstance();
 
     public CommandAroundJump(Editor editor) {
         _se = editor;
@@ -53,4 +52,3 @@ public class CommandAroundJump {
         return _se == _te;
     }
 }
-

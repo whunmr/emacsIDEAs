@@ -1,10 +1,10 @@
 package org.hunmr.acejump.command;
 
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl;
 import com.intellij.openapi.util.TextRange;
 import org.hunmr.acejump.marker.JOffset;
 import org.hunmr.util.AppUtil;
+import org.hunmr.util.ClipboardEditorUtil;
 
 public class PasteAfterJumpCommand extends CommandAroundJump {
     private boolean _addNewLineBeforePaste;
@@ -44,7 +44,7 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
                     _se.getCaretModel().moveToOffset(_se.getCaretModel().getOffset() + 1);
                 }
 
-                EditorCopyPasteHelperImpl.getInstance().pasteFromClipboard(_se);
+                ClipboardEditorUtil.pasteFromClipboard(_se);
             }
         };
 
