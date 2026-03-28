@@ -16,6 +16,11 @@ public class HighlightSymbolAction extends EmacsIdeasAction {
         Project project = e.getData(CommonDataKeys.PROJECT);
 
         if (project != null && super.initAction(e)) {
+            if (!isUsableEditor(_editor)) {
+                super.cleanupSetupsInAndBackToNormalEditingMode();
+                return;
+            }
+
             int nextSymbolOffset = getNextSymbolOffset(searchForward, project);
             if (-1 != nextSymbolOffset) {
                 _editor.getCaretModel().moveToOffset(nextSymbolOffset);
@@ -28,6 +33,10 @@ public class HighlightSymbolAction extends EmacsIdeasAction {
     }
 
     private int getNextSymbolOffset(boolean searchForward, Project project) {
+        if (!isUsableEditor(_editor) || project == null) {
+            return -1;
+        }
+
         _editor.getSelectionModel().selectWordAtCaret(false);
 
         int symbolStart = _editor.getSelectionModel().getSelectionStart();
@@ -37,6 +46,10 @@ public class HighlightSymbolAction extends EmacsIdeasAction {
             String symbol =  _editor.getDocument().getText(new TextRange(symbolStart, symbolEnd));
 
             FindManager findManager = FindManager.getInstance(project);
+            if (findManager == null || findManager.getFindInFileModel() == null) {
+                return -1;
+            }
+
             FindModel findModel = (FindModel) findManager.getFindInFileModel().clone();
             findModel.setFindAll(false);
             findModel.setFromCursor(true);

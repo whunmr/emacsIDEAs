@@ -23,6 +23,10 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
 
     @Override
     public void beforeJump(final JOffset jumpTargetOffset) {
+        if (!hasUsableSourceEditor()) {
+            return;
+        }
+
         super.beforeJump(jumpTargetOffset);
         EditorUtils.selectRangeOf(_selectorClass, _se);
         _caretOffsetFromSelectRangeStartBeforeJump = _soff - _se.getSelectionModel().getSelectionStart();
@@ -31,9 +35,16 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+            return;
+        }
+
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableTargetEditor()) {
+                    return;
+                }
 
                 TextRange tr = EditorUtils.getRangeOf(_selectorClass, _te);
                 if (tr != null)
@@ -51,7 +62,7 @@ public class ReplaceAfterJumpCommand extends CommandAroundJump {
 
                 TextRange[] textRanges = ClipboardEditorUtil.pasteFromClipboard(_te);
 
-                if (_config._needSelectTextAfterJump && textRanges.length > 0) {
+                if (shouldSelectAfterJump() && textRanges.length > 0) {
                     int caret = textRanges[0].getStartOffset() + _caretOffsetFromSelectRangeStartBeforeJump;
                     targetCaret.moveToOffset(caret);
                     EditorUtils.selectRangeOf(_selectorClass, _te);

@@ -12,9 +12,17 @@ public class CopyAfterJumpCommand extends CommandAroundJump {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+            return;
+        }
+
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableTargetEditor()) {
+                    return;
+                }
+
                 selectJumpArea();
                 _te.getSelectionModel().copySelectionToClipboard();
                 _te.getSelectionModel().removeSelection();

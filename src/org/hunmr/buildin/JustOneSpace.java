@@ -25,15 +25,24 @@ public class JustOneSpace extends EmacsIdeasAction {
     }
 
     private void makeOneSpaceBetween(final int begin, final int end) {
+        final com.intellij.openapi.editor.Editor editor = _editor;
+        if (editor == null || editor.isDisposed()) {
+            return;
+        }
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                _editor.getSelectionModel().setSelection(begin, end);
-                EditorModificationUtil.deleteSelectedText(_editor);
-                EditorModificationUtil.insertStringAtCaret(_editor, " ");
+                if (editor.isDisposed()) {
+                    return;
+                }
+
+                editor.getSelectionModel().setSelection(begin, end);
+                EditorModificationUtil.deleteSelectedText(editor);
+                EditorModificationUtil.insertStringAtCaret(editor, " ");
             }
         };
-        AppUtil.runWriteAction(runnable, _editor);
+        AppUtil.runWriteAction(runnable, editor);
     }
 
     private int forwardToEndOffset(int end, String doc, int textLength) {

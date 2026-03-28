@@ -30,6 +30,10 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor()) {
+            return;
+        }
+
         TextRange tr = getTextRangeToReplace();
         if (tr != null)
         {
@@ -39,6 +43,10 @@ public class PasteAfterJumpCommand extends CommandAroundJump {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableSourceEditor()) {
+                    return;
+                }
+
                 if (_addNewLineBeforePaste) {
                     _se.getDocument().insertString(_se.getCaretModel().getOffset(), "\n");
                     _se.getCaretModel().moveToOffset(_se.getCaretModel().getOffset() + 1);

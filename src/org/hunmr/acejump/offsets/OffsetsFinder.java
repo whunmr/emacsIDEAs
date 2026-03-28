@@ -11,8 +11,16 @@ import java.util.List;
 
 public class OffsetsFinder {
     public List<Integer> getOffsets(char key, Editor editor, Editor selectedEditor) {
+        if (editor == null || editor.isDisposed()) {
+            return new ArrayList<Integer>();
+        }
+
         Document document = editor.getDocument();
         TextRange visibleRange = EditorUtils.getVisibleTextRange(editor);
+        if (visibleRange.isEmpty()) {
+            return new ArrayList<Integer>();
+        }
+
         List<Integer> offsets = getOffsetsOfCharIgnoreCase(String.valueOf(key), visibleRange, document, editor, selectedEditor);
 
         if (key == KeyEvent.VK_SPACE) {
@@ -26,6 +34,10 @@ public class OffsetsFinder {
     }
 
     private void addStartLineOffsetsTo(List<Integer> offsets, Editor editor) {
+        if (editor == null || editor.isDisposed()) {
+            return;
+        }
+
         ArrayList<Integer> visibleLineStartOffsets = EditorUtils.getVisibleLineStartOffsets(editor);
         for (Integer i : visibleLineStartOffsets) {
             if (!offsets.contains(i)) {

@@ -7,6 +7,10 @@ import org.hunmr.common.CommandContext;
 
 public class Selection {
     public static TextRange getTextRangeBy(Editor editor, CommandContext cmdCtx) {
+        if (editor == null || editor.isDisposed() || cmdCtx == null) {
+            return null;
+        }
+
         char key = cmdCtx.getLastCmdKey();
         Selector selector = SelectorFactory.createSelectorBy(key, editor);
 

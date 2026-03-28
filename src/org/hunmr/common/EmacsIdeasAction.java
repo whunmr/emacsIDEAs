@@ -52,14 +52,14 @@ public abstract class EmacsIdeasAction extends SimpleEditorAction {
     }
 
     public boolean initAction(AnActionEvent e) {
-        if (getEditorFrom(e) == null) {
+        Editor newEditor = getEditorFrom(e);
+        if (!isUsableEditor(newEditor)) {
             return false;
         }
 
-        switchEditorIfNeed(e);
-
-        if (_isStillRunning) {
-            cleanupSetupsInAndBackToNormalEditingMode();
+        switchEditorIfNeed(e, newEditor);
+        if (!isUsableEditor(_editor)) {
+            return false;
         }
 
         initMemberVariableForConvenientAccess(e);
@@ -81,8 +81,17 @@ public abstract class EmacsIdeasAction extends SimpleEditorAction {
     }
 
     public void switchEditorIfNeed(AnActionEvent e) {
-        Editor newEditor = getEditorFrom(e);
-        if (_editor != null && _editor != newEditor) {
+        switchEditorIfNeed(e, getEditorFrom(e));
+    }
+
+    private void switchEditorIfNeed(AnActionEvent e, Editor newEditor) {
+        if (!isUsableEditor(newEditor)) {
+            _editor = null;
+            _editors = new ArrayList<Editor>();
+            return;
+        }
+
+        if (_isStillRunning || (_editor != null && _editor != newEditor)) {
             cleanupSetupsInAndBackToNormalEditingMode();
         }
 
@@ -107,8 +116,14 @@ public abstract class EmacsIdeasAction extends SimpleEditorAction {
         for (FileEditor selectedEditor : selectedEditors) {
             if (selectedEditor instanceof TextEditor) {
                 Editor editor = ((TextEditor) selectedEditor).getEditor();
-                editors.add(editor);
+                if (isUsableEditor(editor)) {
+                    editors.add(editor);
+                }
             }
+        }
+
+        if (editors.isEmpty() && isUsableEditor(fallbackEditor)) {
+            editors.add(fallbackEditor);
         }
 
         return editors;
@@ -173,5 +188,9 @@ public abstract class EmacsIdeasAction extends SimpleEditorAction {
         }
 
         return e.getData(CommonDataKeys.PROJECT);
+    }
+
+    protected final boolean isUsableEditor(Editor editor) {
+        return editor != null && !editor.isDisposed();
     }
 }

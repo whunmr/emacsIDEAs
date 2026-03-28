@@ -15,7 +15,15 @@ public class AceJumpMoveRangeAction extends SimpleEditorAction {
             return;
         }
 
+        if (e.getActionManager() == null) {
+            return;
+        }
+
         String actionId = e.getActionManager().getId(this);
+        if (actionId == null || !actionId.startsWith("emacsIDEAs.AceJumpMove.")) {
+            return;
+        }
+
         String selectorClassName = "org.hunmr.common.selector."
                 + actionId.substring("emacsIDEAs.AceJumpMove.".length())
                 + "Selector";

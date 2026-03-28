@@ -12,6 +12,10 @@ public class JOffset {
     }
 
     public void restoreCaret() {
+        if (editor == null || editor.isDisposed()) {
+            return;
+        }
+
         editor.getContentComponent().requestFocus();
         editor.getCaretModel().moveToOffset(offset);
     }

@@ -10,7 +10,7 @@ public class MarkerCollection extends HashMap<String, Marker> {
         ArrayList<JOffset> ai = new ArrayList<JOffset>();
 
         for (Marker marker : this.values()) {
-            if (marker.getMarkerChar() == key) {
+            if (marker != null && marker.getMarkerChar() == key) {
                 ai.addAll(marker.getOffsets());
             }
         }
@@ -31,6 +31,10 @@ public class MarkerCollection extends HashMap<String, Marker> {
     }
 
     public JOffset getFirstOffset() {
+        if (this.isEmpty()) {
+            return null;
+        }
+
         return this.values().iterator().next().getOffset();
     }
 
@@ -44,7 +48,7 @@ public class MarkerCollection extends HashMap<String, Marker> {
 
     public boolean containsMarkerWithKey(char key) {
         for (Marker marker : this.values()) {
-            if (marker.getMarkerChar() == key) {
+            if (marker != null && marker.getMarkerChar() == key) {
                 return true;
             }
         }

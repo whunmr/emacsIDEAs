@@ -19,9 +19,17 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+            return;
+        }
+
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+                    return;
+                }
+
                 EditorUtils.copyRange(_selectorClass, _te);
                 focusSourceCaret();
 
@@ -29,7 +37,7 @@ public class ObtainAndPasteRangeAfterJumpCommand extends CommandAroundJump {
                 EditorUtils.deleteRange(_selectorClass, _se);
                 TextRange[] tr = ClipboardEditorUtil.pasteFromClipboard(_se);
 
-                if (_config._needSelectTextAfterJump && tr.length > 0) {
+                if (shouldSelectAfterJump() && tr.length > 0) {
                     EditorUtils.selectTextRange(_se, tr);
                 }
             }

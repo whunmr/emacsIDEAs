@@ -17,9 +17,17 @@ public class DeleteRangeAfterJumpCommand extends CommandAroundJump  {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+            return;
+        }
+
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableTargetEditor()) {
+                    return;
+                }
+
                 //TODO: add option to specify whether copy or not before delete
                 EditorUtils.copyRange(_selectorClass, _te);
                 EditorUtils.deleteRange(_selectorClass, _te);

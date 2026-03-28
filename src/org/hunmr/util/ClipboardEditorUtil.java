@@ -12,6 +12,10 @@ public final class ClipboardEditorUtil {
     }
 
     public static TextRange[] pasteFromClipboard(Editor editor) {
+        if (editor == null || editor.isDisposed()) {
+            return new TextRange[0];
+        }
+
         String text = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
         if (text == null || text.isEmpty()) {
             return new TextRange[0];

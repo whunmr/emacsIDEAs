@@ -15,6 +15,10 @@ public class SelectAfterJumpCommand extends CommandAroundJump {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+            return;
+        }
+
         selectJumpArea();
     }
 }

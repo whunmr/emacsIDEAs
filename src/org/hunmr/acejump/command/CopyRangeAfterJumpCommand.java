@@ -19,9 +19,17 @@ public class CopyRangeAfterJumpCommand extends CommandAroundJump  {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+            return;
+        }
+
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+                    return;
+                }
+
                 EditorUtils.copyRange(_selectorClass, _te);
                 pasteClipboardToOffset();
             }
@@ -31,7 +39,7 @@ public class CopyRangeAfterJumpCommand extends CommandAroundJump  {
 
                 TextRange[] tr = ClipboardEditorUtil.pasteFromClipboard(_se);
 
-                if (_config._needSelectTextAfterJump && tr.length > 0)
+                if (shouldSelectAfterJump() && tr.length > 0)
                     EditorUtils.selectTextRange(_se, tr);
             }
         };

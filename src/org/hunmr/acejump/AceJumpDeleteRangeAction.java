@@ -14,7 +14,15 @@ public class AceJumpDeleteRangeAction extends SimpleEditorAction {
             return;
         }
 
+        if (e.getActionManager() == null) {
+            return;
+        }
+
         String actionId = e.getActionManager().getId(this);
+        if (actionId == null || !actionId.startsWith("emacsIDEAs.AceJumpDelete.")) {
+            return;
+        }
+
         String selectorClassName = "org.hunmr.common.selector."
                 + actionId.substring("emacsIDEAs.AceJumpDelete.".length())
                 + "Selector";

@@ -17,6 +17,10 @@ import java.util.ArrayList;
 
 public class EditorUtils {
     public static TextRange getVisibleTextRange(Editor editor) {
+        if (!isUsableEditor(editor)) {
+            return TextRange.EMPTY_RANGE;
+        }
+
         Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
 
         LogicalPosition startLogicalPosition = editor.xyToLogicalPosition(visibleArea.getLocation());
@@ -38,8 +42,12 @@ public class EditorUtils {
     }
         
     public static ArrayList<Integer> getVisibleLineStartOffsets(Editor editor) {
-        Document document = editor.getDocument();
         ArrayList<Integer> offsets = new ArrayList<Integer>();
+        if (!isUsableEditor(editor)) {
+            return offsets;
+        }
+
+        Document document = editor.getDocument();
 
         TextRange visibleTextRange = getVisibleTextRange(editor);
         int startLine = document.getLineNumber(visibleTextRange.getStartOffset());
@@ -53,6 +61,10 @@ public class EditorUtils {
     }
 
     private static Selector getSelector(Class<? extends Selector> selectorClass, Editor editor) {
+        if (selectorClass == null || !isUsableEditor(editor)) {
+            return null;
+        }
+
         try {
             return selectorClass.getDeclaredConstructor(Editor.class).newInstance(editor);
         } catch (InstantiationException e) {
@@ -69,10 +81,14 @@ public class EditorUtils {
 
     public static TextRange getRangeOf(Class<? extends Selector> selectorClass, Editor editor) {
         Selector selector = getSelector(selectorClass, editor);
-        return selector.getRange(new CommandContext());
+        return selector != null ? selector.getRange(new CommandContext()) : null;
     }
 
     public static void selectRangeOf(Class<? extends Selector> selectorClass, Editor editor) {
+        if (!isUsableEditor(editor)) {
+            return;
+        }
+
         TextRange tr = getRangeOf(selectorClass, editor);
         if (tr != null) {
             editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());
@@ -80,35 +96,55 @@ public class EditorUtils {
     }
 
     public static void copyRange(Class<? extends Selector> selectorClass, Editor editor) {
+        if (!isUsableEditor(editor)) {
+            return;
+        }
+
         selectRangeOf(selectorClass, editor);
         editor.getSelectionModel().copySelectionToClipboard();
         editor.getSelectionModel().removeSelection();
     }
 
     public static void deleteRange(Class<? extends Selector> selectorClass, Editor editor) {
+        if (!isUsableEditor(editor)) {
+            return;
+        }
+
         selectRangeOf(selectorClass, editor);
         EditorModificationUtil.deleteSelectedText(editor);
     }
 
     public static void reformatCode(AnActionEvent e) {
+        if (e == null) {
+            return;
+        }
+
         ReformatCodeAction reformat = new ReformatCodeAction();
         reformat.actionPerformed(e);
     }
 
     public static void selectTextRange(Editor editor, TextRange[] tr) {
-        if (editor != null && tr != null && tr.length > 0) {
+        if (isUsableEditor(editor) && tr != null && tr.length > 0) {
             editor.getSelectionModel().setSelection(tr[0].getStartOffset(), tr[0].getEndOffset());
         }
     }
 
     public static void selectTextRange(Editor editor, int startOffset, int endOffset) {
-        if (editor != null) {
+        if (isUsableEditor(editor)) {
             editor.getSelectionModel().setSelection(startOffset, endOffset);
         }
     }
 
     public static void deleteRange(TextRange tr, Editor editor) {
+        if (tr == null || !isUsableEditor(editor)) {
+            return;
+        }
+
         selectTextRange(editor, new TextRange[] {tr} );
         EditorModificationUtil.deleteSelectedText(editor);
+    }
+
+    private static boolean isUsableEditor(Editor editor) {
+        return editor != null && !editor.isDisposed();
     }
 }

@@ -24,7 +24,7 @@ public class IdeaConfigurable implements Configurable {
     @Nls
     @Override
     public String getDisplayName() {
-        return "emacsIDEAs";
+        return "emacsJump";
     }
 
     @Nullable
@@ -110,6 +110,7 @@ public class IdeaConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
+        ensureUiInitialized();
         return !Objects.equals(_firstJumpBackground.getSelectedColor(), config.getFirstJumpBackground())
                 || !Objects.equals(_firstJumpForeground.getSelectedColor(), config.getFirstJumpForeground())
                 || !Objects.equals(_secondJumpBackground.getSelectedColor(), config.getSecondJumpBackground())
@@ -119,6 +120,7 @@ public class IdeaConfigurable implements Configurable {
 
     @Override
     public void apply() throws ConfigurationException {
+        ensureUiInitialized();
         if (!isModified()) {
             return;
         }
@@ -132,6 +134,7 @@ public class IdeaConfigurable implements Configurable {
 
     @Override
     public void reset() {
+        ensureUiInitialized();
         setFromConfig();
     }
 

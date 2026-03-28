@@ -3,7 +3,7 @@ package org.hunmr.util;
 public class Chars {
 
     public static boolean isSymbol(Character character) {
-        return Chars.isSymbol(character);
+        return character != null && Chars.isSymbol(character.charValue());
     }
 
     public static boolean isSymbol(char c) {

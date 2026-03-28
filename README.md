@@ -1,5 +1,7 @@
-emacsIDEAs
-==========
+emacsJump
+=========
+
+Previously known as `emacsIDEAs`.
 
 Porting some great extensions of emacs to Intellij IDEA. 
 Such as AceJump, CopyWithoutSelection, 
@@ -191,7 +193,6 @@ C-i C-f 't' 'm' : Basic Jump alias
 Download statistics:
 ![download_per_day](https://raw.githubusercontent.com/whunmr/emacsIDEAs-status/master/download_per_day.png)
 ![download_per_product](https://raw.githubusercontent.com/whunmr/emacsIDEAs-status/master/download_per_product.png)
-
 
 
 

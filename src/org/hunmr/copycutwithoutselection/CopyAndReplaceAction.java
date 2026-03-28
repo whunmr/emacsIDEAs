@@ -16,6 +16,11 @@ public class CopyAndReplaceAction extends EmacsIdeasAction {
     public void actionPerformed(final AnActionEvent e) {
         if (super.initAction(e)) {
             final Editor editor = _editor;
+            if (editor == null || editor.isDisposed()) {
+                cleanupSetupsInAndBackToNormalEditingMode();
+                return;
+            }
+
             final ChainActionEvent pendingJumpAction = new ChainActionEvent(e, createPendingJumpAction(e, editor), editor);
             CopyCutWithoutSelectAction.getInstance().actionPerformed(pendingJumpAction);
             cleanupSetupsInAndBackToNormalEditingMode();
@@ -26,6 +31,10 @@ public class CopyAndReplaceAction extends EmacsIdeasAction {
         return new Runnable() {
             @Override
             public void run() {
+                if (editor.isDisposed()) {
+                    return;
+                }
+
                 AceJumpAction.getInstance().actionPerformed(createPendingSelectAndPasteAction(e, editor));
             }
         };
@@ -35,10 +44,18 @@ public class CopyAndReplaceAction extends EmacsIdeasAction {
         Runnable selectAndPaste = new Runnable() {
             @Override
             public void run() {
+                if (editor.isDisposed()) {
+                    return;
+                }
+
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
                         CommandContext cmdCtx = CopyCutWithoutSelectAction.getInstance().getCmdContext();
+                        if (editor.isDisposed() || cmdCtx == null) {
+                            return;
+                        }
+
                         TextRange tr = Selection.getTextRangeBy(editor, cmdCtx);
                         if (tr != null) {
                             editor.getSelectionModel().setSelection(tr.getStartOffset(), tr.getEndOffset());

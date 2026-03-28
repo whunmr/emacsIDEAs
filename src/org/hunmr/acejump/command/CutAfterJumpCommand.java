@@ -12,9 +12,17 @@ public class CutAfterJumpCommand extends CommandAroundJump {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor()) {
+            return;
+        }
+
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableSourceEditor()) {
+                    return;
+                }
+
                 if (inSameEditor()) {
                     selectJumpArea();
 

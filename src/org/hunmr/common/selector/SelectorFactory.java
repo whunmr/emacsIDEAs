@@ -19,6 +19,10 @@ public class SelectorFactory {
     }
 
     public static Selector createSelectorBy(char key, Editor editor) {
+        if (editor == null || editor.isDisposed()) {
+            return null;
+        }
+
         Selector selector = null;
 
         switch (Character.toLowerCase(key)) {

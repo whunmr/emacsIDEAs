@@ -15,6 +15,10 @@ public class JumpRunnable implements Runnable{
 
     @Override
     public void run() {
+        if (_offsetToJump == null || _offsetToJump.editor == null || _offsetToJump.editor.isDisposed()) {
+            return;
+        }
+
         _offsetToJump.editor.getContentComponent().requestFocus();
         _offsetToJump.editor.getCaretModel().moveToOffset(_offsetToJump.offset);
         _offsetToJump.editor.getSelectionModel().removeSelection();

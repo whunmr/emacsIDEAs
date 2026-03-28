@@ -1,5 +1,5 @@
 <idea-plugin version="2">
-    <name>emacsIDEAs</name>
+    <name>emacsJump</name>
     <description>
         <![CDATA[
       <p>Porting some great extensions of emacs to Intellij IDEA. such as AceJump, CopyWithoutSelectAction. And new created EditWithoutSelection (Cut/Move/Replace without selection). </p>
@@ -239,7 +239,7 @@
     <depends>com.intellij.modules.platform</depends>
 
     <actions>
-        <group id="emacsIDEAs" text="emacsIDEAs" description="emacsIDEAs">
+        <group id="emacsIDEAs" text="emacsJump" description="emacsJump">
             <!--<add-to-group group-id="MainMenu" anchor="last"  />-->
             <action id="emacsIDEAs.AceJumpWord" class="org.hunmr.acejump.AceJumpAction" text="AceJumpWord" description="AceJumpWord" >
                 <keyboard-shortcut keymap="$default" first-keystroke="alt L" />

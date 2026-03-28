@@ -17,7 +17,9 @@ import org.hunmr.common.EmacsIdeasAction;
 import org.hunmr.util.EditorUtils;
 import org.hunmr.util.Str;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -51,11 +53,15 @@ public class AceJumpAction extends EmacsIdeasAction {
         }
 
         if (super.initAction(e)) {
-            _contentComponent.addKeyListener(_showMarkersKeyListener);
+            attachKeyListener(_showMarkersKeyListener);
         }
     }
 
     private boolean handleShowMarkersKey(char key) {
+        if (_markers == null || _action == null) {
+            return false;
+        }
+
         if (EditorUtils.isPrintableChar(key)) {
             runReadAction(new ShowMarkersRunnable(getOffsetsOfCharInVisibleArea(key), (AceJumpAction) _action));
 
@@ -65,11 +71,17 @@ public class AceJumpAction extends EmacsIdeasAction {
             }
 
             if (_isCalledFromOtherAction && _markers.hasOnlyOnePlaceToJump()) {
-                jumpToOffset(_markers.getFirstOffset());
+                JOffset firstOffset = _markers.getFirstOffset();
+                if (firstOffset == null) {
+                    cleanupSetupsInAndBackToNormalEditingMode();
+                    return false;
+                }
+
+                jumpToOffset(firstOffset);
                 return false;
             }
 
-            _contentComponent.addKeyListener(_jumpToMarkerKeyListener);
+            attachKeyListener(_jumpToMarkerKeyListener);
             return true;
         }
 
@@ -77,6 +89,10 @@ public class AceJumpAction extends EmacsIdeasAction {
     }
 
     private boolean handleJumpToMarkerKey(char key) {
+        if (_markers == null) {
+            return false;
+        }
+
         if (!_markers.containsMarkerWithKey(key)) {
             key = Str.getCounterCase(key);
         }
@@ -98,55 +114,78 @@ public class AceJumpAction extends EmacsIdeasAction {
     }
 
     private KeyListener createShowMarkersKeyListener() {
-        return new KeyListener() {
+        return new KeyAdapter() {
+            @Override
             public void keyTyped(KeyEvent keyEvent) {
                 keyEvent.consume();
                 boolean showMarkersFinished = handleShowMarkersKey(keyEvent.getKeyChar());
                 if (showMarkersFinished) {
-                    _contentComponent.removeKeyListener(_showMarkersKeyListener);
+                    detachKeyListener(keyEvent, this);
                 }
             }
 
+            @Override
             public void keyPressed(KeyEvent keyEvent) {
                 if (KeyEvent.VK_ESCAPE == keyEvent.getKeyChar()) {
                     cleanupSetupsInAndBackToNormalEditingMode();
                 }
-            }
-
-            public void keyReleased(KeyEvent keyEvent) {
             }
         };
     }
 
     private KeyListener createJumpToMarkupKeyListener() {
-        return new KeyListener() {
+        return new KeyAdapter() {
+            @Override
             public void keyTyped(KeyEvent keyEvent) {
                 keyEvent.consume();
 
                 if (KeyEvent.VK_SPACE == keyEvent.getKeyChar() || KeyEvent.VK_SEMICOLON == keyEvent.getKeyChar()) {
                     cleanupSetupsInAndBackToNormalEditingMode();
+                    return;
                 }
 
-                if (keyEvent.isShiftDown()) {
+                if (keyEvent.isShiftDown() && isUsableEditor(_editor)) {
                     addCommandAroundJump(new SelectAfterJumpCommand(_editor));
                 }
 
                 boolean jumpFinished = handleJumpToMarkerKey(keyEvent.getKeyChar());
                 if (jumpFinished) {
-                    _contentComponent.removeKeyListener(_jumpToMarkerKeyListener);
+                    detachKeyListener(keyEvent, this);
                     handlePendingActionOnSuccess();
                 }
             }
 
+            @Override
             public void keyPressed(KeyEvent keyEvent) {
                 if (KeyEvent.VK_ESCAPE == keyEvent.getKeyChar()) {
                     cleanupSetupsInAndBackToNormalEditingMode();
                 }
             }
-
-            public void keyReleased(KeyEvent keyEvent) {
-            }
         };
+    }
+
+    private void attachKeyListener(KeyListener keyListener) {
+        JComponent contentComponent = _contentComponent;
+        if (contentComponent != null && keyListener != null) {
+            contentComponent.addKeyListener(keyListener);
+        }
+    }
+
+    private void detachKeyListener(KeyListener keyListener) {
+        JComponent contentComponent = _contentComponent;
+        if (contentComponent != null && keyListener != null) {
+            contentComponent.removeKeyListener(keyListener);
+        }
+    }
+
+    private void detachKeyListener(KeyEvent keyEvent, KeyListener keyListener) {
+        Component component = keyEvent.getComponent();
+        if (component instanceof JComponent && keyListener != null) {
+            ((JComponent) component).removeKeyListener(keyListener);
+            return;
+        }
+
+        detachKeyListener(keyListener);
     }
 
     private List<JOffset> getOffsetsOfCharInVisibleArea(char key) {
@@ -159,8 +198,15 @@ public class AceJumpAction extends EmacsIdeasAction {
 
     private List<JOffset> findOffsetsInEditors(char key) {
         List<JOffset> joffsets = new ArrayList<JOffset>();
+        if (_editors == null || _offsetsFinder == null || !isUsableEditor(_editor)) {
+            return joffsets;
+        }
 
         for (Editor editor : _editors) {
+            if (!isUsableEditor(editor)) {
+                continue;
+            }
+
             List<Integer> offsets = _offsetsFinder.getOffsets(key, editor, _editor);
             for (Integer offset : offsets) {
                 joffsets.add(new JOffset(editor, offset));
@@ -171,15 +217,24 @@ public class AceJumpAction extends EmacsIdeasAction {
     }
 
     private void jumpToOffset(final JOffset jumpOffset) {
+        if (jumpOffset == null || !isUsableEditor(jumpOffset.editor)) {
+            cleanupSetupsInAndBackToNormalEditingMode();
+            return;
+        }
+
         for (CommandAroundJump cmd : _commandsAroundJump) {
-            cmd.beforeJump(jumpOffset);
+            if (cmd != null) {
+                cmd.beforeJump(jumpOffset);
+            }
         }
 
         ApplicationManager.getApplication().runReadAction(new JumpRunnable(jumpOffset, this));
 
         for (CommandAroundJump cmd : _commandsAroundJump) {
-            cmd.preAfterJump(jumpOffset);
-            cmd.afterJump();
+            if (cmd != null) {
+                cmd.preAfterJump(jumpOffset);
+                cmd.afterJump();
+            }
         }
 
         cleanupSetupsInAndBackToNormalEditingMode();
@@ -187,17 +242,21 @@ public class AceJumpAction extends EmacsIdeasAction {
 
     public void cleanupSetupsInAndBackToNormalEditingMode() {
         if (_showMarkersKeyListener != null) {
-            _contentComponent.removeKeyListener(_showMarkersKeyListener);
+            detachKeyListener(_showMarkersKeyListener);
             _showMarkersKeyListener = null;
         }
 
         if (_jumpToMarkerKeyListener != null) {
-            _contentComponent.removeKeyListener(_jumpToMarkerKeyListener);
+            detachKeyListener(_jumpToMarkerKeyListener);
             _jumpToMarkerKeyListener = null;
         }
 
         if (_markersPanels != null) {
             for (MarkersPanel markersPanel : _markersPanels) {
+                if (markersPanel == null) {
+                    continue;
+                }
+
                 Container parent = markersPanel.getParent();
                 if (parent != null) {
                     parent.remove(markersPanel);
@@ -208,7 +267,9 @@ public class AceJumpAction extends EmacsIdeasAction {
 
         if (_editors != null) {
             for (Editor editor : _editors) {
-                editor.getComponent().repaint();
+                if (isUsableEditor(editor)) {
+                    editor.getComponent().repaint();
+                }
             }
         }
 
@@ -231,6 +292,10 @@ public class AceJumpAction extends EmacsIdeasAction {
     public void showNewMarkersPanel(ArrayList<MarkersPanel> markersPanels) {
         if (_markersPanels != null) {
             for (MarkersPanel markersPanel : _markersPanels) {
+                if (markersPanel == null) {
+                    continue;
+                }
+
                 Container parent = markersPanel.getParent();
                 if (parent != null) {
                     parent.remove(markersPanel);
@@ -241,9 +306,15 @@ public class AceJumpAction extends EmacsIdeasAction {
 
         _markersPanels = markersPanels;
 
+        if (markersPanels == null) {
+            return;
+        }
+
         for (MarkersPanel markersPanel : markersPanels) {
-            markersPanel._editor.getContentComponent().add(markersPanel);
-            markersPanel._editor.getContentComponent().repaint();
+            if (markersPanel != null && isUsableEditor(markersPanel._editor)) {
+                markersPanel._editor.getContentComponent().add(markersPanel);
+                markersPanel._editor.getContentComponent().repaint();
+            }
         }
     }
 
@@ -259,7 +330,9 @@ public class AceJumpAction extends EmacsIdeasAction {
     }
 
     public void addCommandAroundJump(CommandAroundJump commandAroundJump) {
-        _commandsAroundJump.push(commandAroundJump);
+        if (commandAroundJump != null) {
+            _commandsAroundJump.push(commandAroundJump);
+        }
     }
 
     public boolean isCalledFromOtherAction() {

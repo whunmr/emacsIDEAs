@@ -22,10 +22,21 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
 
     @Override
     public void afterJump() {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+            return;
+        }
+
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
+                    return;
+                }
+
                 TextRange sourceRange = EditorUtils.getRangeOf(_selectorClass, _te);
+                if (sourceRange == null) {
+                    return;
+                }
 
                 if (inSameEditor()) {
                     boolean noNeedToMove = sourceRange.contains(_soff);
@@ -59,6 +70,10 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
             }
 
             private void deleteTextSource(Editor editor) {
+                if (!isUsableEditor(editor)) {
+                    return;
+                }
+
                 EditorUtils.selectRangeOf(_selectorClass, editor);
                 EditorModificationUtil.deleteSelectedText(editor);
             }
@@ -67,7 +82,7 @@ public class MoveRangeAfterJumpCommand extends CommandAroundJump  {
                 focusSourceCaret();
 
                 TextRange[] tr = ClipboardEditorUtil.pasteFromClipboard(_se);
-                if (_config._needSelectTextAfterJump && tr.length > 0) {
+                if (shouldSelectAfterJump() && tr.length > 0) {
                     EditorUtils.selectTextRange(_se, tr);
                 }
                 _length = tr.length == 0 ? 0 : tr[0].getEndOffset() - tr[0].getStartOffset();

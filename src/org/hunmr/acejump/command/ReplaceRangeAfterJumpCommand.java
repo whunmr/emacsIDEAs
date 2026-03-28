@@ -15,6 +15,6 @@ public class ReplaceRangeAfterJumpCommand extends PasteAfterJumpCommand {
 
     public TextRange getTextRangeToReplace()
     {
-        return EditorUtils.getRangeOf(_selectorClass, _se);
+        return hasUsableSourceEditor() ? EditorUtils.getRangeOf(_selectorClass, _se) : null;
     }
 }

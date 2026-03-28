@@ -18,10 +18,19 @@ public class CommandAroundJump {
     }
 
     public void beforeJump(final JOffset jumpTargetOffset) {
+        if (!hasUsableSourceEditor()) {
+            return;
+        }
+
         _soff = _se.getCaretModel().getOffset();
     }
 
     public void preAfterJump(final JOffset jumpTargetOffset) {
+        if (jumpTargetOffset == null || !isUsableEditor(jumpTargetOffset.editor)) {
+            _te = null;
+            return;
+        }
+
         _te = jumpTargetOffset.editor;
         _toff = jumpTargetOffset.offset;
     }
@@ -30,17 +39,25 @@ public class CommandAroundJump {
     }
 
     public void focusSourceCaret() {
+        if (!hasUsableSourceEditor()) {
+            return;
+        }
+
         _se.getContentComponent().requestFocus();
         _se.getCaretModel().moveToOffset(_soff);
     }
 
     public void focusTargetCaret() {
+        if (!hasUsableTargetEditor()) {
+            return;
+        }
+
         _te.getContentComponent().requestFocus();
         _te.getCaretModel().moveToOffset(_toff);
     }
 
     protected void selectJumpArea() {
-        if (inSameEditor()) {
+        if (inSameEditor() && hasUsableSourceEditor()) {
             if (_soff < _toff)
                 _se.getSelectionModel().setSelection(_soff, _toff);
             else
@@ -50,5 +67,21 @@ public class CommandAroundJump {
 
     public boolean inSameEditor() {
         return _se == _te;
+    }
+
+    protected boolean hasUsableSourceEditor() {
+        return isUsableEditor(_se);
+    }
+
+    protected boolean hasUsableTargetEditor() {
+        return isUsableEditor(_te);
+    }
+
+    protected boolean isUsableEditor(Editor editor) {
+        return editor != null && !editor.isDisposed();
+    }
+
+    protected boolean shouldSelectAfterJump() {
+        return _config != null && _config._needSelectTextAfterJump;
     }
 }
