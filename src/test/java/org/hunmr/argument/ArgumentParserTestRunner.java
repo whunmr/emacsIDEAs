@@ -177,10 +177,94 @@ public final class ArgumentParserTestRunner {
             }
         });
 
-        run("plain insert inside a token falls back safely", new Runnable() {
+        run("insert inside current argument appends after that argument", new Runnable() {
             @Override
             public void run() {
-                assertInsertion("foo(ab|c)", "X", "foo(abXc)");
+                assertInsertion("foo(ab|c)", "X", "foo(abc, X)");
+            }
+        });
+
+        run("insert at the start of the current argument prepends before it", new Runnable() {
+            @Override
+            public void run() {
+                assertInsertion("foo(a, |char aaa, b)", "X", "foo(a, X, char aaa, b)");
+            }
+        });
+
+        run("insert inside a declaration-style argument appends after it", new Runnable() {
+            @Override
+            public void run() {
+                assertInsertion("foo(a, c|har aaa, b)", "X", "foo(a, char aaa, X, b)");
+            }
+        });
+
+        run("delete first argument cleans the comma", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete("foo(^a, b, c)", "foo(b, c)");
+            }
+        });
+
+        run("delete middle argument cleans both sides", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete("foo(a, ^b, c)", "foo(a, c)");
+            }
+        });
+
+        run("delete last argument removes the leading comma", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete("foo(a, b, ^c)", "foo(a, b)");
+            }
+        });
+
+        run("delete only argument leaves an empty list", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete("foo(^only)", "foo()");
+            }
+        });
+
+        run("delete argument with leading block comment", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete("foo(a, ^/*AAA, BBB*/ b, c)", "foo(a, c)");
+            }
+        });
+
+        run("obtain target argument and replace the current argument", new Runnable() {
+            @Override
+            public void run() {
+                assertObtainAndReplace("foo(|a, b); bar(^x, y)", "foo(x, b); bar(x, y)");
+            }
+        });
+
+        run("replace target argument with the current argument", new Runnable() {
+            @Override
+            public void run() {
+                assertAndReplace("foo(|a, b); bar(^x, y)", "foo(a, b); bar(a, y)");
+            }
+        });
+
+        run("move target argument into an empty parameter list", new Runnable() {
+            @Override
+            public void run() {
+                assertMove("foo(|); bar(^x, y)", "foo(x); bar(y)");
+            }
+        });
+
+        run("move target argument before another argument in the same list", new Runnable() {
+            @Override
+            public void run() {
+                assertMove("foo(a, | b, ^c)", "foo(a, c, b)");
+            }
+        });
+
+        run("move target argument across nested calls", new Runnable() {
+            @Override
+            public void run() {
+                assertMove("outer(|x, y, inner(a, ^b, c))", "outer(b, x, y, inner(a, c))");
             }
         });
     }
@@ -204,6 +288,53 @@ public final class ArgumentParserTestRunner {
         assertEquals(expectedOutput, builder.toString(), "insertion result should match");
     }
 
+    private static void assertDelete(String inputWithTargetMarker, String expectedOutput) {
+        Markers markers = stripMarkers(inputWithTargetMarker);
+        ParsedArguments parsed = ArgumentParser.parse(markers.text);
+        ArgumentCandidate target = findTargetCandidate(parsed, markers);
+        ArgumentInsertionPlan plan = ArgumentEditPlanner.planDelete(markers.text, target);
+        assertEquals(expectedOutput, ArgumentEditPlanner.apply(markers.text, plan), "delete result should match");
+    }
+
+    private static void assertObtainAndReplace(String inputWithMarkers, String expectedOutput) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        ParsedArguments parsed = ArgumentParser.parse(markers.text);
+        ArgumentCandidate source = parsed.findArgumentAtOrNear(markers.sourceOffset);
+        ArgumentCandidate target = findTargetCandidate(parsed, markers);
+        String targetText = target.getText(markers.text);
+        ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(source, targetText);
+        assertEquals(expectedOutput, ArgumentEditPlanner.apply(markers.text, plan), "obtain-and-replace result should match");
+    }
+
+    private static void assertAndReplace(String inputWithMarkers, String expectedOutput) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        ParsedArguments parsed = ArgumentParser.parse(markers.text);
+        ArgumentCandidate source = parsed.findArgumentAtOrNear(markers.sourceOffset);
+        ArgumentCandidate target = findTargetCandidate(parsed, markers);
+        String sourceText = source.getText(markers.text);
+        ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(target, sourceText);
+        assertEquals(expectedOutput, ArgumentEditPlanner.apply(markers.text, plan), "replace result should match");
+    }
+
+    private static void assertMove(String inputWithMarkers, String expectedOutput) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        ParsedArguments parsed = ArgumentParser.parse(markers.text);
+        ArgumentCandidate target = findTargetCandidate(parsed, markers);
+        String targetText = target.getText(markers.text);
+
+        if (target.contains(markers.sourceOffset)) {
+            throw new AssertionError("move tests must not place the source caret inside the target argument");
+        }
+
+        ArgumentInsertionPlan deletePlan = ArgumentEditPlanner.planDelete(markers.text, target);
+        String textAfterDelete = ArgumentEditPlanner.apply(markers.text, deletePlan);
+        int adjustedSourceOffset = ArgumentEditPlanner.adjustOffsetAfterPlan(markers.sourceOffset, deletePlan);
+        ArgumentInsertionPlan insertPlan = ArgumentInsertionPlanner.plan(textAfterDelete, adjustedSourceOffset, targetText);
+        String finalText = ArgumentEditPlanner.apply(textAfterDelete, insertPlan);
+
+        assertEquals(expectedOutput, finalText, "move result should match");
+    }
+
     private static Marker stripMarker(String textWithMarker) {
         int offset = textWithMarker.indexOf('|');
         if (offset < 0) {
@@ -212,6 +343,59 @@ public final class ArgumentParserTestRunner {
 
         String text = textWithMarker.substring(0, offset) + textWithMarker.substring(offset + 1);
         return new Marker(text, offset);
+    }
+
+    private static Markers stripMarkers(String markedText) {
+        StringBuilder builder = new StringBuilder();
+        int sourceOffset = -1;
+        int targetOffset = -1;
+
+        for (int i = 0; i < markedText.length(); i++) {
+            char c = markedText.charAt(i);
+            if (c == '|') {
+                sourceOffset = builder.length();
+                continue;
+            }
+            if (c == '^') {
+                targetOffset = builder.length();
+                continue;
+            }
+            builder.append(c);
+        }
+
+        return new Markers(builder.toString(), sourceOffset, targetOffset);
+    }
+
+    private static ArgumentCandidate findTargetCandidate(ParsedArguments parsed, Markers markers) {
+        if (markers.targetOffset < 0) {
+            throw new AssertionError("missing target marker in test");
+        }
+
+        ArgumentCandidate bestContaining = null;
+        for (ArgumentCandidate candidate : parsed.getArguments()) {
+            if (candidate.getAnchorOffset() == markers.targetOffset) {
+                return candidate;
+            }
+
+            if (!candidate.contains(markers.targetOffset)) {
+                continue;
+            }
+
+            if (bestContaining == null
+                    || candidate.getRange().length() < bestContaining.getRange().length()) {
+                bestContaining = candidate;
+            }
+        }
+
+        if (bestContaining != null) {
+            return bestContaining;
+        }
+
+        ArgumentCandidate candidate = parsed.findArgumentAtOrNear(markers.targetOffset);
+        if (candidate == null) {
+            throw new AssertionError("failed to resolve target candidate");
+        }
+        return candidate;
     }
 
     private static void run(String name, Runnable test) {
@@ -271,6 +455,18 @@ public final class ArgumentParserTestRunner {
         private Marker(String text, int offset) {
             this.text = text;
             this.offset = offset;
+        }
+    }
+
+    private static final class Markers {
+        private final String text;
+        private final int sourceOffset;
+        private final int targetOffset;
+
+        private Markers(String text, int sourceOffset, int targetOffset) {
+            this.text = text;
+            this.sourceOffset = sourceOffset;
+            this.targetOffset = targetOffset;
         }
     }
 }

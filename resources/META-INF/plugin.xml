@@ -306,6 +306,9 @@
       <action id="emacsIDEAs.AceJumpAndReplace.Block" class="org.hunmr.acejump.AceJumpAndReplaceRangeAction" text="AceJumpAndReplace.Block" description="AceJumpAndReplace.Block" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta B"/>
       </action>
+      <action id="emacsIDEAs.AceJumpAndReplace.Argument" class="org.hunmr.acejump.AceJumpAndReplaceArgumentAction" text="AceJumpAndReplace.Argument" description="AceJumpAndReplace.Argument" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta I" second-keystroke="meta COMMA"/>
+      </action>
 
 
       <!-- (w | s | l | q | a | e | p | u | d | b) -->
@@ -342,6 +345,9 @@
       <action id="emacsIDEAs.AceJumpObtainThenReplace.Block" class="org.hunmr.acejump.AceJumpObtainThenReplaceRangeAction" text="AceJumpObtainThenReplace.Block" description="AceJumpObtainThenReplace.Block" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta B"/>
       </action>
+      <action id="emacsIDEAs.AceJumpObtainThenReplace.Argument" class="org.hunmr.acejump.AceJumpObtainThenReplaceArgumentAction" text="AceJumpObtainThenReplace.Argument" description="AceJumpObtainThenReplace.Argument" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta O" second-keystroke="meta COMMA"/>
+      </action>
 
 
       <!-- (w | s | l | q | a | e | p | u | d | b) -->
@@ -377,6 +383,9 @@
       </action>
       <action id="emacsIDEAs.AceJumpMove.Block" class="org.hunmr.acejump.AceJumpMoveRangeAction" text="AceJumpMove.Block" description="AceJumpMove.Block" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta B"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpMove.Argument" class="org.hunmr.acejump.AceJumpMoveArgumentAction" text="AceJumpMove.Argument" description="AceJumpMove.Argument" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta X" second-keystroke="meta COMMA"/>
       </action>
 
       <!-- (w | s | l | q | a | e | p | u | d | b) -->
@@ -450,6 +459,9 @@
       </action>
       <action id="emacsIDEAs.AceJumpDelete.Block" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Block" description="AceJumpDelete.Block" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta B"/>
+      </action>
+      <action id="emacsIDEAs.AceJumpDelete.Argument" class="org.hunmr.acejump.AceJumpDeleteArgumentAction" text="AceJumpDelete.Argument" description="AceJumpDelete.Argument" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta D" second-keystroke="meta COMMA"/>
       </action>
 
     </group>

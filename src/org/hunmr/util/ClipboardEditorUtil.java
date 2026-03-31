@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.util.TextRange;
 
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.DataFlavor;
 
 public final class ClipboardEditorUtil {
@@ -39,5 +40,13 @@ public final class ClipboardEditorUtil {
         int pastedEndOffset = startOffset + text.length();
         editor.getCaretModel().moveToOffset(pastedEndOffset);
         return new TextRange[] {new TextRange(startOffset, pastedEndOffset)};
+    }
+
+    public static void copyToClipboard(String text) {
+        if (text == null) {
+            return;
+        }
+
+        CopyPasteManager.getInstance().setContents(new StringSelection(text));
     }
 }

@@ -11,9 +11,11 @@ public final class ArgumentInsertionPlanner {
 
         ParsedArguments parsed = ArgumentParser.parse(safeText);
         ArgumentList list = parsed.findInnermostList(safeOffset);
-        if (list == null || shouldFallbackToPlainInsert(parsed, safeText, safeOffset)) {
+        if (list == null) {
             return plainInsert(safeOffset, safeArgumentText);
         }
+
+        safeOffset = normalizeOffsetInsideCurrentArgument(parsed, list, safeOffset);
 
         int prevIndex = findPreviousNonWhitespace(safeText, safeOffset - 1, list.getOpenOffset());
         int nextIndex = findNextNonWhitespace(safeText, safeOffset, list.getCloseOffset());
@@ -65,25 +67,27 @@ public final class ArgumentInsertionPlanner {
         return plainInsert(safeOffset, safeArgumentText);
     }
 
-    private static boolean shouldFallbackToPlainInsert(ParsedArguments parsed, String text, int caretOffset) {
+    private static int normalizeOffsetInsideCurrentArgument(ParsedArguments parsed, ArgumentList list, int caretOffset) {
         ArgumentCandidate candidate = parsed.findArgumentAtOrNear(caretOffset);
         if (candidate == null || candidate.getRange() == null) {
-            return false;
+            return caretOffset;
         }
 
         int start = candidate.getRange().getStartOffset();
         int end = candidate.getRange().getEndOffset();
-        if (caretOffset <= start || caretOffset >= end || caretOffset <= 0 || caretOffset >= text.length()) {
-            return false;
+        if (candidate.getListOpenOffset() != list.getOpenOffset() || candidate.getListCloseOffset() != list.getCloseOffset()) {
+            return caretOffset;
         }
 
-        char left = text.charAt(caretOffset - 1);
-        char right = text.charAt(caretOffset);
-        return isTokenChar(left) && isTokenChar(right);
-    }
+        if (caretOffset >= start && caretOffset <= candidate.getAnchorOffset()) {
+            return start;
+        }
 
-    private static boolean isTokenChar(char c) {
-        return !Character.isWhitespace(c) && ",()[]{}".indexOf(c) < 0;
+        if (caretOffset > candidate.getAnchorOffset() && caretOffset < end) {
+            return end;
+        }
+
+        return caretOffset;
     }
 
     private static int findPreviousNonWhitespace(String text, int index, int lowerBoundExclusive) {

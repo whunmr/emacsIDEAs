@@ -6,30 +6,23 @@ import org.hunmr.argument.ArgumentCandidate;
 import org.hunmr.argument.ArgumentInsertionPlan;
 import org.hunmr.argument.ArgumentInsertionPlanner;
 import org.hunmr.util.AppUtil;
+import org.hunmr.util.ClipboardEditorUtil;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class CopyArgumentAfterJumpCommand extends CommandAroundJump {
-    private final IdentityHashMap<Editor, Map<Integer, ArgumentCandidate>> _targets;
-
+public class CopyArgumentAfterJumpCommand extends ArgumentJumpCommand {
     public CopyArgumentAfterJumpCommand(Editor editor, IdentityHashMap<Editor, Map<Integer, ArgumentCandidate>> targets) {
-        super(editor);
-        _targets = targets;
+        super(editor, targets);
     }
 
     @Override
     public void afterJump() {
-        if (!hasUsableSourceEditor() || !hasUsableTargetEditor() || _targets == null) {
+        if (!hasUsableSourceEditor() || !hasUsableTargetEditor()) {
             return;
         }
 
-        Map<Integer, ArgumentCandidate> candidatesByAnchor = _targets.get(_te);
-        if (candidatesByAnchor == null) {
-            return;
-        }
-
-        final ArgumentCandidate candidate = candidatesByAnchor.get(_toff);
+        final ArgumentCandidate candidate = getTargetCandidate();
         if (candidate == null) {
             return;
         }
@@ -46,6 +39,7 @@ public class CopyArgumentAfterJumpCommand extends CommandAroundJump {
                     return;
                 }
 
+                ClipboardEditorUtil.copyToClipboard(targetText);
                 focusSourceCaret();
                 Document document = _se.getDocument();
                 ArgumentInsertionPlan plan = ArgumentInsertionPlanner.plan(document.getText(), _soff, targetText);
