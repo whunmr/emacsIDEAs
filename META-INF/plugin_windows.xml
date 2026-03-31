@@ -31,8 +31,21 @@
           <li><b>C-c  g  </b>  :  Copy paragraph group (e.g.: entire function including white lines) </li>
           <li><b>C-c  u  </b>  :  Copy to paragraph begining</li>
           <li><b>C-c  d  </b>  :  Copy to paragraph end</li>
+          <li><b>C-c  ,  </b>  :  Copy current argument in the current innermost argument list</li>
+          <li><b>C-c  9  </b>  :  Copy arguments before caret in the current innermost argument list</li>
+          <li><b>C-c  0  </b>  :  Copy arguments after caret in the current innermost argument list</li>
           <li><b>C-c  ' '     (w | s | l | q | a | A | e | E | p | g | u | d | b)   </b>  :  Type one space to cut related area</li>
           <li><b>C-c  ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b)   </b>  :  Type two space to select related area</li>
+      </ul>
+      <br/>
+
+      <p><b>Argument-aware selectors:</b></p>
+      <ul>
+          <li><b>,</b>  :  current argument in the current innermost argument list</li>
+          <li><b>9</b>  :  arguments before caret in the current innermost argument list</li>
+          <li><b>0</b>  :  arguments after caret in the current innermost argument list</li>
+          <li><b>, / 9 / 0</b> can be used with <b>C-c</b>, <b>C-w</b>, <b>C-d</b>, <b>C-o</b>, <b>C-i</b>, and <b>C-x</b></li>
+          <li><b>C-w C-(, | 9 | 0)</b>, <b>C-d C-(, | 9 | 0)</b>, <b>C-o C-(, | 9 | 0)</b>, <b>C-i C-(, | 9 | 0)</b>, and <b>C-x C-(, | 9 | 0)</b> now jump by immediate markers on visible argument anchors</li>
       </ul>
       <br/>
 
@@ -296,6 +309,12 @@
             <action id="emacsIDEAs.AceJumpAndReplace.Argument" class="org.hunmr.acejump.AceJumpAndReplaceArgumentAction" text="AceJumpAndReplace.Argument" description="AceJumpAndReplace.Argument" >
                 <keyboard-shortcut keymap="$default" first-keystroke="alt I" second-keystroke="alt COMMA"/>
             </action>
+            <action id="emacsIDEAs.AceJumpAndReplace.BeforeArguments" class="org.hunmr.acejump.AceJumpAndReplaceBeforeArgumentsAction" text="AceJumpAndReplace.BeforeArguments" description="AceJumpAndReplace.BeforeArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt I" second-keystroke="alt 9"/>
+            </action>
+            <action id="emacsIDEAs.AceJumpAndReplace.AfterArguments" class="org.hunmr.acejump.AceJumpAndReplaceAfterArgumentsAction" text="AceJumpAndReplace.AfterArguments" description="AceJumpAndReplace.AfterArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt I" second-keystroke="alt 0"/>
+            </action>
 
 
             <!-- (w | s | l | q | a | e | p | u | d | b) -->
@@ -334,6 +353,12 @@
             </action>
             <action id="emacsIDEAs.AceJumpObtainThenReplace.Argument" class="org.hunmr.acejump.AceJumpObtainThenReplaceArgumentAction" text="AceJumpObtainThenReplace.Argument" description="AceJumpObtainThenReplace.Argument" >
                 <keyboard-shortcut keymap="$default" first-keystroke="alt O" second-keystroke="alt COMMA"/>
+            </action>
+            <action id="emacsIDEAs.AceJumpObtainThenReplace.BeforeArguments" class="org.hunmr.acejump.AceJumpObtainThenReplaceBeforeArgumentsAction" text="AceJumpObtainThenReplace.BeforeArguments" description="AceJumpObtainThenReplace.BeforeArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt O" second-keystroke="alt 9"/>
+            </action>
+            <action id="emacsIDEAs.AceJumpObtainThenReplace.AfterArguments" class="org.hunmr.acejump.AceJumpObtainThenReplaceAfterArgumentsAction" text="AceJumpObtainThenReplace.AfterArguments" description="AceJumpObtainThenReplace.AfterArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt O" second-keystroke="alt 0"/>
             </action>
 
 
@@ -374,6 +399,12 @@
             <action id="emacsIDEAs.AceJumpMove.Argument" class="org.hunmr.acejump.AceJumpMoveArgumentAction" text="AceJumpMove.Argument" description="AceJumpMove.Argument" >
                 <keyboard-shortcut keymap="$default" first-keystroke="alt X" second-keystroke="alt COMMA"/>
             </action>
+            <action id="emacsIDEAs.AceJumpMove.BeforeArguments" class="org.hunmr.acejump.AceJumpMoveBeforeArgumentsAction" text="AceJumpMove.BeforeArguments" description="AceJumpMove.BeforeArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt X" second-keystroke="alt 9"/>
+            </action>
+            <action id="emacsIDEAs.AceJumpMove.AfterArguments" class="org.hunmr.acejump.AceJumpMoveAfterArgumentsAction" text="AceJumpMove.AfterArguments" description="AceJumpMove.AfterArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt X" second-keystroke="alt 0"/>
+            </action>
 
             <!-- (w | s | l | q | a | e | p | u | d | b) -->
             <action id="emacsIDEAs.AceJumpCopy.Word" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Word" description="AceJumpCopy.Word" >
@@ -412,6 +443,12 @@
             <action id="emacsIDEAs.AceJumpCopy.Argument" class="org.hunmr.acejump.AceJumpCopyArgumentAction" text="AceJumpCopy.Argument" description="AceJumpCopy.Argument" >
                 <keyboard-shortcut keymap="$default" first-keystroke="alt W" second-keystroke="alt COMMA"/>
             </action>
+            <action id="emacsIDEAs.AceJumpCopy.BeforeArguments" class="org.hunmr.acejump.AceJumpCopyBeforeArgumentsAction" text="AceJumpCopy.BeforeArguments" description="AceJumpCopy.BeforeArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt W" second-keystroke="alt 9"/>
+            </action>
+            <action id="emacsIDEAs.AceJumpCopy.AfterArguments" class="org.hunmr.acejump.AceJumpCopyAfterArgumentsAction" text="AceJumpCopy.AfterArguments" description="AceJumpCopy.AfterArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt W" second-keystroke="alt 0"/>
+            </action>
 
             <!-- Delete target range. (w | s | l | q | a | e | p | u | d | b) -->
             <action id="emacsIDEAs.AceJumpDelete.Word" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Word" description="AceJumpDelete.Word" >
@@ -449,6 +486,12 @@
             </action>
             <action id="emacsIDEAs.AceJumpDelete.Argument" class="org.hunmr.acejump.AceJumpDeleteArgumentAction" text="AceJumpDelete.Argument" description="AceJumpDelete.Argument" >
                 <keyboard-shortcut keymap="$default" first-keystroke="alt D" second-keystroke="alt COMMA"/>
+            </action>
+            <action id="emacsIDEAs.AceJumpDelete.BeforeArguments" class="org.hunmr.acejump.AceJumpDeleteBeforeArgumentsAction" text="AceJumpDelete.BeforeArguments" description="AceJumpDelete.BeforeArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt D" second-keystroke="alt 9"/>
+            </action>
+            <action id="emacsIDEAs.AceJumpDelete.AfterArguments" class="org.hunmr.acejump.AceJumpDeleteAfterArgumentsAction" text="AceJumpDelete.AfterArguments" description="AceJumpDelete.AfterArguments" >
+                <keyboard-shortcut keymap="$default" first-keystroke="alt D" second-keystroke="alt 0"/>
             </action>
 
         </group>

@@ -12,11 +12,13 @@ public class SelectorFactory {
             "C-c a : Copy Quoted\n" +
             "C-c p : Copy Paragraph\n" +
             "C-c g : Copy Group\n" +
-            "C-c , : Copy Argument\n";
+            "C-c , : Copy Argument\n" +
+            "C-c 9 : Copy Arguments Before Caret\n" +
+            "C-c 0 : Copy Arguments After Caret\n";
     public static final Color HIGHLIGHT_COLOR = new Color(122, 214, 162);
 
     public static boolean isSelectorKey(char c) {
-        return "wslpbqaeudg,".indexOf(Character.toLowerCase(c)) != -1;
+        return "wslpbqaeudg,90".indexOf(Character.toLowerCase(c)) != -1;
     }
 
     public static Selector createSelectorBy(char key, Editor editor) {
@@ -62,6 +64,12 @@ public class SelectorFactory {
                 break;
             case ',':
                 selector = new ArgumentSelector(editor);
+                break;
+            case '9':
+                selector = new BeforeArgumentsSelector(editor);
+                break;
+            case '0':
+                selector = new AfterArgumentsSelector(editor);
                 break;
 
             default:

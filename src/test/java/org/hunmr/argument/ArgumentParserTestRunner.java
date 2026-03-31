@@ -198,6 +198,64 @@ public final class ArgumentParserTestRunner {
             }
         });
 
+        run("multiline insert before current argument keeps line style", new Runnable() {
+            @Override
+            public void run() {
+                assertInsertion(
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    |key22,\n" +
+                                "    key33,\n" +
+                                ")\n",
+                        "fetched",
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    fetched,\n" +
+                                "    key22,\n" +
+                                "    key33,\n" +
+                                ")\n"
+                );
+            }
+        });
+
+        run("multiline insert after current argument keeps line style", new Runnable() {
+            @Override
+            public void run() {
+                assertInsertion(
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    ke|y22,\n" +
+                                "    key33,\n" +
+                                ")\n",
+                        "fetched",
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    key22,\n" +
+                                "    fetched,\n" +
+                                "    key33,\n" +
+                                ")\n"
+                );
+            }
+        });
+
+        run("multiline insert before closing keeps trailing comma style", new Runnable() {
+            @Override
+            public void run() {
+                assertInsertion(
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    ke|y22,\n" +
+                                ")\n",
+                        "fetched",
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    key22,\n" +
+                                "    fetched,\n" +
+                                ")\n"
+                );
+            }
+        });
+
         run("delete first argument cleans the comma", new Runnable() {
             @Override
             public void run() {
@@ -233,6 +291,51 @@ public final class ArgumentParserTestRunner {
             }
         });
 
+        run("multiline delete middle argument keeps line style", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete(
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    ^key22,\n" +
+                                "    key33,\n" +
+                                ")\n",
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    key33,\n" +
+                                ")\n"
+                );
+            }
+        });
+
+        run("multiline delete last argument preserves no-trailing-comma style", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete(
+                        "handle(\n" +
+                                "    key11,\n" +
+                                "    ^key22\n" +
+                                ")\n",
+                        "handle(\n" +
+                                "    key11\n" +
+                                ")\n"
+                );
+            }
+        });
+
+        run("multiline delete only argument keeps multiline shell", new Runnable() {
+            @Override
+            public void run() {
+                assertDelete(
+                        "handle(\n" +
+                                "    ^only,\n" +
+                                ")\n",
+                        "handle(\n" +
+                                ")\n"
+                );
+            }
+        });
+
         run("obtain target argument and replace the current argument", new Runnable() {
             @Override
             public void run() {
@@ -240,10 +343,70 @@ public final class ArgumentParserTestRunner {
             }
         });
 
+        run("obtain multiline target argument keeps destination line style", new Runnable() {
+            @Override
+            public void run() {
+                assertObtainAndReplace(
+                        "foo(\n" +
+                                "    |bar,\n" +
+                                "    baz,\n" +
+                                ")\n" +
+                                "other(\n" +
+                                "    ^call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                ")\n",
+                        "foo(\n" +
+                                "    call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                "    baz,\n" +
+                                ")\n" +
+                                "other(\n" +
+                                "    call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                ")\n"
+                );
+            }
+        });
+
         run("replace target argument with the current argument", new Runnable() {
             @Override
             public void run() {
                 assertAndReplace("foo(|a, b); bar(^x, y)", "foo(a, b); bar(a, y)");
+            }
+        });
+
+        run("replace target argument with multiline current argument keeps target line style", new Runnable() {
+            @Override
+            public void run() {
+                assertAndReplace(
+                        "foo(\n" +
+                                "    |call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                ")\n" +
+                                "other(\n" +
+                                "    ^bar,\n" +
+                                ")\n",
+                        "foo(\n" +
+                                "    call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                ")\n" +
+                                "other(\n" +
+                                "    call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                ")\n"
+                );
             }
         });
 
@@ -265,6 +428,228 @@ public final class ArgumentParserTestRunner {
             @Override
             public void run() {
                 assertMove("outer(|x, y, inner(a, ^b, c))", "outer(b, x, y, inner(a, c))");
+            }
+        });
+
+        run("move multiline target argument keeps source and destination line style", new Runnable() {
+            @Override
+            public void run() {
+                assertMove(
+                        "dest(\n" +
+                                "    |first,\n" +
+                                "    second,\n" +
+                                ")\n" +
+                                "src(\n" +
+                                "    ^call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                ")\n",
+                        "dest(\n" +
+                                "    call(\n" +
+                                "        x,\n" +
+                                "        y,\n" +
+                                "    ),\n" +
+                                "    first,\n" +
+                                "    second,\n" +
+                                ")\n" +
+                                "src(\n" +
+                                ")\n"
+                );
+            }
+        });
+
+        run("copy before-arguments inserts into the current argument list", new Runnable() {
+            @Override
+            public void run() {
+                assertCopyArgumentSlice("dest(a, |char b); src(x, y^, z)", "dest(a, x, y, char b); src(x, y, z)", true);
+            }
+        });
+
+        run("copy after-arguments keeps multiline insertion style", new Runnable() {
+            @Override
+            public void run() {
+                assertCopyArgumentSlice(
+                        "dest(\n" +
+                                "    first,\n" +
+                                "    se|cond,\n" +
+                                ")\n" +
+                                "src(\n" +
+                                "    one,\n" +
+                                "    t^wo,\n" +
+                                "    three,\n" +
+                                ")\n",
+                        "dest(\n" +
+                                "    first,\n" +
+                                "    second,\n" +
+                                "    two,\n" +
+                                "    three,\n" +
+                                ")\n" +
+                                "src(\n" +
+                                "    one,\n" +
+                                "    two,\n" +
+                                "    three,\n" +
+                                ")\n",
+                        false
+                );
+            }
+        });
+
+        run("delete before-arguments removes commas cleanly", new Runnable() {
+            @Override
+            public void run() {
+                assertDeleteArgumentSlice("foo(a, b^, c, d)", "foo(c, d)", true);
+            }
+        });
+
+        run("delete after-arguments keeps multiline shell style", new Runnable() {
+            @Override
+            public void run() {
+                assertDeleteArgumentSlice(
+                        "handle(\n" +
+                                "    one,\n" +
+                                "    t^wo,\n" +
+                                "    three,\n" +
+                                ")\n",
+                        "handle(\n" +
+                                "    one,\n" +
+                                ")\n",
+                        false
+                );
+            }
+        });
+
+        run("obtain before-arguments replaces the current slice with argument-aware insertion", new Runnable() {
+            @Override
+            public void run() {
+                assertObtainAndReplaceArgumentSlice("dest(a, b, c|, d); src(x, y^, z)", "dest(x, y, d); src(x, y, z)", true);
+            }
+        });
+
+        run("replace after-arguments keeps multiline destination style", new Runnable() {
+            @Override
+            public void run() {
+                assertAndReplaceArgumentSlice(
+                        "dest(\n" +
+                                "    one,\n" +
+                                "    t|wo,\n" +
+                                "    three,\n" +
+                                ")\n" +
+                                "src(\n" +
+                                "    alpha,\n" +
+                                "    be^ta,\n" +
+                                ")\n",
+                        "dest(\n" +
+                                "    one,\n" +
+                                "    two,\n" +
+                                "    three,\n" +
+                                ")\n" +
+                                "src(\n" +
+                                "    alpha,\n" +
+                                "    two,\n" +
+                                "    three,\n" +
+                                ")\n",
+                        false
+                );
+            }
+        });
+
+        run("move after-arguments keeps same-editor offsets and commas stable", new Runnable() {
+            @Override
+            public void run() {
+                assertMoveArgumentSlice("foo(a, |b, c, ^d, e)", "foo(a, d, e, b, c)", false);
+            }
+        });
+
+        run("before arguments at first argument start is empty", new Runnable() {
+            @Override
+            public void run() {
+                assertBeforeArguments("foo(|aaa, bbb, ccc)", null);
+            }
+        });
+
+        run("after arguments at first argument start includes full tail", new Runnable() {
+            @Override
+            public void run() {
+                assertAfterArguments("foo(|aaa, bbb, ccc)", "aaa, bbb, ccc");
+            }
+        });
+
+        run("before arguments inside first argument includes current argument", new Runnable() {
+            @Override
+            public void run() {
+                assertBeforeArguments("foo(a|aa, bbb, ccc)", "aaa");
+            }
+        });
+
+        run("after arguments inside first argument still includes current argument", new Runnable() {
+            @Override
+            public void run() {
+                assertAfterArguments("foo(a|aa, bbb, ccc)", "aaa, bbb, ccc");
+            }
+        });
+
+        run("before arguments after first comma includes first argument only", new Runnable() {
+            @Override
+            public void run() {
+                assertBeforeArguments("foo(aaa,| bbb, ccc)", "aaa");
+            }
+        });
+
+        run("after arguments after first comma excludes completed argument", new Runnable() {
+            @Override
+            public void run() {
+                assertAfterArguments("foo(aaa,| bbb, ccc)", "bbb, ccc");
+            }
+        });
+
+        run("before arguments inside second argument includes both first and current", new Runnable() {
+            @Override
+            public void run() {
+                assertBeforeArguments("foo(aaa, b|bb, ccc)", "aaa, bbb");
+            }
+        });
+
+        run("after arguments inside second argument starts from current argument", new Runnable() {
+            @Override
+            public void run() {
+                assertAfterArguments("foo(aaa, b|bb, ccc)", "bbb, ccc");
+            }
+        });
+
+        run("before arguments at final argument end includes whole list", new Runnable() {
+            @Override
+            public void run() {
+                assertBeforeArguments("foo(aaa, bbb, ccc|)", "aaa, bbb, ccc");
+            }
+        });
+
+        run("after arguments at final argument end is empty", new Runnable() {
+            @Override
+            public void run() {
+                assertAfterArguments("foo(aaa, bbb, ccc|)", null);
+            }
+        });
+
+        run("before arguments keeps leading comment with selected current argument", new Runnable() {
+            @Override
+            public void run() {
+                assertBeforeArguments("foo(aaa, /*note*/ b|bb, ccc)", "aaa, /*note*/ bbb");
+            }
+        });
+
+        run("after arguments keeps leading comment with selected current argument", new Runnable() {
+            @Override
+            public void run() {
+                assertAfterArguments("foo(aaa, /*note*/ b|bb, ccc)", "/*note*/ bbb, ccc");
+            }
+        });
+
+        run("before and after arguments use the innermost list", new Runnable() {
+            @Override
+            public void run() {
+                assertBeforeArguments("foo(a, bar(x|, y), c)", "x");
+                assertAfterArguments("foo(a, bar(x|, y), c)", "y");
             }
         });
     }
@@ -302,7 +687,7 @@ public final class ArgumentParserTestRunner {
         ArgumentCandidate source = parsed.findArgumentAtOrNear(markers.sourceOffset);
         ArgumentCandidate target = findTargetCandidate(parsed, markers);
         String targetText = target.getText(markers.text);
-        ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(source, targetText);
+        ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(markers.text, source, targetText);
         assertEquals(expectedOutput, ArgumentEditPlanner.apply(markers.text, plan), "obtain-and-replace result should match");
     }
 
@@ -312,7 +697,7 @@ public final class ArgumentParserTestRunner {
         ArgumentCandidate source = parsed.findArgumentAtOrNear(markers.sourceOffset);
         ArgumentCandidate target = findTargetCandidate(parsed, markers);
         String sourceText = source.getText(markers.text);
-        ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(target, sourceText);
+        ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(markers.text, target, sourceText);
         assertEquals(expectedOutput, ArgumentEditPlanner.apply(markers.text, plan), "replace result should match");
     }
 
@@ -333,6 +718,100 @@ public final class ArgumentParserTestRunner {
         String finalText = ArgumentEditPlanner.apply(textAfterDelete, insertPlan);
 
         assertEquals(expectedOutput, finalText, "move result should match");
+    }
+
+    private static void assertCopyArgumentSlice(String inputWithMarkers, String expectedOutput, boolean before) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        TextSpan targetSpan = planArgumentSlice(markers.text, markers.targetOffset, before);
+        String targetText = textOf(markers.text, targetSpan);
+        ArgumentInsertionPlan insertPlan = ArgumentInsertionPlanner.plan(markers.text, markers.sourceOffset, targetText);
+        String finalText = ArgumentEditPlanner.apply(markers.text, insertPlan);
+        assertEquals(expectedOutput, finalText, "copy argument slice result should match");
+    }
+
+    private static void assertDeleteArgumentSlice(String inputWithMarkers, String expectedOutput, boolean before) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        TextSpan targetSpan = planArgumentSlice(markers.text, markers.targetOffset, before);
+        ArgumentInsertionPlan deletePlan = ArgumentEditPlanner.planDelete(markers.text, targetSpan);
+        String finalText = ArgumentEditPlanner.apply(markers.text, deletePlan);
+        assertEquals(expectedOutput, finalText, "delete argument slice result should match");
+    }
+
+    private static void assertObtainAndReplaceArgumentSlice(String inputWithMarkers, String expectedOutput, boolean before) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        TextSpan sourceSpan = planArgumentSlice(markers.text, markers.sourceOffset, before);
+        TextSpan targetSpan = planArgumentSlice(markers.text, markers.targetOffset, before);
+        String targetText = textOf(markers.text, targetSpan);
+
+        ArgumentInsertionPlan deletePlan = ArgumentEditPlanner.planDelete(markers.text, sourceSpan);
+        String textAfterDelete = ArgumentEditPlanner.apply(markers.text, deletePlan);
+        int insertOffset = ArgumentEditPlanner.adjustOffsetAfterPlan(sourceSpan.getStartOffset(), deletePlan);
+        ArgumentInsertionPlan insertPlan = ArgumentInsertionPlanner.plan(textAfterDelete, insertOffset, targetText);
+        String finalText = ArgumentEditPlanner.apply(textAfterDelete, insertPlan);
+
+        assertEquals(expectedOutput, finalText, "obtain-and-replace argument slice result should match");
+    }
+
+    private static void assertAndReplaceArgumentSlice(String inputWithMarkers, String expectedOutput, boolean before) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        TextSpan sourceSpan = planArgumentSlice(markers.text, markers.sourceOffset, before);
+        TextSpan targetSpan = planArgumentSlice(markers.text, markers.targetOffset, before);
+        String sourceText = textOf(markers.text, sourceSpan);
+
+        ArgumentInsertionPlan deletePlan = ArgumentEditPlanner.planDelete(markers.text, targetSpan);
+        String textAfterDelete = ArgumentEditPlanner.apply(markers.text, deletePlan);
+        int insertOffset = ArgumentEditPlanner.adjustOffsetAfterPlan(targetSpan.getStartOffset(), deletePlan);
+        ArgumentInsertionPlan insertPlan = ArgumentInsertionPlanner.plan(textAfterDelete, insertOffset, sourceText);
+        String finalText = ArgumentEditPlanner.apply(textAfterDelete, insertPlan);
+
+        assertEquals(expectedOutput, finalText, "replace argument slice result should match");
+    }
+
+    private static void assertMoveArgumentSlice(String inputWithMarkers, String expectedOutput, boolean before) {
+        Markers markers = stripMarkers(inputWithMarkers);
+        TextSpan targetSpan = planArgumentSlice(markers.text, markers.targetOffset, before);
+        String targetText = textOf(markers.text, targetSpan);
+
+        if (targetSpan.contains(markers.sourceOffset)) {
+            throw new AssertionError("move slice tests must not place the source caret inside the target slice");
+        }
+
+        ArgumentInsertionPlan deletePlan = ArgumentEditPlanner.planDelete(markers.text, targetSpan);
+        String textAfterDelete = ArgumentEditPlanner.apply(markers.text, deletePlan);
+        int adjustedSourceOffset = ArgumentEditPlanner.adjustOffsetAfterPlan(markers.sourceOffset, deletePlan);
+        ArgumentInsertionPlan insertPlan = ArgumentInsertionPlanner.plan(textAfterDelete, adjustedSourceOffset, targetText);
+        String finalText = ArgumentEditPlanner.apply(textAfterDelete, insertPlan);
+
+        assertEquals(expectedOutput, finalText, "move argument slice result should match");
+    }
+
+    private static void assertBeforeArguments(String inputWithCaret, String expectedText) {
+        assertArgumentSlice(inputWithCaret, expectedText, true);
+    }
+
+    private static void assertAfterArguments(String inputWithCaret, String expectedText) {
+        assertArgumentSlice(inputWithCaret, expectedText, false);
+    }
+
+    private static void assertArgumentSlice(String inputWithCaret, String expectedText, boolean before) {
+        Marker marker = stripMarker(inputWithCaret);
+        TextSpan span = planArgumentSlice(marker.text, marker.offset, before);
+        String actualText = span == null ? null : marker.text.substring(span.getStartOffset(), span.getEndOffset());
+        assertEquals(expectedText, actualText, "argument slice should match");
+    }
+
+    private static TextSpan planArgumentSlice(String text, int offset, boolean before) {
+        return before
+                ? ArgumentListRangePlanner.planBefore(text, offset)
+                : ArgumentListRangePlanner.planAfter(text, offset);
+    }
+
+    private static String textOf(String text, TextSpan span) {
+        if (span == null) {
+            throw new AssertionError("expected a non-empty argument slice");
+        }
+
+        return text.substring(span.getStartOffset(), span.getEndOffset());
     }
 
     private static Marker stripMarker(String textWithMarker) {

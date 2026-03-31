@@ -49,6 +49,9 @@ C-c p : Copy paragraph
 C-c g : Copy paragraph group (e.g.: entire function including white lines)
 C-c u : Copy to paragraph begining
 C-c d : Copy to paragraph end
+C-c , : Copy current argument in the current innermost argument list
+C-c 9 : Copy arguments before caret in the current innermost argument list
+C-c 0 : Copy arguments after caret in the current innermost argument list
 ```
 ![Copy without selection gif](https://github.com/whunmr/emacsIDEAs/blob/master/tutorials/2_copy_without_selection.gif?raw=true)
 
@@ -65,6 +68,46 @@ C-c ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b) : Type one space to 
 Selection:
 
 C-c ' ' ' ' (w | s | l | q | a | A | e | E | p | g | u | d | b) : Type two space to select related area
+```
+
+---
+```
+Argument-aware selectors:
+
+, : current argument in the current innermost argument list
+9 : arguments before caret in the current innermost argument list
+0 : arguments after caret in the current innermost argument list
+
+The 9/0 selectors can overlap the current argument when caret is inside it.
+
+Examples:
+foo(|aaa, bbb, ccc)   => 9: empty            | 0: aaa, bbb, ccc
+foo(a|aa, bbb, ccc)   => 9: aaa              | 0: aaa, bbb, ccc
+foo(aaa,| bbb, ccc)   => 9: aaa              | 0: bbb, ccc
+foo(aaa, b|bb, ccc)   => 9: aaa, bbb         | 0: bbb, ccc
+
+The selectors , / 9 / 0 work in all range families:
+C-c (, 9, 0) : copy without selection
+C-w C-(, 9, 0) : copy target argument slice
+C-d C-(, 9, 0) : delete target argument slice
+C-o C-(, 9, 0) : obtain target argument slice, then replace current slice
+C-i C-(, 9, 0) : replace target argument slice with current slice
+C-x C-(, 9, 0) : move target argument slice
+```
+
+---
+```
+Immediate argument markers:
+
+C-w C-, : immediately show markers on visible arguments, then copy selected argument
+C-w C-9 : immediately show markers on visible argument starts, then copy selected "arguments before caret" slice
+C-w C-0 : immediately show markers on visible argument starts, then copy selected "arguments after caret" slice
+
+The same immediate-marker behavior is available for:
+C-d C-(, 9, 0)
+C-o C-(, 9, 0)
+C-i C-(, 9, 0)
+C-x C-(, 9, 0)
 ```
 
 
@@ -193,7 +236,6 @@ C-i C-f 't' 'm' : Basic Jump alias
 Download statistics:
 ![download_per_day](https://raw.githubusercontent.com/whunmr/emacsIDEAs-status/master/download_per_day.png)
 ![download_per_product](https://raw.githubusercontent.com/whunmr/emacsIDEAs-status/master/download_per_product.png)
-
 
 
 

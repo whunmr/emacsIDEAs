@@ -61,7 +61,7 @@ public class ObtainAndReplaceArgumentAfterJumpCommand extends ArgumentJumpComman
 
                 ClipboardEditorUtil.copyToClipboard(targetText);
                 Document document = _se.getDocument();
-                ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(_sourceCandidate, targetText);
+                ArgumentInsertionPlan plan = ArgumentEditPlanner.planReplace(document.getText(), _sourceCandidate, targetText);
                 if (plan == null) {
                     return;
                 }

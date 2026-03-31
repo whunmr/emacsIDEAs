@@ -17,7 +17,12 @@ public final class ArgumentInsertionPlanner {
 
         safeOffset = normalizeOffsetInsideCurrentArgument(parsed, list, safeOffset);
 
-        int prevIndex = findPreviousNonWhitespace(safeText, safeOffset - 1, list.getOpenOffset());
+        ArgumentInsertionPlan multilinePlan = planMultilineInsert(parsed, safeText, list, safeOffset, safeArgumentText);
+        if (multilinePlan != null) {
+            return multilinePlan;
+        }
+
+        int prevIndex = ArgumentListFormatting.findPreviousNonWhitespace(safeText, safeOffset - 1, list.getOpenOffset());
         int nextIndex = findNextNonWhitespace(safeText, safeOffset, list.getCloseOffset());
 
         boolean hasBefore = prevIndex > list.getOpenOffset();
@@ -67,6 +72,82 @@ public final class ArgumentInsertionPlanner {
         return plainInsert(safeOffset, safeArgumentText);
     }
 
+    private static ArgumentInsertionPlan planMultilineInsert(ParsedArguments parsed,
+                                                             String text,
+                                                             ArgumentList list,
+                                                             int offset,
+                                                             String argumentText) {
+        if (!ArgumentListFormatting.isMultilineList(text, list)) {
+            return null;
+        }
+
+        String lineSeparator = ArgumentListFormatting.detectLineSeparator(text);
+        boolean trailingComma = ArgumentListFormatting.hasTrailingComma(text, list);
+
+        ArgumentCandidate beforeCandidate = ArgumentListFormatting.findCandidateStartingAt(list, offset);
+        if (beforeCandidate != null) {
+            String indent = ArgumentListFormatting.getLineIndent(text, beforeCandidate.getRange().getStartOffset());
+            String formattedArgument = ArgumentListFormatting.reindentArgumentText(argumentText, indent, lineSeparator);
+            return createPlan(offset, offset, "", formattedArgument, "," + lineSeparator + indent);
+        }
+
+        ArgumentCandidate afterCandidate = ArgumentListFormatting.findCandidateEndingAt(list, offset);
+        if (afterCandidate != null) {
+            ArgumentCandidate nextCandidate = ArgumentListFormatting.findNextCandidate(list, afterCandidate);
+            String indent = nextCandidate != null
+                    ? ArgumentListFormatting.getLineIndent(text, nextCandidate.getRange().getStartOffset())
+                    : ArgumentListFormatting.getLineIndent(text, afterCandidate.getRange().getStartOffset());
+            String formattedArgument = ArgumentListFormatting.reindentArgumentText(argumentText, indent, lineSeparator);
+
+            if (nextCandidate != null) {
+                String nextIndent = ArgumentListFormatting.getLineIndent(text, nextCandidate.getRange().getStartOffset());
+                return createPlan(offset, nextCandidate.getRange().getStartOffset(),
+                        "," + lineSeparator + indent,
+                        formattedArgument,
+                        "," + lineSeparator + nextIndent);
+            }
+
+            String closeIndent = ArgumentListFormatting.getLineIndent(text, list.getCloseOffset());
+            return createPlan(offset, list.getCloseOffset(),
+                    "," + lineSeparator + indent,
+                    formattedArgument,
+                    (trailingComma ? "," : "") + lineSeparator + closeIndent);
+        }
+
+        ArgumentCandidate nextCandidate = ArgumentListFormatting.findCandidateStartingAtOrAfter(list, offset);
+        if (nextCandidate != null) {
+            String indent = ArgumentListFormatting.getLineIndent(text, nextCandidate.getRange().getStartOffset());
+            String formattedArgument = ArgumentListFormatting.reindentArgumentText(argumentText, indent, lineSeparator);
+            return createPlan(offset, nextCandidate.getRange().getStartOffset(),
+                    "",
+                    formattedArgument,
+                    "," + lineSeparator + indent);
+        }
+
+        ArgumentCandidate previousCandidate = ArgumentListFormatting.findCandidateEndingAtOrBefore(list, offset);
+        if (previousCandidate != null) {
+            String indent = ArgumentListFormatting.getLineIndent(text, previousCandidate.getRange().getStartOffset());
+            String formattedArgument = ArgumentListFormatting.reindentArgumentText(argumentText, indent, lineSeparator);
+            String closeIndent = ArgumentListFormatting.getLineIndent(text, list.getCloseOffset());
+            return createPlan(previousCandidate.getRange().getEndOffset(), list.getCloseOffset(),
+                    "," + lineSeparator + indent,
+                    formattedArgument,
+                    (trailingComma ? "," : "") + lineSeparator + closeIndent);
+        }
+
+        if (list.getArguments().isEmpty()) {
+            String closeIndent = ArgumentListFormatting.getLineIndent(text, list.getCloseOffset());
+            String argumentIndent = closeIndent + ArgumentListFormatting.detectIndentUnit(text, list);
+            String formattedArgument = ArgumentListFormatting.reindentArgumentText(argumentText, argumentIndent, lineSeparator);
+            return createPlan(offset, offset,
+                    lineSeparator + argumentIndent,
+                    formattedArgument,
+                    (trailingComma ? "," : "") + lineSeparator + closeIndent);
+        }
+
+        return null;
+    }
+
     private static int normalizeOffsetInsideCurrentArgument(ParsedArguments parsed, ArgumentList list, int caretOffset) {
         ArgumentCandidate candidate = parsed.findArgumentAtOrNear(caretOffset);
         if (candidate == null || candidate.getRange() == null) {
@@ -88,15 +169,6 @@ public final class ArgumentInsertionPlanner {
         }
 
         return caretOffset;
-    }
-
-    private static int findPreviousNonWhitespace(String text, int index, int lowerBoundExclusive) {
-        for (int i = index; i > lowerBoundExclusive; i--) {
-            if (!Character.isWhitespace(text.charAt(i))) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private static int findNextNonWhitespace(String text, int index, int upperBoundExclusive) {
