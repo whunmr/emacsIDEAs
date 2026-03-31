@@ -46,6 +46,17 @@ public class AceJumpAction extends EmacsIdeasAction {
         this.actionPerformed(e);
     }
 
+    public void startJump(AnActionEvent e, List<JOffset> offsets) {
+        _isCalledFromOtherAction = true;
+        if (offsets == null || offsets.isEmpty()) {
+            return;
+        }
+
+        if (super.initAction(e)) {
+            showMarkers(offsets);
+        }
+    }
+
     @Override
     public void actionPerformed(AnActionEvent e) {
         if (isCalledFromOtherAction()) {
@@ -63,25 +74,7 @@ public class AceJumpAction extends EmacsIdeasAction {
         }
 
         if (EditorUtils.isPrintableChar(key)) {
-            runReadAction(new ShowMarkersRunnable(getOffsetsOfCharInVisibleArea(key), (AceJumpAction) _action));
-
-            if (_markers.hasNoPlaceToJump()) {
-                cleanupSetupsInAndBackToNormalEditingMode();
-                return false;
-            }
-
-            if (_isCalledFromOtherAction && _markers.hasOnlyOnePlaceToJump()) {
-                JOffset firstOffset = _markers.getFirstOffset();
-                if (firstOffset == null) {
-                    cleanupSetupsInAndBackToNormalEditingMode();
-                    return false;
-                }
-
-                jumpToOffset(firstOffset);
-                return false;
-            }
-
-            attachKeyListener(_jumpToMarkerKeyListener);
+            showMarkers(getOffsetsOfCharInVisibleArea(key));
             return true;
         }
 
@@ -337,5 +330,32 @@ public class AceJumpAction extends EmacsIdeasAction {
 
     public boolean isCalledFromOtherAction() {
         return _isCalledFromOtherAction;
+    }
+
+    private void showMarkers(List<JOffset> offsets) {
+        if (_markers == null || _action == null || offsets == null || offsets.isEmpty()) {
+            cleanupSetupsInAndBackToNormalEditingMode();
+            return;
+        }
+
+        runReadAction(new ShowMarkersRunnable(offsets, (AceJumpAction) _action));
+
+        if (_markers.hasNoPlaceToJump()) {
+            cleanupSetupsInAndBackToNormalEditingMode();
+            return;
+        }
+
+        if (_isCalledFromOtherAction && _markers.hasOnlyOnePlaceToJump()) {
+            JOffset firstOffset = _markers.getFirstOffset();
+            if (firstOffset == null) {
+                cleanupSetupsInAndBackToNormalEditingMode();
+                return;
+            }
+
+            jumpToOffset(firstOffset);
+            return;
+        }
+
+        attachKeyListener(_jumpToMarkerKeyListener);
     }
 }

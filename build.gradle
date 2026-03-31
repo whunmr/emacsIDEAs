@@ -24,8 +24,17 @@ java {
 
 sourceSets {
     main {
-        java.srcDirs = ['src']
-        resources.srcDirs = ['resources', 'src']
+        java {
+            srcDirs = ['src']
+            exclude 'test/**'
+        }
+        resources {
+            srcDirs = ['resources', 'src']
+            exclude 'test/**'
+        }
+    }
+    test {
+        java.srcDirs = ['src/test/java']
     }
 }
 
@@ -46,6 +55,18 @@ tasks.withType(JavaCompile).configureEach {
 tasks.named('processResources') {
     exclude '**/*.java'
     duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('argumentParserTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the standalone argument parser regression suite.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.hunmr.argument.ArgumentParserTestRunner'
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('argumentParserTest')
 }
 
 tasks.named('wrapper', Wrapper) {

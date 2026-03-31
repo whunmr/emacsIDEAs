@@ -413,6 +413,9 @@
       <action id="emacsIDEAs.AceJumpCopy.Block" class="org.hunmr.acejump.AceJumpCopyRangeAction" text="AceJumpCopy.Block" description="AceJumpCopy.Block" >
         <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta B"/>
       </action>
+      <action id="emacsIDEAs.AceJumpCopy.Argument" class="org.hunmr.acejump.AceJumpCopyArgumentAction" text="AceJumpCopy.Argument" description="AceJumpCopy.Argument" >
+        <keyboard-shortcut keymap="$default" first-keystroke="meta W" second-keystroke="meta COMMA"/>
+      </action>
 
       <!-- Delete target range. (w | s | l | q | a | e | p | u | d | b) -->
       <action id="emacsIDEAs.AceJumpDelete.Word" class="org.hunmr.acejump.AceJumpDeleteRangeAction" text="AceJumpDelete.Word" description="AceJumpDelete.Word" >
