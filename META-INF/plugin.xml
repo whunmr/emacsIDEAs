@@ -257,10 +257,10 @@
     </html>
     ]]>
   </change-notes>
-  <version>253.30387.90.1</version>
+  <version>213.7172.48.1</version>
   <vendor email="whunmr@gmail.com">whunmr</vendor>
 
-  <idea-version since-build="253"/>
+  <idea-version since-build="213.7172.48" until-build="213.*"/>
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
 

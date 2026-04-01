@@ -236,11 +236,11 @@
     </html>
     ]]>
     </change-notes>
-    <version>1.4.3</version>
+    <version>213.7172.48.1</version>
     <vendor>whunmr@gmail.com</vendor>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="107.105"/>
+    <idea-version since-build="213.7172.48" until-build="213.*"/>
 
     <application-components>
         <!-- Add your application components here -->

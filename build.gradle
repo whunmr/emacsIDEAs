@@ -1,8 +1,6 @@
-import org.gradle.api.tasks.wrapper.Wrapper
-
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij.platform' version '2.11.0'
+    id 'org.jetbrains.intellij' version '1.17.4'
 }
 
 group = providers.gradleProperty('pluginGroup').get()
@@ -10,15 +8,11 @@ version = providers.gradleProperty('pluginVersion').get()
 
 repositories {
     mavenCentral()
-
-    intellijPlatform {
-        defaultRepositories()
-    }
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
@@ -38,23 +32,34 @@ sourceSets {
     }
 }
 
-dependencies {
-    intellijPlatform {
-        create(providers.gradleProperty('platformType'), providers.gradleProperty('platformVersion'))
-        instrumentationTools()
-        pluginVerifier()
-        zipSigner()
+intellij {
+    String localIdePath = findProperty('localIdePath') ?: System.getenv('EMACSJUMP_IDE_HOME')
+    if (localIdePath != null && !localIdePath.isEmpty()) {
+        localPath = localIdePath
+    } else {
+        type = providers.gradleProperty('platformType').get()
+        version = providers.gradleProperty('platformVersion').get()
     }
+
+    updateSinceUntilBuild = false
+    downloadSources = false
+    instrumentCode = true
+}
+
+patchPluginXml {
+    version = providers.gradleProperty('pluginVersion').get()
+    sinceBuild = providers.gradleProperty('sinceBuild').get()
+    untilBuild = providers.gradleProperty('untilBuild').get()
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release = 21
+    options.release = 11
 }
 
 tasks.named('processResources') {
     exclude '**/*.java'
-    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.register('argumentParserTest', JavaExec) {
@@ -69,24 +74,6 @@ tasks.named('check') {
     dependsOn tasks.named('argumentParserTest')
 }
 
-tasks.named('wrapper', Wrapper) {
-    gradleVersion = '8.13'
-    distributionType = Wrapper.DistributionType.BIN
-}
-
-intellijPlatform {
-    instrumentCode = true
-    buildSearchableOptions = false
-
-    pluginConfiguration {
-        ideaVersion {
-            sinceBuild = '253'
-        }
-    }
-
-    pluginVerification {
-        ides {
-            recommended()
-        }
-    }
+tasks.matching { it.name == 'buildSearchableOptions' }.configureEach {
+    enabled = false
 }
