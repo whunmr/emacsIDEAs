@@ -65,8 +65,17 @@ tasks.register('argumentParserTest', JavaExec) {
     mainClass = 'org.hunmr.argument.ArgumentParserTestRunner'
 }
 
+tasks.register('locationFormatterTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the standalone collected-location formatter regression suite.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.hunmr.location.CollectedLocationFormatterTestRunner'
+}
+
 tasks.named('check') {
     dependsOn tasks.named('argumentParserTest')
+    dependsOn tasks.named('locationFormatterTest')
 }
 
 tasks.named('wrapper', Wrapper) {
