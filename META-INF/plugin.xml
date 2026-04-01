@@ -540,6 +540,18 @@
       <keyboard-shortcut keymap="$default" first-keystroke="meta ctrl SPACE" />
     </action>
 
+    <action id="CollectLocationsAction" class="org.hunmr.location.CollectLocationsAction" text="CollectLocations"
+            description="Collect file locations for AI prompts">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="F2" />
+    </action>
+
+    <action id="ClearLocationsAction" class="org.hunmr.location.ClearLocationsAction" text="ClearLocations"
+            description="Clear collected file locations">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="shift F2" />
+    </action>
+
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">

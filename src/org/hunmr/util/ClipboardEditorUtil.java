@@ -17,7 +17,7 @@ public final class ClipboardEditorUtil {
             return new TextRange[0];
         }
 
-        String text = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
+        String text = getClipboardText();
         if (text == null || text.isEmpty()) {
             return new TextRange[0];
         }
@@ -48,5 +48,13 @@ public final class ClipboardEditorUtil {
         }
 
         CopyPasteManager.getInstance().setContents(new StringSelection(text));
+    }
+
+    public static String getClipboardText() {
+        return CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
+    }
+
+    public static void clearClipboard() {
+        copyToClipboard("");
     }
 }
