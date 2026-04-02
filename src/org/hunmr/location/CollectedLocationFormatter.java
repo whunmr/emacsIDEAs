@@ -43,8 +43,23 @@ public final class CollectedLocationFormatter {
                                      int startLine,
                                      int endLine,
                                      boolean fullFileSelection) {
+        return formatEntry(label, CollectedLocationContext.EMPTY, selectedText, absolutePath, startLine, endLine, fullFileSelection);
+    }
+
+    public static String formatEntry(String label,
+                                     CollectedLocationContext context,
+                                     String selectedText,
+                                     String absolutePath,
+                                     int startLine,
+                                     int endLine,
+                                     boolean fullFileSelection) {
         String safeLabel = formatLabel(label);
         String location = formatLocation(absolutePath, startLine, endLine, fullFileSelection);
+        String symbolDescription = formatSymbolDescription(context);
+        if (!symbolDescription.isEmpty()) {
+            return safeLabel + " " + symbolDescription + "  " + location;
+        }
+
         String safeSelectedText = stripTrailingLineBreaks(selectedText);
         if (safeSelectedText.isEmpty()) {
             return safeLabel + " " + location;
@@ -61,6 +76,24 @@ public final class CollectedLocationFormatter {
     public static String toHintHtml(String entry) {
         String safeEntry = escapeHtml(entry == null ? "" : entry);
         return "<html><pre>" + safeEntry + "</pre></html>";
+    }
+
+    private static String formatSymbolDescription(CollectedLocationContext context) {
+        CollectedLocationContext safeContext = context == null ? CollectedLocationContext.EMPTY : context;
+        if (!safeContext.hasSymbol()) {
+            return "";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(safeContext.getSymbolKind()).append(" `").append(safeContext.getSymbolName()).append("`");
+        if (safeContext.hasContainer()) {
+            builder.append(" in ")
+                    .append(safeContext.getContainerKind())
+                    .append(" `")
+                    .append(safeContext.getContainerName())
+                    .append("`");
+        }
+        return builder.toString();
     }
 
     private static String formatLocation(String absolutePath, int startLine, int endLine, boolean fullFileSelection) {

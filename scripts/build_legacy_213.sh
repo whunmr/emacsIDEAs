@@ -53,7 +53,7 @@ fi
 MAIN_SOURCES=$(find "$ROOT_DIR/src" -name '*.java' ! -path '*/test/*' | sort)
 TEST_SOURCES=$(find "$ROOT_DIR/src/test/java" -name '*.java' | sort)
 ARGUMENT_SOURCES=$(find "$ROOT_DIR/src/org/hunmr/argument" -name '*.java' ! -name 'ArgumentSelectorSupport.java' | sort)
-LOCATION_TEST_SOURCES="$ROOT_DIR/src/org/hunmr/location/CollectedLocationFormatter.java"
+LOCATION_TEST_SOURCES="$ROOT_DIR/src/org/hunmr/location/CollectedLocationContext.java $ROOT_DIR/src/org/hunmr/location/CollectedLocationFormatter.java"
 
 "$JAVAC" --release 11 -cp "$IDE_CLASSPATH" -d "$CLASS_DIR" $MAIN_SOURCES
 "$JAVAC" --release 11 -d "$TEST_CLASS_DIR" $ARGUMENT_SOURCES $LOCATION_TEST_SOURCES $TEST_SOURCES
