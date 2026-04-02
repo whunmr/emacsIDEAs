@@ -69,6 +69,26 @@ public final class CollectedLocationFormatterTestRunner {
                         "full file selection should use path only");
             }
         });
+
+        run("symbol entry includes kind and container", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("method", "handleShowMarkersKey", "class", "Main");
+                assertEquals("<e>= method `handleShowMarkersKey` in class `Main`  (at /tmp/x.java:78)",
+                        CollectedLocationFormatter.formatEntry("e", context, "", "/tmp/x.java", 78, 78, false),
+                        "symbol entry should prefer symbol kind and container");
+            }
+        });
+
+        run("symbol entry omits snippet fallback", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("attribute", "inheritedJdk", "tag", "orderEntry");
+                assertEquals("<f>= attribute `inheritedJdk` in tag `orderEntry`  (at /tmp/x.iml:8)",
+                        CollectedLocationFormatter.formatEntry("f", context, "inheritedJdk", "/tmp/x.iml", 8, 8, false),
+                        "symbol context should replace raw text preview");
+            }
+        });
     }
 
     private static void run(String name, Runnable test) {

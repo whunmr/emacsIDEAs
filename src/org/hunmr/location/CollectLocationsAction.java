@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.hunmr.common.SimpleEditorAction;
 import org.hunmr.util.ClipboardEditorUtil;
@@ -29,19 +30,35 @@ public class CollectLocationsAction extends SimpleEditorAction {
         SelectionModel selectionModel = editor.getSelectionModel();
         String clipboardText = ClipboardEditorUtil.getClipboardText();
         String label = CollectedLocationFormatter.nextLabel(clipboardText);
+        Project project = e.getProject();
         String entry;
 
         if (!selectionModel.hasSelection()) {
             int lineNumber = document.getLineNumber(editor.getCaretModel().getOffset()) + 1;
-            entry = CollectedLocationFormatter.formatEntry(label, "", absolutePath, lineNumber, lineNumber, false);
+            CollectedLocationContext context = CollectedLocationContextResolver.resolve(
+                    project,
+                    editor,
+                    editor.getCaretModel().getOffset(),
+                    editor.getCaretModel().getOffset(),
+                    false
+            );
+            entry = CollectedLocationFormatter.formatEntry(label, context, "", absolutePath, lineNumber, lineNumber, false);
         } else {
             int selectionStart = selectionModel.getSelectionStart();
             int selectionEnd = selectionModel.getSelectionEnd();
             int startLine = document.getLineNumber(selectionStart) + 1;
             int endLine = document.getLineNumber(getSelectionEndForLineNumber(selectionStart, selectionEnd)) + 1;
             boolean fullFileSelection = selectionStart == 0 && selectionEnd == document.getTextLength();
+            CollectedLocationContext context = CollectedLocationContextResolver.resolve(
+                    project,
+                    editor,
+                    selectionStart,
+                    selectionEnd,
+                    true
+            );
             entry = CollectedLocationFormatter.formatEntry(
                     label,
+                    context,
                     selectionModel.getSelectedText(),
                     absolutePath,
                     startLine,
