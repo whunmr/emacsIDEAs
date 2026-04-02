@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class CollectedLocationFormatter {
-    private static final Pattern LABEL_PATTERN = Pattern.compile("(?m)^@([a-z]+)\\b");
+    private static final Pattern LABEL_PATTERN = Pattern.compile("(?m)^-\\s*<([a-z]+)>=");
 
     private CollectedLocationFormatter() {
     }
@@ -16,7 +16,7 @@ public final class CollectedLocationFormatter {
             maxIndex = Math.max(maxIndex, decodeLabel(matcher.group(1)));
         }
 
-        return "@" + encodeLabel(maxIndex + 1);
+        return encodeLabel(maxIndex + 1);
     }
 
     public static String appendEntry(String clipboardText, String entry) {
@@ -43,7 +43,7 @@ public final class CollectedLocationFormatter {
                                      int startLine,
                                      int endLine,
                                      boolean fullFileSelection) {
-        String safeLabel = label == null ? "@a" : label;
+        String safeLabel = formatLabel(label);
         String location = formatLocation(absolutePath, startLine, endLine, fullFileSelection);
         String safeSelectedText = stripTrailingLineBreaks(selectedText);
         if (safeSelectedText.isEmpty()) {
@@ -51,11 +51,11 @@ public final class CollectedLocationFormatter {
         }
 
         if (isSingleLine(safeSelectedText)) {
-            return safeLabel + " `" + safeSelectedText + "` " + location;
+            return safeLabel + " `" + safeSelectedText + "`  " + location;
         }
 
         String preview = firstTwoLines(safeSelectedText);
-        return safeLabel + " ```\n" + preview + "\n``` " + location;
+        return safeLabel + " ```\n" + preview + "\n```  " + location;
     }
 
     public static String toHintHtml(String entry) {
@@ -65,15 +65,16 @@ public final class CollectedLocationFormatter {
 
     private static String formatLocation(String absolutePath, int startLine, int endLine, boolean fullFileSelection) {
         String safePath = absolutePath == null ? "" : absolutePath;
+        String location;
         if (fullFileSelection || startLine <= 0) {
-            return safePath;
+            location = safePath;
+        } else if (endLine <= startLine) {
+            location = safePath + ":" + startLine;
+        } else {
+            location = safePath + ":" + startLine + "-" + endLine;
         }
 
-        if (endLine <= startLine) {
-            return safePath + ":" + startLine;
-        }
-
-        return safePath + ":" + startLine + "-" + endLine;
+        return "(at " + location + ")";
     }
 
     private static String stripTrailingLineBreaks(String text) {
@@ -132,6 +133,23 @@ public final class CollectedLocationFormatter {
             value = value * 26 + (current - 'a' + 1);
         }
         return value - 1;
+    }
+
+    private static String formatLabel(String label) {
+        String safeLabel = label == null ? "a" : label.trim();
+        if (safeLabel.startsWith("-")) {
+            Matcher matcher = LABEL_PATTERN.matcher(safeLabel);
+            if (matcher.find()) {
+                safeLabel = matcher.group(1);
+            } else {
+                safeLabel = safeLabel.replaceFirst("^-\\s*<", "").replaceFirst(">=$", "");
+            }
+        }
+
+        if (safeLabel.isEmpty()) {
+            safeLabel = "a";
+        }
+        return "- <" + safeLabel + ">=";
     }
 
     private static String escapeHtml(String text) {
