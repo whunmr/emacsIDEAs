@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class CollectedLocationFormatter {
-    private static final Pattern LABEL_PATTERN = Pattern.compile("(?m)^<([a-z]+)>=");
+    private static final Pattern LABEL_PATTERN = Pattern.compile("(?m)^-?\\s*<([a-z]+)>=");
 
     private CollectedLocationFormatter() {
     }
@@ -233,7 +233,7 @@ public final class CollectedLocationFormatter {
         if (safeLabel.isEmpty()) {
             safeLabel = "a";
         }
-        return "<" + safeLabel + ">=";
+        return "- <" + safeLabel + ">=";
     }
 
     private static String escapeHtml(String text) {

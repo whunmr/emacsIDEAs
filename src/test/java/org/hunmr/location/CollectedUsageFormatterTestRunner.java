@@ -12,7 +12,7 @@ public final class CollectedUsageFormatterTestRunner {
         run("usage labels continue after az", new Runnable() {
             @Override
             public void run() {
-                assertEquals("ba", CollectedUsageFormatter.nextLabel("- (az) `x`  (at /tmp/x.go:1)\n"),
+                assertEquals("ba", CollectedUsageFormatter.nextLabel("- (az)= `x`  (at /tmp/x.go:1)\n"),
                         "label after az should be ba");
             }
         });
@@ -21,7 +21,7 @@ public final class CollectedUsageFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("reference", "target", "method", "buildPlan");
-                assertEquals("- (aa) `runPlan(target)` located in { method `buildPlan` }  (at /tmp/x.go:18)",
+                assertEquals("- (aa)= `runPlan(target)` located in { method `buildPlan` }  (at /tmp/x.go:18)",
                         CollectedUsageFormatter.formatEntry("aa", "runPlan(target)", context, "/tmp/x.go", 18),
                         "usage entry should include line content and container");
             }
@@ -31,7 +31,7 @@ public final class CollectedUsageFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("function", "handleJump", "", "");
-                assertEquals("- (ab) `handleJump()` located in { function `handleJump` }  (at /tmp/x.go:21)",
+                assertEquals("- (ab)= `handleJump()` located in { function `handleJump` }  (at /tmp/x.go:21)",
                         CollectedUsageFormatter.formatEntry("ab", "handleJump()", context, "/tmp/x.go", 21),
                         "usage entry should fall back to symbol description");
             }
@@ -40,7 +40,7 @@ public final class CollectedUsageFormatterTestRunner {
         run("usage entry uses empty marker for blank lines", new Runnable() {
             @Override
             public void run() {
-                assertEquals("- (ac) `<empty>`  (at /tmp/x.go:22)",
+                assertEquals("- (ac)= `<empty>`  (at /tmp/x.go:22)",
                         CollectedUsageFormatter.formatEntry("ac", "   ", CollectedLocationContext.EMPTY, "/tmp/x.go", 22),
                         "blank line usages should still be representable");
             }

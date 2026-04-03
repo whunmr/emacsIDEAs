@@ -28,10 +28,10 @@ public final class CollectedUsageFormatter {
         String location = formatLocation(absolutePath, lineNumber);
         String container = formatContainer(context);
         if (!container.isEmpty()) {
-            return "- (" + normalizeLabel(label) + ") `" + safeLineContent + "` located in { " + container + " }  " + location;
+            return "- (" + normalizeLabel(label) + ")= `" + safeLineContent + "` located in { " + container + " }  " + location;
         }
 
-        return "- (" + normalizeLabel(label) + ") `" + safeLineContent + "`  " + location;
+        return "- (" + normalizeLabel(label) + ")= `" + safeLineContent + "`  " + location;
     }
 
     private static String formatContainer(CollectedLocationContext context) {
