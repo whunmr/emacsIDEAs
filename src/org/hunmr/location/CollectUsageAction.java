@@ -25,6 +25,8 @@ import com.intellij.psi.PsiElement;
 import org.hunmr.util.ClipboardEditorUtil;
 
 import javax.swing.JComponent;
+import java.awt.Component;
+import java.awt.Container;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
@@ -93,6 +95,11 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             return currentUsageView;
         }
 
+        UsageView selectedUsageView = UsageViewManager.getInstance(project).getSelectedUsageView();
+        if (selectedUsageView != null) {
+            return selectedUsageView;
+        }
+
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.FIND);
         if (toolWindow != null) {
             ContentManager contentManager = toolWindow.getContentManagerIfCreated();
@@ -120,12 +127,37 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             return null;
         }
 
+        JComponent actionsContextComponent = content.getActionsContextComponent();
+        UsageView actionUsageView = findUsageViewInComponent(actionsContextComponent);
+        if (actionUsageView != null) {
+            return actionUsageView;
+        }
+
         JComponent component = content.getComponent();
+        return findUsageViewInComponent(component);
+    }
+
+    private static UsageView findUsageViewInComponent(Component component) {
         if (component == null) {
             return null;
         }
 
-        return UsageView.USAGE_VIEW_KEY.getData(DataManager.getInstance().getDataContext(component));
+        UsageView directUsageView = UsageView.USAGE_VIEW_KEY.getData(DataManager.getInstance().getDataContext(component));
+        if (directUsageView != null) {
+            return directUsageView;
+        }
+
+        if (component instanceof Container) {
+            Component[] children = ((Container) component).getComponents();
+            for (int i = 0; i < children.length; i++) {
+                UsageView usageView = findUsageViewInComponent(children[i]);
+                if (usageView != null) {
+                    return usageView;
+                }
+            }
+        }
+
+        return null;
     }
 
     private static UsageLineInfo collectUsageLineInfo(Project project, Usage usage) {
