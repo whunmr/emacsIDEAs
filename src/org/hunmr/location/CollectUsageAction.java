@@ -6,11 +6,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -51,7 +50,7 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
 
         List<Usage> sortedUsages = usageView.getSortedUsages();
         Set<Usage> excludedUsages = usageView.getExcludedUsages();
-        String existingEntries = readExistingEntries(project);
+        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
         String nextLabel = CollectedUsageFormatter.nextLabel(existingEntries);
         StringBuilder builder = new StringBuilder();
         int nextIndex = decodeUsageLabel(nextLabel);
@@ -259,25 +258,6 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         }
 
         Messages.showInfoMessage(project, message, "emacsJump");
-    }
-
-    private static String readExistingEntries(Project project) {
-        java.io.File ioFile = new java.io.File(System.getProperty("java.io.tmpdir"), "emacsJump-collected-context.txt");
-        VirtualFile outputFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(ioFile);
-        if (outputFile == null) {
-            return "";
-        }
-
-        Document outputDocument = FileDocumentManager.getInstance().getCachedDocument(outputFile);
-        if (outputDocument != null) {
-            return outputDocument.getText();
-        }
-
-        try {
-            return new String(outputFile.contentsToByteArray(), java.nio.charset.StandardCharsets.UTF_8);
-        } catch (java.io.IOException ignored) {
-            return "";
-        }
     }
 
     private static void appendToOutput(Project project, AnActionEvent e, String text, int collectedCount) {

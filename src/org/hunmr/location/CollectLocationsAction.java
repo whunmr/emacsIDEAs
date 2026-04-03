@@ -30,7 +30,7 @@ public class CollectLocationsAction extends SimpleEditorAction {
 
         SelectionModel selectionModel = editor.getSelectionModel();
         Project project = e.getProject();
-        String existingEntries = readExistingEntries(project);
+        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
         String label = CollectedLocationFormatter.nextLabel(existingEntries);
         String entry;
 
@@ -90,33 +90,6 @@ public class CollectLocationsAction extends SimpleEditorAction {
         }
 
         return virtualFile.getPath();
-    }
-
-    private static String readExistingEntries(Project project) {
-        VirtualFile outputFile = findOutputFile(project);
-        if (outputFile == null) {
-            return "";
-        }
-
-        com.intellij.openapi.editor.Document outputDocument = FileDocumentManager.getInstance().getCachedDocument(outputFile);
-        if (outputDocument != null) {
-            return outputDocument.getText();
-        }
-
-        try {
-            return new String(outputFile.contentsToByteArray(), java.nio.charset.StandardCharsets.UTF_8);
-        } catch (IOException ignored) {
-            return "";
-        }
-    }
-
-    private static VirtualFile findOutputFile(Project project) {
-        java.io.File ioFile = new java.io.File(System.getProperty("java.io.tmpdir"), "emacsJump-collected-context.txt");
-        VirtualFile outputFile = com.intellij.openapi.vfs.LocalFileSystem.getInstance().refreshAndFindFileByIoFile(ioFile);
-        if (outputFile != null && project != null) {
-            return outputFile;
-        }
-        return outputFile;
     }
 
     static void appendToOutput(Project project, Editor editor, String text) {
