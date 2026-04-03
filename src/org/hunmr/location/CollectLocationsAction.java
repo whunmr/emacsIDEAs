@@ -9,7 +9,8 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.hunmr.common.SimpleEditorAction;
-import org.hunmr.util.ClipboardEditorUtil;
+
+import java.io.IOException;
 
 public class CollectLocationsAction extends SimpleEditorAction {
     @Override
@@ -28,9 +29,9 @@ public class CollectLocationsAction extends SimpleEditorAction {
         }
 
         SelectionModel selectionModel = editor.getSelectionModel();
-        String clipboardText = ClipboardEditorUtil.getClipboardText();
-        String label = CollectedLocationFormatter.nextLabel(clipboardText);
         Project project = e.getProject();
+        String existingEntries = readExistingEntries(project);
+        String label = CollectedLocationFormatter.nextLabel(existingEntries);
         String entry;
 
         if (!selectionModel.hasSelection()) {
@@ -67,8 +68,7 @@ public class CollectLocationsAction extends SimpleEditorAction {
             );
         }
 
-        ClipboardEditorUtil.copyToClipboard(CollectedLocationFormatter.appendEntry(clipboardText, entry));
-        HintManager.getInstance().showInformationHint(editor, CollectedLocationFormatter.toHintHtml(entry));
+        appendToOutput(project, editor, CollectedLocationFormatter.appendEntry("", entry));
     }
 
     private static int getSelectionEndForLineNumber(int selectionStart, int selectionEnd) {
@@ -90,5 +90,42 @@ public class CollectLocationsAction extends SimpleEditorAction {
         }
 
         return virtualFile.getPath();
+    }
+
+    private static String readExistingEntries(Project project) {
+        VirtualFile outputFile = findOutputFile(project);
+        if (outputFile == null) {
+            return "";
+        }
+
+        com.intellij.openapi.editor.Document outputDocument = FileDocumentManager.getInstance().getCachedDocument(outputFile);
+        if (outputDocument != null) {
+            return outputDocument.getText();
+        }
+
+        try {
+            return new String(outputFile.contentsToByteArray(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (IOException ignored) {
+            return "";
+        }
+    }
+
+    private static VirtualFile findOutputFile(Project project) {
+        java.io.File ioFile = new java.io.File(System.getProperty("java.io.tmpdir"), "emacsJump-collected-context.txt");
+        VirtualFile outputFile = com.intellij.openapi.vfs.LocalFileSystem.getInstance().refreshAndFindFileByIoFile(ioFile);
+        if (outputFile != null && project != null) {
+            return outputFile;
+        }
+        return outputFile;
+    }
+
+    static void appendToOutput(Project project, Editor editor, String text) {
+        try {
+            VirtualFile outputFile = CollectedOutputFileManager.appendAndOpen(project, text);
+            String path = outputFile == null ? "tmp output file" : outputFile.getPath();
+            HintManager.getInstance().showInformationHint(editor, "Collected into " + path);
+        } catch (IOException exception) {
+            HintManager.getInstance().showInformationHint(editor, "Failed to write collected output: " + exception.getMessage());
+        }
     }
 }

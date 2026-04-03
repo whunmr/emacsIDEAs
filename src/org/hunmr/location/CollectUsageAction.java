@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.TextRange;
@@ -22,8 +23,6 @@ import com.intellij.usages.UsageViewManager;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageInFile;
 import com.intellij.psi.PsiElement;
-import org.hunmr.util.ClipboardEditorUtil;
-
 import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.Container;
@@ -52,8 +51,8 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
 
         List<Usage> sortedUsages = usageView.getSortedUsages();
         Set<Usage> excludedUsages = usageView.getExcludedUsages();
-        String clipboardText = ClipboardEditorUtil.getClipboardText();
-        String nextLabel = CollectedUsageFormatter.nextLabel(clipboardText);
+        String existingEntries = readExistingEntries(project);
+        String nextLabel = CollectedUsageFormatter.nextLabel(existingEntries);
         StringBuilder builder = new StringBuilder();
         int nextIndex = decodeUsageLabel(nextLabel);
         int collectedCount = 0;
@@ -85,8 +84,7 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             return;
         }
 
-        ClipboardEditorUtil.copyToClipboard(CollectedLocationFormatter.appendEntry(clipboardText, builder.toString()));
-        showMessage(e, project, "Collected " + collectedCount + " usages to clipboard");
+        appendToOutput(project, e, builder.toString(), collectedCount);
     }
 
     private static UsageView findUsageView(Project project, AnActionEvent e) {
@@ -261,6 +259,35 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         }
 
         Messages.showInfoMessage(project, message, "emacsJump");
+    }
+
+    private static String readExistingEntries(Project project) {
+        java.io.File ioFile = new java.io.File(System.getProperty("java.io.tmpdir"), "emacsJump-collected-context.txt");
+        VirtualFile outputFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(ioFile);
+        if (outputFile == null) {
+            return "";
+        }
+
+        Document outputDocument = FileDocumentManager.getInstance().getCachedDocument(outputFile);
+        if (outputDocument != null) {
+            return outputDocument.getText();
+        }
+
+        try {
+            return new String(outputFile.contentsToByteArray(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (java.io.IOException ignored) {
+            return "";
+        }
+    }
+
+    private static void appendToOutput(Project project, AnActionEvent e, String text, int collectedCount) {
+        try {
+            VirtualFile outputFile = CollectedOutputFileManager.appendAndOpen(project, text);
+            String path = outputFile == null ? "tmp output file" : outputFile.getPath();
+            showMessage(e, project, "Collected " + collectedCount + " usages into " + path);
+        } catch (java.io.IOException exception) {
+            showMessage(e, project, "Failed to write collected usages: " + exception.getMessage());
+        }
     }
 
     private static int invokeIntMethod(Object target, String methodName) {
