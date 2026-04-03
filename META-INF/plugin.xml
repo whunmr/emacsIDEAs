@@ -543,13 +543,19 @@
     <action id="CollectLocationsAction" class="org.hunmr.location.CollectLocationsAction" text="CollectLocations"
             description="Collect file locations for AI prompts">
       <add-to-group group-id="emacsIDEAs" anchor="last"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="F2" />
+      <keyboard-shortcut keymap="$default" first-keystroke="F3" />
     </action>
 
     <action id="ClearLocationsAction" class="org.hunmr.location.ClearLocationsAction" text="ClearLocations"
             description="Clear collected file locations">
       <add-to-group group-id="emacsIDEAs" anchor="last"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="shift F2" />
+      <keyboard-shortcut keymap="$default" first-keystroke="shift F3" />
+    </action>
+
+    <action id="CollectUsageAction" class="org.hunmr.location.CollectUsageAction" text="CollectUsage"
+            description="Collect unexcluded Find Usages entries for AI prompts">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="meta F3" />
     </action>
 
   </actions>

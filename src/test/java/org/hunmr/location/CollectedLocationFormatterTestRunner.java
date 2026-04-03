@@ -14,7 +14,7 @@ public final class CollectedLocationFormatterTestRunner {
             public void run() {
                 StringBuilder builder = new StringBuilder();
                 for (char c = 'a'; c <= 'z'; c++) {
-                    builder.append("<").append(c).append(">= x\n");
+                    builder.append("- <").append(c).append(">= x\n");
                 }
                 assertEquals("aa", CollectedLocationFormatter.nextLabel(builder.toString()), "label after z should be aa");
             }
@@ -23,21 +23,21 @@ public final class CollectedLocationFormatterTestRunner {
         run("labels continue after az", new Runnable() {
             @Override
             public void run() {
-                assertEquals("ba", CollectedLocationFormatter.nextLabel("<az>= x\n"), "label after az should be ba");
+                assertEquals("ba", CollectedLocationFormatter.nextLabel("- <az>= x\n"), "label after az should be ba");
             }
         });
 
         run("append adds newline", new Runnable() {
             @Override
             public void run() {
-                assertEquals("<a>= x\n", CollectedLocationFormatter.appendEntry("", "<a>= x"), "entry should end with a newline");
+                assertEquals("- <a>= x\n", CollectedLocationFormatter.appendEntry("", "- <a>= x"), "entry should end with a newline");
             }
         });
 
         run("single line entry includes content and line", new Runnable() {
             @Override
             public void run() {
-                assertEquals("<a>= `abc`  (at /tmp/x.java:32)",
+                assertEquals("- <a>= `abc`  (at /tmp/x.java:32)",
                         CollectedLocationFormatter.formatEntry("a", "abc", "/tmp/x.java", 32, 32, false),
                         "single line entry should include inline content");
             }
@@ -46,7 +46,7 @@ public final class CollectedLocationFormatterTestRunner {
         run("multiline entry uses two-line fenced preview", new Runnable() {
             @Override
             public void run() {
-                assertEquals("<b>= ```\nline1\nline2\n```  (at /tmp/x.java:32-35)",
+                assertEquals("- <b>= ```\nline1\nline2\n```  (at /tmp/x.java:32-35)",
                         CollectedLocationFormatter.formatEntry("b", "line1\nline2\nline3", "/tmp/x.java", 32, 35, false),
                         "multiline entry should keep first two lines only");
             }
@@ -55,7 +55,7 @@ public final class CollectedLocationFormatterTestRunner {
         run("empty selection falls back to location only", new Runnable() {
             @Override
             public void run() {
-                assertEquals("<c>= (at /tmp/x.java:9)",
+                assertEquals("- <c>= (at /tmp/x.java:9)",
                         CollectedLocationFormatter.formatEntry("c", "", "/tmp/x.java", 9, 9, false),
                         "no-selection entry should only contain location");
             }
@@ -64,7 +64,7 @@ public final class CollectedLocationFormatterTestRunner {
         run("full file selection uses path only", new Runnable() {
             @Override
             public void run() {
-                assertEquals("<d>= `abc`  (at /tmp/x.java)",
+                assertEquals("- <d>= `abc`  (at /tmp/x.java)",
                         CollectedLocationFormatter.formatEntry("d", "abc", "/tmp/x.java", 1, 1, true),
                         "full file selection should use path only");
             }
@@ -74,7 +74,7 @@ public final class CollectedLocationFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("method", "handleShowMarkersKey", "class", "Main");
-                assertEquals("<e>= method `handleShowMarkersKey` in class `Main`  (at /tmp/x.java:78)",
+                assertEquals("- <e>= method `handleShowMarkersKey` in class `Main`  (at /tmp/x.java:78)",
                         CollectedLocationFormatter.formatEntry("e", context, "", "/tmp/x.java", 78, 78, false),
                         "symbol entry should prefer symbol kind and container");
             }
@@ -84,9 +84,39 @@ public final class CollectedLocationFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("attribute", "inheritedJdk", "tag", "orderEntry");
-                assertEquals("<f>= attribute `inheritedJdk` in tag `orderEntry`  (at /tmp/x.iml:8)",
+                assertEquals("- <f>= attribute `inheritedJdk` in tag `orderEntry`  (at /tmp/x.iml:8)",
                         CollectedLocationFormatter.formatEntry("f", context, "inheritedJdk", "/tmp/x.iml", 8, 8, false),
                         "symbol context should replace raw text preview");
+            }
+        });
+
+        run("symbol entry includes selected single line when description does not contain it", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("method", "handleShowMarkersKey", "class", "Main");
+                assertEquals("- <g>= `selected_content` located in { method `handleShowMarkersKey` in class `Main` }   (at /tmp/x.java:78)",
+                        CollectedLocationFormatter.formatEntry("g", context, "selected_content", "/tmp/x.java", 78, 78, false),
+                        "selected text should be emphasized when symbol description does not contain it");
+            }
+        });
+
+        run("symbol entry keeps original symbol description when it already contains selected text", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("attribute", "inheritedJdk", "tag", "orderEntry");
+                assertEquals("- <h>= attribute `inheritedJdk` in tag `orderEntry`  (at /tmp/x.iml:8)",
+                        CollectedLocationFormatter.formatEntry("h", context, "inheritedJdk", "/tmp/x.iml", 8, 8, false),
+                        "matching selected text should not be duplicated");
+            }
+        });
+
+        run("symbol entry includes first three lines of multiline selection", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("function", "handleJump", "package", "main");
+                assertEquals("- <i>= ```\nline1\nline2\nline3\n``` located in { function `handleJump` in package `main` }   (at /tmp/x.go:12-18)",
+                        CollectedLocationFormatter.formatEntry("i", context, "line1\nline2\nline3\nline4", "/tmp/x.go", 12, 18, false),
+                        "multiline selected text should be limited to the first three lines");
             }
         });
     }

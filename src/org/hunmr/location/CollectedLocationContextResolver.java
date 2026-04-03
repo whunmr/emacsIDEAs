@@ -24,7 +24,18 @@ public final class CollectedLocationContextResolver {
             return CollectedLocationContext.EMPTY;
         }
 
-        Document document = editor.getDocument();
+        return resolve(project, editor.getDocument(), hasSelection ? rangeStart : editor.getCaretModel().getOffset(), rangeEnd, hasSelection);
+    }
+
+    public static CollectedLocationContext resolve(Project project,
+                                                   Document document,
+                                                   int rangeStart,
+                                                   int rangeEnd,
+                                                   boolean hasSelection) {
+        if (project == null || document == null) {
+            return CollectedLocationContext.EMPTY;
+        }
+
         PsiDocumentManager documentManager = PsiDocumentManager.getInstance(project);
         documentManager.commitDocument(document);
         PsiFile psiFile = documentManager.getPsiFile(document);
@@ -32,7 +43,7 @@ public final class CollectedLocationContextResolver {
             return CollectedLocationContext.EMPTY;
         }
 
-        PsiElement anchor = findAnchorElement(psiFile, hasSelection ? rangeStart : editor.getCaretModel().getOffset());
+        PsiElement anchor = findAnchorElement(psiFile, rangeStart);
         if (anchor == null) {
             return CollectedLocationContext.EMPTY;
         }
