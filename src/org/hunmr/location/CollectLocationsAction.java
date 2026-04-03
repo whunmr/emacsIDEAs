@@ -68,7 +68,11 @@ public class CollectLocationsAction extends SimpleEditorAction {
             );
         }
 
-        appendToOutput(project, editor, CollectedLocationFormatter.appendEntry("", entry));
+        String updatedText = CollectedPromptFormatter.appendToContext(
+                existingEntries,
+                CollectedLocationFormatter.appendEntry("", entry)
+        );
+        writeOutput(project, editor, updatedText);
     }
 
     private static int getSelectionEndForLineNumber(int selectionStart, int selectionEnd) {
@@ -92,9 +96,9 @@ public class CollectLocationsAction extends SimpleEditorAction {
         return virtualFile.getPath();
     }
 
-    static void appendToOutput(Project project, Editor editor, String text) {
+    static void writeOutput(Project project, Editor editor, String text) {
         try {
-            VirtualFile outputFile = CollectedOutputFileManager.appendAndOpen(project, text);
+            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, text);
             String path = outputFile == null ? "tmp output file" : outputFile.getPath();
             HintManager.getInstance().showInformationHint(editor, "Collected into " + path);
         } catch (IOException exception) {

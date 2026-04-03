@@ -539,6 +539,12 @@
             <keyboard-shortcut keymap="$default" first-keystroke="shift F3" />
         </action>
 
+        <action id="CollectCallHierarchyAction" class="org.hunmr.location.CollectCallHierarchyAction" text="CollectCallHierarchy"
+                description="Collect one-level call hierarchy entries for AI prompts">
+            <add-to-group group-id="emacsIDEAs" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="meta F3" />
+        </action>
+
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

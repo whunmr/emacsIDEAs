@@ -34,6 +34,25 @@ public final class CollectedLocationFormatterTestRunner {
             }
         });
 
+        run("context template initializes around first entry", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("Context:\n\n- <a>= x\n\nTask:\n- \n\nConstraints:\n- \n",
+                        CollectedPromptFormatter.appendToContext("", "- <a>= x\n"),
+                        "first collected entry should be inserted into the Context section");
+            }
+        });
+
+        run("context append inserts before task section", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n- <a>= first\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n- <a>= first\n- <b>= second\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContext(existing, "- <b>= second\n"),
+                        "new context entries should appear before Task");
+            }
+        });
+
         run("single line entry includes content and line", new Runnable() {
             @Override
             public void run() {

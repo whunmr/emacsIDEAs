@@ -86,10 +86,19 @@ tasks.register('usageFormatterTest', JavaExec) {
     mainClass = 'org.hunmr.location.CollectedUsageFormatterTestRunner'
 }
 
+tasks.register('callHierarchyFormatterTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the standalone collected-call-hierarchy formatter regression suite.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.hunmr.location.CollectedCallHierarchyFormatterTestRunner'
+}
+
 tasks.named('check') {
     dependsOn tasks.named('argumentParserTest')
     dependsOn tasks.named('locationFormatterTest')
     dependsOn tasks.named('usageFormatterTest')
+    dependsOn tasks.named('callHierarchyFormatterTest')
 }
 
 tasks.matching { it.name == 'buildSearchableOptions' }.configureEach {

@@ -45,6 +45,10 @@ public final class CollectedOutputFileManager {
     }
 
     public static VirtualFile appendAndOpen(Project project, String text) throws IOException {
+        return replaceAndOpen(project, mergeCurrentText(project, text));
+    }
+
+    public static VirtualFile replaceAndOpen(Project project, String text) throws IOException {
         if (project == null || text == null || text.isEmpty()) {
             return null;
         }
@@ -55,9 +59,20 @@ public final class CollectedOutputFileManager {
             openInRightSplit(project, outputFile);
         }
 
-        appendText(project, outputFile, text);
-        FileDocumentManager.getInstance().saveDocument(getOrCreateDocument(outputFile));
+        replaceText(project, outputFile, text);
+        Document document = getOrCreateDocument(outputFile);
+        if (document != null) {
+            FileDocumentManager.getInstance().saveDocument(document);
+        }
         return outputFile;
+    }
+
+    private static String mergeCurrentText(Project project, String appendedText) {
+        String currentText = getCurrentText(project);
+        if (currentText.isEmpty()) {
+            return appendedText;
+        }
+        return currentText + appendedText;
     }
 
     private static VirtualFile findOpenOutputFile(Project project) {
@@ -95,19 +110,20 @@ public final class CollectedOutputFileManager {
         return outputFile;
     }
 
-    private static void appendText(Project project, VirtualFile outputFile, String text) throws IOException {
+    private static void replaceText(Project project, VirtualFile outputFile, String text) throws IOException {
         Document document = getOrCreateDocument(outputFile);
         if (document == null) {
-            Files.write(new File(outputFile.getPath()).toPath(), text.getBytes(StandardCharsets.UTF_8), java.nio.file.StandardOpenOption.APPEND);
+            Files.write(new File(outputFile.getPath()).toPath(), text.getBytes(StandardCharsets.UTF_8));
             outputFile.refresh(false, false);
             return;
         }
 
         final Document targetDocument = document;
+        final String safeText = text;
         WriteCommandAction.runWriteCommandAction(project, new Runnable() {
             @Override
             public void run() {
-                targetDocument.insertString(targetDocument.getTextLength(), text);
+                targetDocument.setText(safeText);
             }
         });
     }
