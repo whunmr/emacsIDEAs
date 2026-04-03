@@ -89,6 +89,36 @@ public final class CollectedLocationFormatterTestRunner {
                         "symbol context should replace raw text preview");
             }
         });
+
+        run("symbol entry includes selected single line when description does not contain it", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("method", "handleShowMarkersKey", "class", "Main");
+                assertEquals("<g>= `selected_content` located in { method `handleShowMarkersKey` in class `Main` }   (at /tmp/x.java:78)",
+                        CollectedLocationFormatter.formatEntry("g", context, "selected_content", "/tmp/x.java", 78, 78, false),
+                        "selected text should be emphasized when symbol description does not contain it");
+            }
+        });
+
+        run("symbol entry keeps original symbol description when it already contains selected text", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("attribute", "inheritedJdk", "tag", "orderEntry");
+                assertEquals("<h>= attribute `inheritedJdk` in tag `orderEntry`  (at /tmp/x.iml:8)",
+                        CollectedLocationFormatter.formatEntry("h", context, "inheritedJdk", "/tmp/x.iml", 8, 8, false),
+                        "matching selected text should not be duplicated");
+            }
+        });
+
+        run("symbol entry includes first three lines of multiline selection", new Runnable() {
+            @Override
+            public void run() {
+                CollectedLocationContext context = new CollectedLocationContext("function", "handleJump", "package", "main");
+                assertEquals("<i>= ```\nline1\nline2\nline3\n``` located in { function `handleJump` in package `main` }   (at /tmp/x.go:12-18)",
+                        CollectedLocationFormatter.formatEntry("i", context, "line1\nline2\nline3\nline4", "/tmp/x.go", 12, 18, false),
+                        "multiline selected text should be limited to the first three lines");
+            }
+        });
     }
 
     private static void run(String name, Runnable test) {

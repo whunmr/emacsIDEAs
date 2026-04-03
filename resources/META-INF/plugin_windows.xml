@@ -539,6 +539,12 @@
             <keyboard-shortcut keymap="$default" first-keystroke="shift F2" />
         </action>
 
+        <action id="CollectUsageAction" class="org.hunmr.location.CollectUsageAction" text="CollectUsage"
+                description="Collect unexcluded Find Usages entries for AI prompts">
+            <add-to-group group-id="emacsIDEAs" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="F4" />
+        </action>
+
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

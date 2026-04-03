@@ -55,12 +55,16 @@ public final class CollectedLocationFormatter {
                                      boolean fullFileSelection) {
         String safeLabel = formatLabel(label);
         String location = formatLocation(absolutePath, startLine, endLine, fullFileSelection);
+        String safeSelectedText = stripTrailingLineBreaks(selectedText);
         String symbolDescription = formatSymbolDescription(context);
         if (!symbolDescription.isEmpty()) {
+            String highlightedSelection = formatSelectionForSymbolEntry(safeSelectedText, symbolDescription);
+            if (!highlightedSelection.isEmpty()) {
+                return safeLabel + " " + highlightedSelection + " located in { " + symbolDescription + " }   " + location;
+            }
             return safeLabel + " " + symbolDescription + "  " + location;
         }
 
-        String safeSelectedText = stripTrailingLineBreaks(selectedText);
         if (safeSelectedText.isEmpty()) {
             return safeLabel + " " + location;
         }
@@ -96,6 +100,29 @@ public final class CollectedLocationFormatter {
         return builder.toString();
     }
 
+    private static String formatSelectionForSymbolEntry(String selectedText, String symbolDescription) {
+        String safeSelectedText = selectedText == null ? "" : selectedText.trim();
+        if (safeSelectedText.isEmpty()) {
+            return "";
+        }
+
+        if (containsSelectedText(symbolDescription, safeSelectedText)) {
+            return "";
+        }
+
+        if (isSingleLine(safeSelectedText)) {
+            return "`" + safeSelectedText + "`";
+        }
+
+        return "```\n" + firstLines(safeSelectedText, 3) + "\n```";
+    }
+
+    private static boolean containsSelectedText(String symbolDescription, String selectedText) {
+        String safeDescription = symbolDescription == null ? "" : symbolDescription;
+        String safeSelectedText = selectedText == null ? "" : selectedText.trim();
+        return !safeSelectedText.isEmpty() && safeDescription.contains(safeSelectedText);
+    }
+
     private static String formatLocation(String absolutePath, int startLine, int endLine, boolean fullFileSelection) {
         String safePath = absolutePath == null ? "" : absolutePath;
         String location;
@@ -128,17 +155,41 @@ public final class CollectedLocationFormatter {
     }
 
     private static String firstTwoLines(String text) {
+        return firstLines(text, 2);
+    }
+
+    private static String firstLines(String text, int maxLines) {
         String normalized = (text == null ? "" : text).replace("\r\n", "\n").replace('\r', '\n');
         String[] lines = normalized.split("\n", -1);
         if (lines.length == 0) {
             return "";
         }
 
-        if (lines.length == 1) {
+        int safeMaxLines = Math.max(1, maxLines);
+        if (lines.length <= safeMaxLines) {
+            return joinLines(lines, lines.length);
+        }
+
+        return joinLines(lines, safeMaxLines);
+    }
+
+    private static String joinLines(String[] lines, int count) {
+        if (count <= 0 || lines.length == 0) {
+            return "";
+        }
+
+        if (count == 1) {
             return lines[0];
         }
 
-        return lines[0] + "\n" + lines[1];
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < count && i < lines.length; i++) {
+            if (i > 0) {
+                builder.append('\n');
+            }
+            builder.append(lines[i]);
+        }
+        return builder.toString();
     }
 
     private static String encodeLabel(int index) {
