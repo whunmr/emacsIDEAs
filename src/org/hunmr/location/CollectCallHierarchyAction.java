@@ -19,11 +19,16 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
+import org.hunmr.options.PluginConfig;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CollectCallHierarchyAction extends com.intellij.openapi.project.DumbAwareAction {
+    private static final int MAX_COLLECTED_ITEMS = 40;
+
     @Override
     public void update(AnActionEvent e) {
         e.getPresentation().setEnabled(e.getProject() != null && e.getData(CommonDataKeys.EDITOR) != null);
@@ -66,10 +71,11 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         String existingEntries = CollectedOutputFileManager.getCurrentText(project);
         String nextLabel = CollectedCallHierarchyFormatter.nextLabel(existingEntries);
         int nextIndex = decodeLabel(nextLabel);
+        int configuredDepth = Math.max(1, PluginConfig.getInstance()._collectCallHierarchyDepth);
         StringBuilder incomingEntries = new StringBuilder();
-        nextIndex = appendHierarchyEntries(project, incomingTree, "caller", nextIndex, incomingEntries);
+        nextIndex = appendHierarchyEntries(project, incomingTree, "caller", configuredDepth, nextIndex, incomingEntries);
         StringBuilder outgoingEntries = new StringBuilder();
-        nextIndex = appendHierarchyEntries(project, outgoingTree, "callee", nextIndex, outgoingEntries);
+        nextIndex = appendHierarchyEntries(project, outgoingTree, "callee", configuredDepth, nextIndex, outgoingEntries);
 
         if (incomingEntries.length() == 0 && outgoingEntries.length() == 0) {
             showMessage(editor, project, "No call hierarchy items to collect");
@@ -98,6 +104,7 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
     private static int appendHierarchyEntries(Project project,
                                               HierarchyTreeStructure treeStructure,
                                               String relation,
+                                              int maxDepth,
                                               int nextIndex,
                                               StringBuilder builder) {
         if (treeStructure == null) {
@@ -109,14 +116,39 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return nextIndex;
         }
 
-        Object[] children = treeStructure.getChildElements(root);
-        if (children == null) {
-            return nextIndex;
+        TraversalState state = new TraversalState(nextIndex);
+        Set<String> visited = new HashSet<String>();
+        appendHierarchyEntries(project, treeStructure, root, relation, 1, maxDepth, state, builder, visited);
+        return state.nextIndex;
+    }
+
+    private static void appendHierarchyEntries(Project project,
+                                               HierarchyTreeStructure treeStructure,
+                                               Object parentNode,
+                                               String relation,
+                                               int depth,
+                                               int maxDepth,
+                                               TraversalState state,
+                                               StringBuilder builder,
+                                               Set<String> visited) {
+        if (treeStructure == null || parentNode == null || depth > maxDepth || state.remaining <= 0) {
+            return;
         }
 
-        for (int i = 0; i < children.length; i++) {
-            PsiElement element = extractPsiElement(children[i]);
+        Object[] children = treeStructure.getChildElements(parentNode);
+        if (children == null) {
+            return;
+        }
+
+        for (int i = 0; i < children.length && state.remaining > 0; i++) {
+            Object child = children[i];
+            PsiElement element = extractPsiElement(child);
             if (element == null || !element.isValid()) {
+                continue;
+            }
+
+            String visitKey = buildVisitKey(element, relation);
+            if (!visited.add(visitKey)) {
                 continue;
             }
 
@@ -125,17 +157,18 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                 continue;
             }
 
-            String label = encodeLabel(nextIndex++);
+            String label = encodeLabel(state.nextIndex++);
             builder.append(CollectedCallHierarchyFormatter.formatEntry(
                     label,
-                    relation,
+                    relation + " depth-" + depth,
                     locationInfo.context,
                     locationInfo.absolutePath,
                     locationInfo.lineNumber
             )).append('\n');
-        }
+            state.remaining--;
 
-        return nextIndex;
+            appendHierarchyEntries(project, treeStructure, child, relation, depth + 1, maxDepth, state, builder, visited);
+        }
     }
 
     private static HierarchyTreeStructure createHierarchyTreeStructure(HierarchyBrowser browser, String viewType, PsiElement target) {
@@ -343,6 +376,13 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         return builder.toString();
     }
 
+    private static String buildVisitKey(PsiElement element, String relation) {
+        PsiFile file = element.getContainingFile();
+        VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
+        String path = virtualFile == null ? "" : getAbsolutePath(virtualFile);
+        return relation + ":" + path + ":" + element.getTextOffset();
+    }
+
     private static final class LocationInfo {
         private final String absolutePath;
         private final int lineNumber;
@@ -352,6 +392,15 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             this.absolutePath = absolutePath;
             this.lineNumber = lineNumber;
             this.context = context;
+        }
+    }
+
+    private static final class TraversalState {
+        private int nextIndex;
+        private int remaining = MAX_COLLECTED_ITEMS;
+
+        private TraversalState(int nextIndex) {
+            this.nextIndex = nextIndex;
         }
     }
 }

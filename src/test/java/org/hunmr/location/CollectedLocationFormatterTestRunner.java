@@ -65,7 +65,7 @@ public final class CollectedLocationFormatterTestRunner {
         run("multiline entry uses two-line fenced preview", new Runnable() {
             @Override
             public void run() {
-                assertEquals("- <b>= ```\nline1\nline2\n```  (at /tmp/x.java:32-35)",
+                assertEquals("- <b>= ```line1\\n line2```  (at /tmp/x.java:32-35)",
                         CollectedLocationFormatter.formatEntry("b", "line1\nline2\nline3", "/tmp/x.java", 32, 35, false),
                         "multiline entry should keep first two lines only");
             }
@@ -133,7 +133,7 @@ public final class CollectedLocationFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("function", "handleJump", "package", "main");
-                assertEquals("- <i>= ```\nline1\nline2\nline3\n``` located in { function `handleJump` in package `main` }   (at /tmp/x.go:12-18)",
+                assertEquals("- <i>= ```line1\\n line2\\n line3``` located in { function `handleJump` in package `main` }   (at /tmp/x.go:12-18)",
                         CollectedLocationFormatter.formatEntry("i", context, "line1\nline2\nline3\nline4", "/tmp/x.go", 12, 18, false),
                         "multiline selected text should be limited to the first three lines");
             }
