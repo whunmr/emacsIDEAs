@@ -19,10 +19,13 @@ import com.intellij.usages.Usage;
 import com.intellij.usages.UsageInfo2UsageAdapter;
 import com.intellij.usages.UsageView;
 import com.intellij.usages.UsageViewManager;
+import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageInFile;
+import com.intellij.psi.PsiElement;
 import org.hunmr.util.ClipboardEditorUtil;
 
 import javax.swing.JComponent;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -132,7 +135,7 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         }
 
         Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-        int navigationOffset = Math.max(0, usage.getNavigationOffset());
+        int navigationOffset = Math.max(0, getNavigationOffset(usage));
         int lineNumber = getLineNumber(usage, document, navigationOffset);
         String absolutePath = getAbsolutePath(virtualFile);
         String lineContent = getLineContent(usage, document, navigationOffset, lineNumber);
@@ -155,6 +158,22 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             return ((UsageInfo2UsageAdapter) usage).getFile();
         }
         return null;
+    }
+
+    private static int getNavigationOffset(Usage usage) {
+        int reflectedOffset = invokeIntMethod(usage, "getNavigationOffset");
+        if (reflectedOffset >= 0) {
+            return reflectedOffset;
+        }
+
+        if (usage instanceof PsiElementUsage) {
+            PsiElement element = ((PsiElementUsage) usage).getElement();
+            if (element != null) {
+                return Math.max(0, element.getTextOffset());
+            }
+        }
+
+        return 0;
     }
 
     private static int getLineNumber(Usage usage, Document document, int navigationOffset) {
@@ -210,6 +229,24 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         }
 
         Messages.showInfoMessage(project, message, "emacsJump");
+    }
+
+    private static int invokeIntMethod(Object target, String methodName) {
+        if (target == null || methodName == null || methodName.isEmpty()) {
+            return -1;
+        }
+
+        try {
+            Method method = target.getClass().getMethod(methodName);
+            Object value = method.invoke(target);
+            if (value instanceof Number) {
+                return ((Number) value).intValue();
+            }
+        } catch (Exception ignored) {
+            return -1;
+        }
+
+        return -1;
     }
 
     private static int decodeUsageLabel(String label) {
