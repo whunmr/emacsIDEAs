@@ -536,7 +536,7 @@
         <action id="CollectUsageAction" class="org.hunmr.location.CollectUsageAction" text="CollectUsage"
                 description="Collect unexcluded Find Usages entries for AI prompts">
             <add-to-group group-id="emacsIDEAs" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="meta F3" />
+            <keyboard-shortcut keymap="$default" first-keystroke="shift F3" />
         </action>
 
     </actions>
