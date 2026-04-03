@@ -2,43 +2,40 @@ package org.hunmr.location;
 
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
+import com.intellij.usages.ReadWriteAccessUsage;
 import com.intellij.usages.Usage;
 import com.intellij.usages.UsageInfo2UsageAdapter;
 import com.intellij.usages.UsageView;
 import com.intellij.usages.UsageViewManager;
+import com.intellij.usages.impl.rules.UsageType;
+import com.intellij.usages.impl.rules.UsageTypeProvider;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageInFile;
-import org.hunmr.util.ClipboardEditorUtil;
-
+import com.intellij.psi.PsiElement;
 import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.Container;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class CollectUsageAction extends DumbAwareAction {
-    @Override
-    public ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
-    }
-
+public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAction {
     @Override
     public void update(AnActionEvent e) {
         e.getPresentation().setEnabled(e.getProject() != null);
@@ -59,9 +56,9 @@ public class CollectUsageAction extends DumbAwareAction {
 
         List<Usage> sortedUsages = usageView.getSortedUsages();
         Set<Usage> excludedUsages = usageView.getExcludedUsages();
-        String clipboardText = ClipboardEditorUtil.getClipboardText();
-        String nextLabel = CollectedUsageFormatter.nextLabel(clipboardText);
-        StringBuilder builder = new StringBuilder();
+        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
+        String nextLabel = CollectedUsageFormatter.nextLabel(existingEntries);
+        Map<String, List<String>> groupedEntries = new LinkedHashMap<String, List<String>>();
         int nextIndex = decodeUsageLabel(nextLabel);
         int collectedCount = 0;
 
@@ -77,13 +74,16 @@ public class CollectUsageAction extends DumbAwareAction {
             }
 
             String label = encodeUsageLabel(nextIndex++);
-            builder.append(CollectedUsageFormatter.formatEntry(
+            String usageCategory = classifyUsage(usage, info.context, info.lineContent);
+            String formattedEntry = CollectedUsageFormatter.formatEntry(
                     label,
+                    usageCategory,
                     info.lineContent,
                     info.context,
                     info.absolutePath,
                     info.lineNumber
-            )).append('\n');
+            );
+            addGroupedEntry(groupedEntries, usageCategory, formattedEntry);
             collectedCount++;
         }
 
@@ -92,8 +92,9 @@ public class CollectUsageAction extends DumbAwareAction {
             return;
         }
 
-        ClipboardEditorUtil.copyToClipboard(CollectedLocationFormatter.appendEntry(clipboardText, builder.toString()));
-        showMessage(e, project, "Collected " + collectedCount + " usages to clipboard");
+        String block = CollectedUsageFormatter.formatBlock("Usages", groupedEntries);
+        String updatedText = CollectedPromptFormatter.appendToContext(existingEntries, block);
+        writeOutput(project, e, updatedText, collectedCount);
     }
 
     private static UsageView findUsageView(Project project, AnActionEvent e) {
@@ -140,7 +141,8 @@ public class CollectUsageAction extends DumbAwareAction {
             return actionUsageView;
         }
 
-        return findUsageViewInComponent(content.getComponent());
+        JComponent component = content.getComponent();
+        return findUsageViewInComponent(component);
     }
 
     private static UsageView findUsageViewInComponent(Component component) {
@@ -269,6 +271,16 @@ public class CollectUsageAction extends DumbAwareAction {
         Messages.showInfoMessage(project, message, "emacsJump");
     }
 
+    private static void writeOutput(Project project, AnActionEvent e, String text, int collectedCount) {
+        try {
+            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, text);
+            String path = outputFile == null ? "tmp output file" : outputFile.getPath();
+            showMessage(e, project, "Collected " + collectedCount + " usages into " + path);
+        } catch (java.io.IOException exception) {
+            showMessage(e, project, "Failed to write collected usages: " + exception.getMessage());
+        }
+    }
+
     private static int invokeIntMethod(Object target, String methodName) {
         if (target == null || methodName == null || methodName.isEmpty()) {
             return -1;
@@ -285,6 +297,19 @@ public class CollectUsageAction extends DumbAwareAction {
         }
 
         return -1;
+    }
+
+    private static Object invokeNoArgMethod(Object target, String methodName) {
+        if (target == null || methodName == null || methodName.isEmpty()) {
+            return null;
+        }
+
+        try {
+            Method method = target.getClass().getMethod(methodName);
+            return method.invoke(target);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private static int decodeUsageLabel(String label) {
@@ -316,6 +341,81 @@ public class CollectUsageAction extends DumbAwareAction {
             builder.insert(0, 'a');
         }
         return builder.toString();
+    }
+
+    private static void addGroupedEntry(Map<String, List<String>> groupedEntries, String usageCategory, String formattedEntry) {
+        String category = usageCategory == null || usageCategory.trim().isEmpty() ? "other" : usageCategory.trim();
+        List<String> entries = groupedEntries.get(category);
+        if (entries == null) {
+            entries = new ArrayList<String>();
+            groupedEntries.put(category, entries);
+        }
+        entries.add(formattedEntry);
+    }
+
+    private static String classifyUsage(Usage usage, CollectedLocationContext context, String lineContent) {
+        if (usage instanceof ReadWriteAccessUsage) {
+            ReadWriteAccessUsage accessUsage = (ReadWriteAccessUsage) usage;
+            boolean read = accessUsage.isAccessedForReading();
+            boolean write = accessUsage.isAccessedForWriting();
+            if (read && write) {
+                return "read-write";
+            }
+            if (write) {
+                return "write";
+            }
+            if (read) {
+                return "read";
+            }
+        }
+
+        UsageType usageType = resolveUsageType(usage);
+        if (usageType != null) {
+            String usageTypeText = usageType.toString();
+            if (usageTypeText != null && !usageTypeText.trim().isEmpty()) {
+                return normalizeUsageCategory(usageTypeText);
+            }
+        }
+
+        if (context != null && context.hasSymbol()) {
+            String symbolName = context.getSymbolName();
+            if (lineContent != null && symbolName != null && lineContent.contains(symbolName + "(")) {
+                return "call";
+            }
+            if ("method".equals(context.getSymbolKind()) || "function".equals(context.getSymbolKind())) {
+                return "reference";
+            }
+        }
+
+        return "other";
+    }
+
+    private static UsageType resolveUsageType(Usage usage) {
+        if (!(usage instanceof PsiElementUsage)) {
+            return null;
+        }
+
+        PsiElement element = ((PsiElementUsage) usage).getElement();
+        if (element == null) {
+            return null;
+        }
+
+        for (UsageTypeProvider provider : UsageTypeProvider.EP_NAME.getExtensionList()) {
+            UsageType usageType = provider.getUsageType(element);
+            if (usageType != null) {
+                return usageType;
+            }
+        }
+        return null;
+    }
+
+    private static String normalizeUsageCategory(String text) {
+        String normalized = text == null ? "" : text.trim().toLowerCase();
+        if (normalized.isEmpty()) {
+            return "other";
+        }
+        normalized = normalized.replace(' ', '-');
+        return normalized;
     }
 
     private static final class UsageLineInfo {

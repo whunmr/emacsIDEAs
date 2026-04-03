@@ -74,7 +74,7 @@ public final class CollectedLocationFormatter {
         }
 
         String preview = firstTwoLines(safeSelectedText);
-        return safeLabel + " ```\n" + preview + "\n```  " + location;
+        return safeLabel + " ```" + inlineLineBreaks(preview) + "```  " + location;
     }
 
     public static String toHintHtml(String entry) {
@@ -114,7 +114,7 @@ public final class CollectedLocationFormatter {
             return "`" + safeSelectedText + "`";
         }
 
-        return "```\n" + firstLines(safeSelectedText, 3) + "\n```";
+        return "```" + inlineLineBreaks(firstLines(safeSelectedText, 3)) + "```";
     }
 
     private static boolean containsSelectedText(String symbolDescription, String selectedText) {
@@ -190,6 +190,11 @@ public final class CollectedLocationFormatter {
             builder.append(lines[i]);
         }
         return builder.toString();
+    }
+
+    private static String inlineLineBreaks(String text) {
+        String normalized = (text == null ? "" : text).replace("\r\n", "\n").replace('\r', '\n');
+        return normalized.replace("\n", "\\n ");
     }
 
     private static String encodeLabel(int index) {

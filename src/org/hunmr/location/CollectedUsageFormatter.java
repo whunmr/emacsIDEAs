@@ -20,6 +20,7 @@ public final class CollectedUsageFormatter {
     }
 
     public static String formatEntry(String label,
+                                     String usageCategory,
                                      String lineContent,
                                      CollectedLocationContext context,
                                      String absolutePath,
@@ -27,11 +28,27 @@ public final class CollectedUsageFormatter {
         String safeLineContent = sanitizeLineContent(lineContent);
         String location = formatLocation(absolutePath, lineNumber);
         String container = formatContainer(context);
+        String categoryPrefix = formatCategory(usageCategory);
         if (!container.isEmpty()) {
-            return "- (" + normalizeLabel(label) + ")= `" + safeLineContent + "` located in { " + container + " }  " + location;
+            return "- (" + normalizeLabel(label) + ")= " + categoryPrefix + "`" + safeLineContent + "` located in { " + container + " }  " + location;
         }
 
-        return "- (" + normalizeLabel(label) + ")= `" + safeLineContent + "`  " + location;
+        return "- (" + normalizeLabel(label) + ")= " + categoryPrefix + "`" + safeLineContent + "`  " + location;
+    }
+
+    public static String formatBlock(String title, java.util.Map<String, java.util.List<String>> groupedEntries) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(title).append(":\n");
+        for (java.util.Map.Entry<String, java.util.List<String>> entry : groupedEntries.entrySet()) {
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                continue;
+            }
+            builder.append('[').append(entry.getKey()).append("]\n");
+            for (String line : entry.getValue()) {
+                builder.append(line).append('\n');
+            }
+        }
+        return builder.toString();
     }
 
     private static String formatContainer(CollectedLocationContext context) {
@@ -59,6 +76,14 @@ public final class CollectedUsageFormatter {
             return "<empty>";
         }
         return safeLineContent;
+    }
+
+    private static String formatCategory(String usageCategory) {
+        String safeCategory = usageCategory == null ? "" : usageCategory.trim();
+        if (safeCategory.isEmpty()) {
+            return "";
+        }
+        return "[" + safeCategory + "] ";
     }
 
     private static String normalizeLabel(String label) {

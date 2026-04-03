@@ -21,8 +21,8 @@ public final class CollectedUsageFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("reference", "target", "method", "buildPlan");
-                assertEquals("- (aa)= `runPlan(target)` located in { method `buildPlan` }  (at /tmp/x.go:18)",
-                        CollectedUsageFormatter.formatEntry("aa", "runPlan(target)", context, "/tmp/x.go", 18),
+                assertEquals("- (aa)= [call] `runPlan(target)` located in { method `buildPlan` }  (at /tmp/x.go:18)",
+                        CollectedUsageFormatter.formatEntry("aa", "call", "runPlan(target)", context, "/tmp/x.go", 18),
                         "usage entry should include line content and container");
             }
         });
@@ -31,8 +31,8 @@ public final class CollectedUsageFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("function", "handleJump", "", "");
-                assertEquals("- (ab)= `handleJump()` located in { function `handleJump` }  (at /tmp/x.go:21)",
-                        CollectedUsageFormatter.formatEntry("ab", "handleJump()", context, "/tmp/x.go", 21),
+                assertEquals("- (ab)= [reference] `handleJump()` located in { function `handleJump` }  (at /tmp/x.go:21)",
+                        CollectedUsageFormatter.formatEntry("ab", "reference", "handleJump()", context, "/tmp/x.go", 21),
                         "usage entry should fall back to symbol description");
             }
         });
@@ -41,8 +41,24 @@ public final class CollectedUsageFormatterTestRunner {
             @Override
             public void run() {
                 assertEquals("- (ac)= `<empty>`  (at /tmp/x.go:22)",
-                        CollectedUsageFormatter.formatEntry("ac", "   ", CollectedLocationContext.EMPTY, "/tmp/x.go", 22),
+                        CollectedUsageFormatter.formatEntry("ac", "", "   ", CollectedLocationContext.EMPTY, "/tmp/x.go", 22),
                         "blank line usages should still be representable");
+            }
+        });
+
+        run("usage block groups entries by category", new Runnable() {
+            @Override
+            public void run() {
+                java.util.Map<String, java.util.List<String>> grouped = new java.util.LinkedHashMap<String, java.util.List<String>>();
+                java.util.List<String> calls = new java.util.ArrayList<String>();
+                calls.add("- (aa)= [call] `foo()`  (at /tmp/x.go:1)");
+                grouped.put("call", calls);
+                java.util.List<String> reads = new java.util.ArrayList<String>();
+                reads.add("- (ab)= [read] `value`  (at /tmp/x.go:2)");
+                grouped.put("read", reads);
+                assertEquals("Usages:\n[call]\n- (aa)= [call] `foo()`  (at /tmp/x.go:1)\n[read]\n- (ab)= [read] `value`  (at /tmp/x.go:2)\n",
+                        CollectedUsageFormatter.formatBlock("Usages", grouped),
+                        "usage blocks should emit category headings");
             }
         });
     }

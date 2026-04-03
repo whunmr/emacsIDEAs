@@ -34,6 +34,25 @@ public final class CollectedLocationFormatterTestRunner {
             }
         });
 
+        run("context template initializes around first entry", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("Context:\n\n- <a>= x\n\nTask:\n- \n\nConstraints:\n- \n",
+                        CollectedPromptFormatter.appendToContext("", "- <a>= x\n"),
+                        "first collected entry should be inserted into the Context section");
+            }
+        });
+
+        run("context append inserts before task section", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n- <a>= first\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n- <a>= first\n- <b>= second\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContext(existing, "- <b>= second\n"),
+                        "new context entries should appear before Task");
+            }
+        });
+
         run("single line entry includes content and line", new Runnable() {
             @Override
             public void run() {
@@ -46,7 +65,7 @@ public final class CollectedLocationFormatterTestRunner {
         run("multiline entry uses two-line fenced preview", new Runnable() {
             @Override
             public void run() {
-                assertEquals("- <b>= ```\nline1\nline2\n```  (at /tmp/x.java:32-35)",
+                assertEquals("- <b>= ```line1\\n line2```  (at /tmp/x.java:32-35)",
                         CollectedLocationFormatter.formatEntry("b", "line1\nline2\nline3", "/tmp/x.java", 32, 35, false),
                         "multiline entry should keep first two lines only");
             }
@@ -114,7 +133,7 @@ public final class CollectedLocationFormatterTestRunner {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("function", "handleJump", "package", "main");
-                assertEquals("- <i>= ```\nline1\nline2\nline3\n``` located in { function `handleJump` in package `main` }   (at /tmp/x.go:12-18)",
+                assertEquals("- <i>= ```line1\\n line2\\n line3``` located in { function `handleJump` in package `main` }   (at /tmp/x.go:12-18)",
                         CollectedLocationFormatter.formatEntry("i", context, "line1\nline2\nline3\nline4", "/tmp/x.go", 12, 18, false),
                         "multiline selected text should be limited to the first three lines");
             }

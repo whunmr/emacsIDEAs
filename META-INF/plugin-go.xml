@@ -1,0 +1,9 @@
+<idea-plugin>
+  <actions>
+    <action id="CollectTypesInSelectionAction" class="org.hunmr.location.CollectTypesInSelectionAction" text="CollectTypesInSelection"
+            description="Collect Go types referenced by the current selection for AI prompts">
+      <add-to-group group-id="emacsIDEAs" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="F6" />
+    </action>
+  </actions>
+</idea-plugin>

@@ -9,7 +9,8 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.hunmr.common.SimpleEditorAction;
-import org.hunmr.util.ClipboardEditorUtil;
+
+import java.io.IOException;
 
 public class CollectLocationsAction extends SimpleEditorAction {
     @Override
@@ -28,9 +29,9 @@ public class CollectLocationsAction extends SimpleEditorAction {
         }
 
         SelectionModel selectionModel = editor.getSelectionModel();
-        String clipboardText = ClipboardEditorUtil.getClipboardText();
-        String label = CollectedLocationFormatter.nextLabel(clipboardText);
         Project project = e.getProject();
+        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
+        String label = CollectedLocationFormatter.nextLabel(existingEntries);
         String entry;
 
         if (!selectionModel.hasSelection()) {
@@ -67,8 +68,11 @@ public class CollectLocationsAction extends SimpleEditorAction {
             );
         }
 
-        ClipboardEditorUtil.copyToClipboard(CollectedLocationFormatter.appendEntry(clipboardText, entry));
-        HintManager.getInstance().showInformationHint(editor, CollectedLocationFormatter.toHintHtml(entry));
+        String updatedText = CollectedPromptFormatter.appendToContext(
+                existingEntries,
+                CollectedLocationFormatter.appendEntry("", entry)
+        );
+        writeOutput(project, editor, updatedText);
     }
 
     private static int getSelectionEndForLineNumber(int selectionStart, int selectionEnd) {
@@ -90,5 +94,15 @@ public class CollectLocationsAction extends SimpleEditorAction {
         }
 
         return virtualFile.getPath();
+    }
+
+    static void writeOutput(Project project, Editor editor, String text) {
+        try {
+            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, text);
+            String path = outputFile == null ? "tmp output file" : outputFile.getPath();
+            HintManager.getInstance().showInformationHint(editor, "Collected into " + path);
+        } catch (IOException exception) {
+            HintManager.getInstance().showInformationHint(editor, "Failed to write collected output: " + exception.getMessage());
+        }
     }
 }

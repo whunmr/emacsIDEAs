@@ -129,6 +129,24 @@
       </ul>
       <br/>
 
+      <p><b>AI coding context collection</b></p>
+      <p>emacsJump can also collect code context into a temporary prompt file for Claude/Codex style workflows. The collected file is organized as <b>Context</b>, <b>Task</b>, and <b>Constraints</b>. All collected entries are appended into the <b>Context</b> section, and each collected item is kept on a single line so it can be copied into AI prompts easily.</p>
+      <ul>
+          <li><b>F3 - CollectLocations</b>  :  collect the current caret line or current selection as a labeled context item such as <b>- &lt;a&gt;= method `handleShowMarkersKey` in class `Main`  (at /abs/path/Main.java:78)</b>. Use this for the exact place to change, a reference implementation, or a related symbol.</li>
+          <li><b>F4 - CollectUsages</b>  :  collect the active, non-excluded entries from the latest Find Usages window, grouped by usage category such as <b>call</b>, <b>read</b>, <b>write</b>, or <b>reference</b>. This is useful when asking AI to update a symbol and check its impact area.</li>
+          <li><b>F5 - CollectCallHierarchy</b>  :  collect callers and callees around the current symbol. The traversal depth is configurable in settings and defaults to <b>3</b>. This helps AI understand entry points, upstream callers, and downstream side effects before changing code.</li>
+          <li><b>F6 - CollectTypesInSelection</b>  :  for Go selections, collect related types referenced by the selected code, including inferred variable/parameter types and one level of field-related types. Items include type kind such as <b>struct</b> or <b>interface</b>, package/import path, and reasons such as <b>parameter type</b> or <b>field type of `Handler.req`</b>.</li>
+      </ul>
+      <p><b>Typical AI usage:</b></p>
+      <ul>
+          <li>Use <b>F3</b> on the target method and on a similar implementation, then tell AI: <b>apply the logic from &lt;a&gt; to &lt;b&gt;</b>.</li>
+          <li>Use <b>F4</b> after Find Usages to give AI the concrete call/read/write surface of a symbol, instead of asking it to grep the whole repository.</li>
+          <li>Use <b>F5</b> before a behavior change to show who calls the method and what the method calls, which is especially useful for refactors and bug fixes.</li>
+          <li>Use <b>F6</b> on a Go code selection when AI needs surrounding data model context, interfaces, or field-related types to make a safe change.</li>
+      </ul>
+      <p><b>Example prompt:</b> <b>Context:</b> [collected by F3-F6] <b>Task:</b> add the validation logic from &lt;a&gt; to &lt;b&gt; and update all affected usages from the collected context. <b>Constraints:</b> keep public API unchanged and minimize duplicate code.</p>
+      <br/>
+
       <br/>
       <p><b>Highlight symbol:</b></p>
       <ul>
@@ -236,11 +254,12 @@
     </html>
     ]]>
     </change-notes>
-    <version>1.4.3</version>
+    <version>253.30387.90.1</version>
     <vendor>whunmr@gmail.com</vendor>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="107.105"/>
+    <idea-version since-build="253"/>
+    <depends optional="true" config-file="plugin-go.xml">org.jetbrains.plugins.go</depends>
 
     <application-components>
         <!-- Add your application components here -->
@@ -533,16 +552,16 @@
             <keyboard-shortcut keymap="$default" first-keystroke="F3" />
         </action>
 
-        <action id="ClearLocationsAction" class="org.hunmr.location.ClearLocationsAction" text="ClearLocations"
-                description="Clear collected file locations">
-            <add-to-group group-id="emacsIDEAs" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="shift F3" />
-        </action>
-
         <action id="CollectUsageAction" class="org.hunmr.location.CollectUsageAction" text="CollectUsage"
                 description="Collect unexcluded Find Usages entries for AI prompts">
             <add-to-group group-id="emacsIDEAs" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="meta F3" />
+            <keyboard-shortcut keymap="$default" first-keystroke="F4" />
+        </action>
+
+        <action id="CollectCallHierarchyAction" class="org.hunmr.location.CollectCallHierarchyAction" text="CollectCallHierarchy"
+                description="Collect one-level call hierarchy entries for AI prompts">
+            <add-to-group group-id="emacsIDEAs" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="F5" />
         </action>
 
     </actions>

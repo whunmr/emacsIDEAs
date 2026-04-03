@@ -21,6 +21,10 @@ public class PluginConfig implements PersistentStateComponent<PluginConfig> {
     public int _secondJumpBackground = Color.RED.getRGB();
     public int _secondJumpForeground = Color.WHITE.getRGB();
     public boolean _needSelectTextAfterJump = true;
+    public int _collectCallHierarchyDepth = 3;
+    public String _collectTypesInSelectionInclude = "";
+    public String _collectTypesInSelectionExclude = "";
+    public boolean _collectTypesInSelectionProjectOnly = false;
 
     public Color getFirstJumpBackground() {
         return new Color(_firstJumpBackground);
