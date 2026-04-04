@@ -1,6 +1,8 @@
 package org.hunmr.location;
 
 public final class CollectedPromptFormatter {
+    private static final String USAGES_SECTION = "[Usages]";
+    private static final String CALL_HIERARCHY_SECTION = "[Call Hierarchy]";
     private static final String CONTEXT_HEADER = "Context:\n";
     private static final String TASK_HEADER = "Task:\n";
     private static final String CONSTRAINTS_HEADER = "Constraints:\n";
@@ -19,6 +21,18 @@ public final class CollectedPromptFormatter {
         PromptParts parts = splitPrompt(template);
         String updatedContext = appendMainContext(parts.contextPart, safeBlock);
         return joinPrompt(updatedContext, parts.tailPart);
+    }
+
+    public static String withPromptHeader(String existingText, String promptHeader) {
+        String normalized = normalizeTemplate(existingText);
+        String safeHeader = trimTrailingLineBreaks(promptHeader);
+        if (safeHeader.trim().isEmpty()) {
+            return normalized;
+        }
+        if (startsWithPromptHeader(normalized, safeHeader)) {
+            return normalized;
+        }
+        return safeHeader + "\n\n" + normalized;
     }
 
     public static String appendToContextSection(String existingText, String sectionHeader, String sectionLine) {
@@ -133,10 +147,10 @@ public final class CollectedPromptFormatter {
 
     private static String appendMainContext(String contextPart, String block) {
         String trimmedContext = trimTrailingLineBreaks(contextPart);
-        int callHierarchyIndex = indexOfSection(trimmedContext, "[Call Hierarchy]");
-        if (callHierarchyIndex >= 0) {
-            String beforeSection = trimTrailingLineBreaks(trimmedContext.substring(0, callHierarchyIndex));
-            String sectionAndAfter = trimmedContext.substring(callHierarchyIndex);
+        int firstSectionIndex = findFirstContextSectionIndex(trimmedContext);
+        if (firstSectionIndex >= 0) {
+            String beforeSection = trimTrailingLineBreaks(trimmedContext.substring(0, firstSectionIndex));
+            String sectionAndAfter = trimmedContext.substring(firstSectionIndex);
             if (trimTrailingLineBreaks(beforeSection).equals("Context:")) {
                 return beforeSection + "\n\n" + block + "\n\n" + sectionAndAfter;
             }
@@ -153,6 +167,15 @@ public final class CollectedPromptFormatter {
         String trimmedContext = trimTrailingLineBreaks(contextPart);
         int sectionIndex = indexOfSection(trimmedContext, sectionHeader);
         if (sectionIndex < 0) {
+            int insertBeforeIndex = findNextSectionIndex(trimmedContext, sectionHeader);
+            if (insertBeforeIndex >= 0) {
+                String beforeSection = trimTrailingLineBreaks(trimmedContext.substring(0, insertBeforeIndex));
+                String sectionAndAfter = trimmedContext.substring(insertBeforeIndex);
+                if (trimTrailingLineBreaks(beforeSection).equals("Context:")) {
+                    return beforeSection + "\n\n" + sectionHeader + "\n" + sectionLine + "\n\n" + sectionAndAfter;
+                }
+                return beforeSection + "\n\n" + sectionHeader + "\n" + sectionLine + "\n\n" + sectionAndAfter;
+            }
             if (trimmedContext.equals("Context:")) {
                 return trimmedContext + "\n\n" + sectionHeader + "\n" + sectionLine + '\n';
             }
@@ -193,12 +216,36 @@ public final class CollectedPromptFormatter {
         return -1;
     }
 
+    private static int findFirstContextSectionIndex(String contextPart) {
+        int usagesIndex = indexOfSection(contextPart, USAGES_SECTION);
+        int callHierarchyIndex = indexOfSection(contextPart, CALL_HIERARCHY_SECTION);
+        if (usagesIndex < 0) {
+            return callHierarchyIndex;
+        }
+        if (callHierarchyIndex < 0) {
+            return usagesIndex;
+        }
+        return Math.min(usagesIndex, callHierarchyIndex);
+    }
+
+    private static int findNextSectionIndex(String contextPart, String sectionHeader) {
+        if (USAGES_SECTION.equals(sectionHeader)) {
+            return indexOfSection(contextPart, CALL_HIERARCHY_SECTION);
+        }
+        return -1;
+    }
+
     private static String[] splitLines(String text) {
         String safeText = trimTrailingLineBreaks(text).replace("\r\n", "\n").replace('\r', '\n');
         if (safeText.isEmpty()) {
             return new String[0];
         }
         return safeText.split("\n");
+    }
+
+    private static boolean startsWithPromptHeader(String text, String promptHeader) {
+        String safeText = text == null ? "" : text;
+        return safeText.startsWith(promptHeader + "\n") || safeText.equals(promptHeader);
     }
 
     private static final class PromptParts {

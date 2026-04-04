@@ -61,6 +61,15 @@ public final class CollectedUsageFormatterTestRunner {
                         "usage blocks should emit category headings");
             }
         });
+
+        run("usage section entry is folded into one line", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("- ```Usages:\\n [call]\\n - (aa)= [call] `foo()`  (at /tmp/x.go:1)```",
+                        CollectedUsageFormatter.formatSectionEntry("Usages:\n[call]\n- (aa)= [call] `foo()`  (at /tmp/x.go:1)\n"),
+                        "usage section entry should stay on one line");
+            }
+        });
     }
 
     private static void run(String name, Runnable test) {

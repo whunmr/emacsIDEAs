@@ -21,6 +21,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
+import org.hunmr.options.PluginConfig;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -64,7 +65,10 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return;
         }
 
-        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
+        String existingEntries = CollectedPromptFormatter.withPromptHeader(
+                CollectedOutputFileManager.getCurrentText(project),
+                PluginConfig.getInstance()._promptHeader
+        );
         StringBuilder collectedEntries = new StringBuilder();
         appendTreeRows(project, tree, relation, collectedEntries);
 

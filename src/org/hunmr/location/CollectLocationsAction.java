@@ -9,6 +9,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.hunmr.common.SimpleEditorAction;
+import org.hunmr.options.PluginConfig;
 
 import java.io.IOException;
 
@@ -30,7 +31,10 @@ public class CollectLocationsAction extends SimpleEditorAction {
 
         SelectionModel selectionModel = editor.getSelectionModel();
         Project project = e.getProject();
-        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
+        String existingEntries = CollectedPromptFormatter.withPromptHeader(
+                CollectedOutputFileManager.getCurrentText(project),
+                PluginConfig.getInstance()._promptHeader
+        );
         String label = CollectedLocationFormatter.nextLabel(existingEntries);
         String entry;
 

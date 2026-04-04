@@ -48,6 +48,15 @@ public final class CollectedOutputFileManager {
         return replaceAndOpen(project, mergeCurrentText(project, text));
     }
 
+    public static Path getOutputDirectoryPath() {
+        String systemPath = PathManager.getSystemPath();
+        if (systemPath != null && !systemPath.isEmpty()) {
+            return new File(systemPath, OUTPUT_DIR_NAME).toPath();
+        }
+
+        return new File(System.getProperty("java.io.tmpdir"), OUTPUT_DIR_NAME).toPath();
+    }
+
     public static VirtualFile replaceAndOpen(Project project, String text) throws IOException {
         if (project == null || text == null || text.isEmpty()) {
             return null;
@@ -162,11 +171,6 @@ public final class CollectedOutputFileManager {
     }
 
     private static Path getOutputDirectory(Project project) {
-        String systemPath = PathManager.getSystemPath();
-        if (systemPath != null && !systemPath.isEmpty()) {
-            return new File(systemPath, OUTPUT_DIR_NAME).toPath();
-        }
-
-        return new File(System.getProperty("java.io.tmpdir"), OUTPUT_DIR_NAME).toPath();
+        return getOutputDirectoryPath();
     }
 }

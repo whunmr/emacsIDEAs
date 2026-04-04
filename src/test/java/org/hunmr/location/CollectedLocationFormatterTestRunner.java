@@ -43,6 +43,25 @@ public final class CollectedLocationFormatterTestRunner {
             }
         });
 
+        run("prompt header is prepended before template", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("My prompt header\n\nContext:\n\nTask:\n- \n\nConstraints:\n- \n",
+                        CollectedPromptFormatter.withPromptHeader("", "My prompt header"),
+                        "prompt header should be added before the generated template");
+            }
+        });
+
+        run("prompt header is not duplicated", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "My prompt header\n\nContext:\n\n- <a>= first\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals(existing,
+                        CollectedPromptFormatter.withPromptHeader(existing, "My prompt header"),
+                        "prompt header should not be inserted twice");
+            }
+        });
+
         run("context append inserts before task section", new Runnable() {
             @Override
             public void run() {
@@ -72,6 +91,18 @@ public final class CollectedLocationFormatterTestRunner {
                                 "\n\nTask:\n- \n\nConstraints:\n- \n",
                         CollectedPromptFormatter.appendToContextSection("", "[Call Hierarchy]", "- ```Call hierarchy```"),
                         "call hierarchy section should be created inside Context");
+            }
+        });
+
+        run("context section append initializes usages before call hierarchy", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n[Usages]\n- ```Usages```\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
+                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContextSection(existing, "[Usages]", "- ```Usages```"),
+                        "usages section should be inserted before call hierarchy");
             }
         });
 

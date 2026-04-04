@@ -51,6 +51,10 @@ public final class CollectedUsageFormatter {
         return builder.toString();
     }
 
+    public static String formatSectionEntry(String block) {
+        return "- ```" + inlineLineBreaks(trimTrailingLineBreaks(block)) + "```";
+    }
+
     private static String formatContainer(CollectedLocationContext context) {
         CollectedLocationContext safeContext = context == null ? CollectedLocationContext.EMPTY : context;
         if (safeContext.hasContainer()) {
@@ -92,6 +96,24 @@ public final class CollectedUsageFormatter {
             return "aa";
         }
         return safeLabel;
+    }
+
+    private static String trimTrailingLineBreaks(String text) {
+        String safeText = text == null ? "" : text;
+        int end = safeText.length();
+        while (end > 0) {
+            char current = safeText.charAt(end - 1);
+            if (current != '\n' && current != '\r') {
+                break;
+            }
+            end--;
+        }
+        return safeText.substring(0, end);
+    }
+
+    private static String inlineLineBreaks(String text) {
+        String normalized = (text == null ? "" : text).replace("\r\n", "\n").replace('\r', '\n');
+        return normalized.replace("\n", "\\n ");
     }
 
     private static String encodeLabel(int index) {

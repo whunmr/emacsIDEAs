@@ -73,7 +73,10 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
         List<String> includeFilters = splitLines(config._collectTypesInSelectionInclude);
         List<String> excludeFilters = splitLines(config._collectTypesInSelectionExclude);
 
-        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
+        String existingEntries = CollectedPromptFormatter.withPromptHeader(
+                CollectedOutputFileManager.getCurrentText(project),
+                config._promptHeader
+        );
         String nextLabel = CollectedLocationFormatter.nextLabel(existingEntries);
         int nextIndex = decodeLabel(nextLabel);
         StringBuilder contextBlock = new StringBuilder();
