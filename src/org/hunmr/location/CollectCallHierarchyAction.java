@@ -19,6 +19,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import org.hunmr.options.PluginConfig;
@@ -30,6 +31,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 public class CollectCallHierarchyAction extends com.intellij.openapi.project.DumbAwareAction {
     private static final String CALL_HIERARCHY_SECTION = "[Call Hierarchy]";
@@ -263,35 +265,43 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
     }
 
     private static PsiElement extractPsiElement(Object node) {
-        if (node instanceof PsiElement) {
-            return (PsiElement) node;
+        PsiElement direct = coercePsiElement(node);
+        if (direct != null) {
+            return direct;
         }
 
         if (node instanceof HierarchyNodeDescriptor) {
-            Object value = ((HierarchyNodeDescriptor) node).getElement();
-            if (value instanceof PsiElement) {
-                return (PsiElement) value;
+            PsiElement descriptorElement = coercePsiElement(((HierarchyNodeDescriptor) node).getElement());
+            if (descriptorElement != null) {
+                return descriptorElement;
             }
         }
 
         Object descriptor = invokeNoArgMethod(node, "getDescriptor");
+        PsiElement descriptorElement = coercePsiElement(descriptor);
+        if (descriptorElement != null) {
+            return descriptorElement;
+        }
         if (descriptor instanceof HierarchyNodeDescriptor) {
-            Object value = ((HierarchyNodeDescriptor) descriptor).getElement();
-            if (value instanceof PsiElement) {
-                return (PsiElement) value;
+            PsiElement hierarchyDescriptorElement = coercePsiElement(((HierarchyNodeDescriptor) descriptor).getElement());
+            if (hierarchyDescriptorElement != null) {
+                return hierarchyDescriptorElement;
             }
         }
 
         Object userObject = invokeNoArgMethod(node, "getUserObject");
+        PsiElement userObjectElement = coercePsiElement(userObject);
+        if (userObjectElement != null) {
+            return userObjectElement;
+        }
         if (userObject instanceof HierarchyNodeDescriptor) {
-            Object value = ((HierarchyNodeDescriptor) userObject).getElement();
-            if (value instanceof PsiElement) {
-                return (PsiElement) value;
+            PsiElement hierarchyUserObjectElement = coercePsiElement(((HierarchyNodeDescriptor) userObject).getElement());
+            if (hierarchyUserObjectElement != null) {
+                return hierarchyUserObjectElement;
             }
         }
 
-        Object value = invokeNoArgMethod(node, "getElement");
-        return value instanceof PsiElement ? (PsiElement) value : null;
+        return coercePsiElement(invokeNoArgMethod(node, "getElement"));
     }
 
     private static CollectedLocationContext resolveContext(Project project, PsiElement element) {
@@ -299,19 +309,28 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return CollectedLocationContext.EMPTY;
         }
 
+        PsiElement locationElement = normalizeLocationElement(element);
         PsiFile file = element.getContainingFile();
+        if (locationElement != null) {
+            file = locationElement.getContainingFile();
+        }
         VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
         Document document = virtualFile == null ? null : FileDocumentManager.getInstance().getDocument(virtualFile);
         if (document == null) {
             return CollectedLocationContext.EMPTY;
         }
 
-        int offset = Math.max(0, element.getTextOffset());
+        int offset = Math.max(0, locationElement == null ? element.getTextOffset() : locationElement.getTextOffset());
         return CollectedLocationContextResolver.resolve(project, document, offset, offset, false);
     }
 
     private static LocationInfo buildLocationInfo(Project project, PsiElement element) {
-        PsiFile file = element.getContainingFile();
+        PsiElement locationElement = normalizeLocationElement(element);
+        if (locationElement == null) {
+            return null;
+        }
+
+        PsiFile file = locationElement.getContainingFile();
         VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
         if (virtualFile == null) {
             return null;
@@ -322,7 +341,7 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         int lineNumber = 0;
         CollectedLocationContext context = CollectedLocationContext.EMPTY;
         if (document != null) {
-            int safeOffset = Math.max(0, Math.min(element.getTextOffset(), Math.max(0, document.getTextLength() - 1)));
+            int safeOffset = Math.max(0, Math.min(locationElement.getTextOffset(), Math.max(0, document.getTextLength() - 1)));
             lineNumber = document.getLineNumber(safeOffset) + 1;
             context = CollectedLocationContextResolver.resolve(project, document, safeOffset, safeOffset, false);
         }
@@ -343,6 +362,86 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             }
         }
         return "`<unknown>`";
+    }
+
+    private static PsiElement normalizeLocationElement(PsiElement element) {
+        PsiElement candidate = coercePsiElement(element);
+        if (hasPhysicalLocation(candidate)) {
+            return candidate;
+        }
+
+        PsiElement navigationElement = candidate == null ? null : coercePsiElement(candidate.getNavigationElement());
+        if (hasPhysicalLocation(navigationElement)) {
+            return navigationElement;
+        }
+
+        PsiElement originalElement = candidate == null ? null : coercePsiElement(candidate.getOriginalElement());
+        if (hasPhysicalLocation(originalElement)) {
+            return originalElement;
+        }
+
+        if (candidate != null && candidate.isValid()) {
+            return candidate;
+        }
+        if (navigationElement != null && navigationElement.isValid()) {
+            return navigationElement;
+        }
+        if (originalElement != null && originalElement.isValid()) {
+            return originalElement;
+        }
+        return null;
+    }
+
+    private static boolean hasPhysicalLocation(PsiElement element) {
+        if (element == null || !element.isValid()) {
+            return false;
+        }
+        PsiFile file = element.getContainingFile();
+        return file != null && file.getVirtualFile() != null;
+    }
+
+    private static PsiElement coercePsiElement(Object value) {
+        if (value instanceof PsiElement) {
+            return (PsiElement) value;
+        }
+        if (value instanceof SmartPsiElementPointer) {
+            Object pointerElement = ((SmartPsiElementPointer<?>) value).getElement();
+            return pointerElement instanceof PsiElement ? (PsiElement) pointerElement : null;
+        }
+        if (value instanceof HierarchyNodeDescriptor) {
+            return coercePsiElement(((HierarchyNodeDescriptor) value).getElement());
+        }
+        if (value instanceof Collection) {
+            for (Object item : (Collection<?>) value) {
+                PsiElement element = coercePsiElement(item);
+                if (element != null) {
+                    return element;
+                }
+            }
+        }
+        if (value instanceof Object[]) {
+            Object[] array = (Object[]) value;
+            for (int i = 0; i < array.length; i++) {
+                PsiElement element = coercePsiElement(array[i]);
+                if (element != null) {
+                    return element;
+                }
+            }
+        }
+
+        String[] accessorNames = {"getElement", "getPsiElement", "getTargetElement", "getNavigationElement", "getOriginalElement"};
+        for (int i = 0; i < accessorNames.length; i++) {
+            Object nested = invokeNoArgMethod(value, accessorNames[i]);
+            if (nested == value) {
+                continue;
+            }
+            PsiElement element = coercePsiElement(nested);
+            if (element != null) {
+                return element;
+            }
+        }
+
+        return null;
     }
 
     private static void showMessage(Editor editor, Project project, String message) {
