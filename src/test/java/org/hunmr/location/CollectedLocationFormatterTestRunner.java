@@ -142,6 +142,23 @@ public final class CollectedLocationFormatterTestRunner {
             }
         });
 
+        run("context section duplicate detection supports multiline call hierarchy blocks", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Call Hierarchy]\n- Call hierarchy for function `buildPlan`:\n" +
+                        "  - [incoming callers]\n" +
+                        "    - [caller depth-1] function `runPlan` in file `dummy.go`  (at /tmp/dummy.go:7)" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                String block = "- Call hierarchy for function `buildPlan`:\n" +
+                        "  - [incoming callers]\n" +
+                        "    - [caller depth-1] function `runPlan` in file `dummy.go`  (at /tmp/dummy.go:7)";
+                assertTrue(
+                        CollectedPromptFormatter.contextSectionContainsLine(existing, "[Call Hierarchy]", block),
+                        "multiline call hierarchy block duplicates should be detected"
+                );
+            }
+        });
+
         run("single line entry includes content and line", new Runnable() {
             @Override
             public void run() {
