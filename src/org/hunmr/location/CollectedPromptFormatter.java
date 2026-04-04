@@ -65,12 +65,17 @@ public final class CollectedPromptFormatter {
 
     public static boolean contextSectionContainsLine(String existingText, String sectionHeader, String line) {
         String safeHeader = trimTrailingLineBreaks(sectionHeader);
-        String safeLine = trimTrailingLineBreaks(line);
+        String safeLine = normalizeLineBreaks(trimTrailingLineBreaks(line));
         if (safeHeader.isEmpty() || safeLine.isEmpty()) {
             return false;
         }
 
-        String[] lines = splitLines(extractContextSection(normalizeTemplate(existingText), safeHeader));
+        String sectionBody = normalizeLineBreaks(extractContextSection(normalizeTemplate(existingText), safeHeader));
+        if (safeLine.indexOf('\n') >= 0) {
+            return containsSectionBlock(sectionBody, safeLine);
+        }
+
+        String[] lines = splitLines(sectionBody);
         for (int i = 0; i < lines.length; i++) {
             if (safeLine.equals(lines[i])) {
                 return true;
@@ -237,11 +242,29 @@ public final class CollectedPromptFormatter {
     }
 
     private static String[] splitLines(String text) {
-        String safeText = trimTrailingLineBreaks(text).replace("\r\n", "\n").replace('\r', '\n');
+        String safeText = normalizeLineBreaks(trimTrailingLineBreaks(text));
         if (safeText.isEmpty()) {
             return new String[0];
         }
         return safeText.split("\n");
+    }
+
+    private static String normalizeLineBreaks(String text) {
+        return (text == null ? "" : text).replace("\r\n", "\n").replace('\r', '\n');
+    }
+
+    private static boolean containsSectionBlock(String sectionBody, String block) {
+        String safeSectionBody = trimTrailingLineBreaks(normalizeLineBreaks(sectionBody));
+        String safeBlock = trimTrailingLineBreaks(normalizeLineBreaks(block));
+        if (safeSectionBody.isEmpty() || safeBlock.isEmpty()) {
+            return false;
+        }
+        if (safeSectionBody.equals(safeBlock)) {
+            return true;
+        }
+        return safeSectionBody.startsWith(safeBlock + "\n\n")
+                || safeSectionBody.contains("\n\n" + safeBlock + "\n\n")
+                || safeSectionBody.endsWith("\n\n" + safeBlock);
     }
 
     private static boolean startsWithPromptHeader(String text, String promptHeader) {

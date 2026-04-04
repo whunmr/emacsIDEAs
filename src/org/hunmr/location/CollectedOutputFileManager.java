@@ -80,7 +80,6 @@ public final class CollectedOutputFileManager {
             outputFile = findOpenOutputFile(project);
             if (outputFile == null) {
                 outputFile = createNewOutputFile(project);
-                openInRightSplit(project, outputFile);
             }
 
             replaceText(project, outputFile, text);
@@ -88,6 +87,7 @@ public final class CollectedOutputFileManager {
             if (document != null) {
                 FileDocumentManager.getInstance().saveDocument(document);
             }
+            openInRightSplit(project, outputFile);
             return outputFile;
         } finally {
             focusRestoreState.restore(project);
@@ -176,12 +176,15 @@ public final class CollectedOutputFileManager {
             return;
         }
 
-        manager.createSplitter(SwingConstants.VERTICAL, currentWindow);
-        com.intellij.openapi.fileEditor.impl.EditorWindow nextWindow = manager.getNextWindow(currentWindow);
-        if (nextWindow != null) {
-            manager.openFileWithProviders(outputFile, true, nextWindow);
-            manager.setCurrentWindow(nextWindow);
-            FileEditorManager.getInstance(project).openTextEditor(new OpenFileDescriptor(project, outputFile), true);
+        com.intellij.openapi.fileEditor.impl.EditorWindow targetWindow = manager.getNextWindow(currentWindow);
+        if (targetWindow == null) {
+            manager.createSplitter(SwingConstants.VERTICAL, currentWindow);
+            targetWindow = manager.getNextWindow(currentWindow);
+        }
+
+        if (targetWindow != null) {
+            manager.openFileWithProviders(outputFile, true, targetWindow);
+            manager.setCurrentWindow(targetWindow);
             return;
         }
 
@@ -193,17 +196,20 @@ public final class CollectedOutputFileManager {
     }
 
     private static final class FocusRestoreState {
+        private final Editor editor;
         private final VirtualFile file;
         private final int caretOffset;
         private final boolean hasSelection;
         private final int selectionStart;
         private final int selectionEnd;
 
-        private FocusRestoreState(VirtualFile file,
+        private FocusRestoreState(Editor editor,
+                                  VirtualFile file,
                                   int caretOffset,
                                   boolean hasSelection,
                                   int selectionStart,
                                   int selectionEnd) {
+            this.editor = editor;
             this.file = file;
             this.caretOffset = caretOffset;
             this.hasSelection = hasSelection;
@@ -214,16 +220,17 @@ public final class CollectedOutputFileManager {
         private static FocusRestoreState capture(Project project, Editor sourceEditor) {
             Editor editor = isUsableEditor(sourceEditor) ? sourceEditor : FileEditorManager.getInstance(project).getSelectedTextEditor();
             if (!isUsableEditor(editor)) {
-                return new FocusRestoreState(null, 0, false, 0, 0);
+                return new FocusRestoreState(null, null, 0, false, 0, 0);
             }
 
             VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
             if (file == null || !file.isValid() || isCollectedOutputFile(file)) {
-                return new FocusRestoreState(null, 0, false, 0, 0);
+                return new FocusRestoreState(null, null, 0, false, 0, 0);
             }
 
             SelectionModel selectionModel = editor.getSelectionModel();
             return new FocusRestoreState(
+                    editor,
                     file,
                     editor.getCaretModel().getOffset(),
                     selectionModel.hasSelection(),
@@ -233,24 +240,17 @@ public final class CollectedOutputFileManager {
         }
 
         private void restore(Project project) {
-            if (project == null || file == null || !file.isValid()) {
+            Editor targetEditor = resolveEditor(project);
+            if (!isUsableEditor(targetEditor)) {
                 return;
             }
 
-            Editor editor = FileEditorManager.getInstance(project).openTextEditor(
-                    new OpenFileDescriptor(project, file, Math.max(0, caretOffset)),
-                    true
-            );
-            if (!isUsableEditor(editor)) {
-                return;
-            }
-
-            Document document = editor.getDocument();
+            Document document = targetEditor.getDocument();
             int textLength = document.getTextLength();
             int safeCaretOffset = Math.max(0, Math.min(caretOffset, textLength));
-            editor.getCaretModel().moveToOffset(safeCaretOffset);
+            targetEditor.getCaretModel().moveToOffset(safeCaretOffset);
 
-            SelectionModel selectionModel = editor.getSelectionModel();
+            SelectionModel selectionModel = targetEditor.getSelectionModel();
             if (hasSelection) {
                 int safeSelectionStart = Math.max(0, Math.min(selectionStart, textLength));
                 int safeSelectionEnd = Math.max(safeSelectionStart, Math.min(selectionEnd, textLength));
@@ -259,8 +259,26 @@ public final class CollectedOutputFileManager {
                 selectionModel.removeSelection();
             }
 
-            editor.getScrollingModel().scrollToCaret(ScrollType.MAKE_VISIBLE);
-            IdeFocusManager.getGlobalInstance().requestFocus(editor.getContentComponent(), true);
+            targetEditor.getScrollingModel().scrollToCaret(ScrollType.MAKE_VISIBLE);
+            IdeFocusManager.getGlobalInstance().requestFocus(targetEditor.getContentComponent(), true);
+        }
+
+        private Editor resolveEditor(Project project) {
+            if (isUsableEditor(editor)) {
+                VirtualFile currentFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
+                if (currentFile != null && currentFile.isValid() && !isCollectedOutputFile(currentFile)) {
+                    return editor;
+                }
+            }
+
+            if (project == null || file == null || !file.isValid()) {
+                return null;
+            }
+
+            return FileEditorManager.getInstance(project).openTextEditor(
+                    new OpenFileDescriptor(project, file, Math.max(0, caretOffset)),
+                    true
+            );
         }
 
         private static boolean isUsableEditor(Editor editor) {
