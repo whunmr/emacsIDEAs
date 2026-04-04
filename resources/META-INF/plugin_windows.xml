@@ -134,7 +134,7 @@
       <ul>
           <li><b>F3 - CollectLocations</b>  :  collect the current caret line or current selection as a labeled context item such as <b>- &lt;a&gt;= method `handleShowMarkersKey` in class `Main`  (at /abs/path/Main.java:78)</b>. Use this for the exact place to change, a reference implementation, or a related symbol.</li>
           <li><b>F4 - CollectUsages</b>  :  collect the active, non-excluded entries from the latest Find Usages window, grouped by usage category such as <b>call</b>, <b>read</b>, <b>write</b>, or <b>reference</b>. This is useful when asking AI to update a symbol and check its impact area.</li>
-          <li><b>F5 - CollectCallHierarchy</b>  :  collect callers and callees around the current symbol. The traversal depth is configurable in settings and defaults to <b>3</b>. This helps AI understand entry points, upstream callers, and downstream side effects before changing code.</li>
+          <li><b>F5 - CollectCallHierarchy</b>  :  collect the entries currently shown in the open Call Hierarchy window, using whichever caller or callee view is selected there. Open Call Hierarchy first, then use this to pass the IDE-confirmed call graph context to AI.</li>
           <li><b>F6 - CollectTypesInSelection</b>  :  for Go selections, collect related types referenced by the selected code, including inferred variable/parameter types and one level of field-related types. Items include type kind such as <b>struct</b> or <b>interface</b>, package/import path, and reasons such as <b>parameter type</b> or <b>field type of `Handler.req`</b>.</li>
       </ul>
       <p><b>Typical AI usage:</b></p>
@@ -554,7 +554,7 @@
         <action id="CollectTypesInSelectionAction" class="org.hunmr.location.CollectTypesInSelectionAction" text="CollectTypesInSelection"
                 description="Collect Go types referenced by the current selection for AI prompts">
             <add-to-group group-id="emacsIDEAs" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="F4" />
+            <keyboard-shortcut keymap="$default" first-keystroke="F6" />
         </action>
 
         <action id="CollectUsageAction" class="org.hunmr.location.CollectUsageAction" text="CollectUsage"
@@ -564,7 +564,7 @@
         </action>
 
         <action id="CollectCallHierarchyAction" class="org.hunmr.location.CollectCallHierarchyAction" text="CollectCallHierarchy"
-                description="Collect one-level call hierarchy entries for AI prompts">
+                description="Collect the current Call Hierarchy view for AI prompts">
             <add-to-group group-id="emacsIDEAs" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="F5" />
         </action>

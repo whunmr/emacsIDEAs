@@ -68,6 +68,11 @@ public class CollectLocationsAction extends SimpleEditorAction {
             );
         }
 
+        if (CollectedLocationFormatter.containsDuplicate(existingEntries, entry)) {
+            HintManager.getInstance().showInformationHint(editor, "Already exists");
+            return;
+        }
+
         String updatedText = CollectedPromptFormatter.appendToContext(
                 existingEntries,
                 CollectedLocationFormatter.appendEntry("", entry)

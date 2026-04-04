@@ -1,21 +1,7 @@
 package org.hunmr.location;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public final class CollectedCallHierarchyFormatter {
-    private static final Pattern LABEL_PATTERN = Pattern.compile("(?m)^- \\(([a-z]+)\\)=");
-
     private CollectedCallHierarchyFormatter() {
-    }
-
-    public static String nextLabel(String text) {
-        Matcher matcher = LABEL_PATTERN.matcher(text == null ? "" : text);
-        int maxIndex = -1;
-        while (matcher.find()) {
-            maxIndex = Math.max(maxIndex, decodeLabel(matcher.group(1)));
-        }
-        return encodeLabel(maxIndex + 1);
     }
 
     public static String formatBlock(String targetDescription, String callers, String callees) {
@@ -34,19 +20,21 @@ public final class CollectedCallHierarchyFormatter {
         return builder.toString();
     }
 
-    public static String formatEntry(String label,
-                                     String relation,
+    public static String formatEntry(String relation,
                                      CollectedLocationContext context,
                                      String absolutePath,
                                      int lineNumber) {
         StringBuilder builder = new StringBuilder();
-        builder.append("- (").append(normalizeLabel(label)).append(")= ");
         if (relation != null && !relation.isEmpty()) {
             builder.append('[').append(relation).append("] ");
         }
         builder.append(formatContext(context));
         builder.append("  ").append(formatLocation(absolutePath, lineNumber));
         return builder.toString();
+    }
+
+    public static String formatSectionEntry(String block) {
+        return "- ```" + inlineLineBreaks(trimTrailingLineBreaks(block)) + "```";
     }
 
     private static String formatContext(CollectedLocationContext context) {
@@ -74,39 +62,21 @@ public final class CollectedCallHierarchyFormatter {
         return "(at " + safePath + ":" + lineNumber + ")";
     }
 
-    private static String normalizeLabel(String label) {
-        String safeLabel = label == null ? "" : label.trim();
-        return safeLabel.isEmpty() ? "aa" : safeLabel;
-    }
-
-    private static String encodeLabel(int index) {
-        int safeIndex = Math.max(0, index);
-        StringBuilder builder = new StringBuilder();
-        int current = safeIndex;
-        do {
-            builder.insert(0, (char) ('a' + (current % 26)));
-            current = current / 26 - 1;
-        } while (current >= 0);
-
-        while (builder.length() < 2) {
-            builder.insert(0, 'a');
-        }
-        return builder.toString();
-    }
-
-    private static int decodeLabel(String label) {
-        if (label == null || label.isEmpty()) {
-            return -1;
-        }
-
-        int value = 0;
-        for (int i = 0; i < label.length(); i++) {
-            char current = label.charAt(i);
-            if (current < 'a' || current > 'z') {
-                return -1;
+    private static String trimTrailingLineBreaks(String text) {
+        String safeText = text == null ? "" : text;
+        int end = safeText.length();
+        while (end > 0) {
+            char current = safeText.charAt(end - 1);
+            if (current != '\n' && current != '\r') {
+                break;
             }
-            value = value * 26 + (current - 'a' + 1);
+            end--;
         }
-        return value - 1;
+        return safeText.substring(0, end);
+    }
+
+    private static String inlineLineBreaks(String text) {
+        String normalized = (text == null ? "" : text).replace("\r\n", "\n").replace('\r', '\n');
+        return normalized.replace("\n", "\\n ");
     }
 }

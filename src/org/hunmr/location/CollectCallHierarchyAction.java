@@ -1,97 +1,95 @@
 package org.hunmr.location;
 
 import com.intellij.codeInsight.hint.HintManager;
+import com.intellij.ide.DataManager;
 import com.intellij.ide.hierarchy.CallHierarchyBrowserBase;
-import com.intellij.ide.hierarchy.HierarchyBrowser;
-import com.intellij.ide.hierarchy.HierarchyProvider;
-import com.intellij.ide.hierarchy.HierarchyTreeStructure;
-import com.intellij.ide.hierarchy.LanguageCallHierarchy;
-import com.intellij.lang.Language;
+import com.intellij.ide.hierarchy.HierarchyBrowserBaseEx;
+import com.intellij.ide.hierarchy.HierarchyNodeDescriptor;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDocumentManager;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowId;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
-import org.hunmr.options.PluginConfig;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentManager;
 
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+import java.awt.Component;
+import java.awt.Container;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
 
 public class CollectCallHierarchyAction extends com.intellij.openapi.project.DumbAwareAction {
-    private static final int MAX_COLLECTED_ITEMS = 40;
+    private static final String CALL_HIERARCHY_SECTION = "[Call Hierarchy]";
 
     @Override
     public void update(AnActionEvent e) {
-        e.getPresentation().setEnabled(e.getProject() != null && e.getData(CommonDataKeys.EDITOR) != null);
+        e.getPresentation().setEnabled(e.getProject() != null);
     }
 
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+
         Editor editor = e.getData(CommonDataKeys.EDITOR);
-        if (project == null || editor == null || editor.isDisposed()) {
+        CallHierarchyView currentView = findCurrentCallHierarchyView(project);
+        if (currentView == null) {
+            showMessage(editor, project, "Open Call Hierarchy first");
             return;
         }
 
-        PsiElement target = findTargetElement(project, editor, e);
-        if (target == null) {
-            showMessage(editor, project, "No call hierarchy target at caret");
+        String relation = relationForView(currentView.viewType);
+        if (relation.isEmpty()) {
+            showMessage(editor, project, "Current Hierarchy view is not a Call Hierarchy caller/callee view");
             return;
         }
 
-        HierarchyProvider provider = LanguageCallHierarchy.INSTANCE.forLanguage(resolveLanguage(target));
-        if (provider == null) {
-            showMessage(editor, project, "Call hierarchy is not available for this language");
-            return;
-        }
-
-        HierarchyBrowser browser = provider.createHierarchyBrowser(target);
-        if (browser == null) {
-            showMessage(editor, project, "Failed to create call hierarchy browser");
-            return;
-        }
-        provider.browserActivated(browser);
-
-        HierarchyTreeStructure incomingTree = createHierarchyTreeStructure(browser, CallHierarchyBrowserBase.getCallerType(), target);
-        HierarchyTreeStructure outgoingTree = createHierarchyTreeStructure(browser, CallHierarchyBrowserBase.getCalleeType(), target);
-        if (incomingTree == null && outgoingTree == null) {
-            showMessage(editor, project, "No call hierarchy data available");
+        JTree tree = currentView.tree;
+        if (tree == null || tree.getRowCount() <= 1) {
+            showMessage(editor, project, "Current Call Hierarchy view has no collected rows");
             return;
         }
 
         String existingEntries = CollectedOutputFileManager.getCurrentText(project);
-        String nextLabel = CollectedCallHierarchyFormatter.nextLabel(existingEntries);
-        int nextIndex = decodeLabel(nextLabel);
-        int configuredDepth = Math.max(1, PluginConfig.getInstance()._collectCallHierarchyDepth);
-        StringBuilder incomingEntries = new StringBuilder();
-        nextIndex = appendHierarchyEntries(project, incomingTree, "caller", configuredDepth, nextIndex, incomingEntries);
-        StringBuilder outgoingEntries = new StringBuilder();
-        nextIndex = appendHierarchyEntries(project, outgoingTree, "callee", configuredDepth, nextIndex, outgoingEntries);
+        StringBuilder collectedEntries = new StringBuilder();
+        appendTreeRows(project, tree, relation, collectedEntries);
 
-        if (incomingEntries.length() == 0 && outgoingEntries.length() == 0) {
-            showMessage(editor, project, "No call hierarchy items to collect");
+        if (collectedEntries.length() == 0) {
+            showMessage(editor, project, "Current Call Hierarchy view has no visible rows to collect");
             return;
         }
 
-        CollectedLocationContext targetContext = resolveContext(project, target);
+        PsiElement hierarchyBase = getHierarchyBase(currentView.browser);
+        CollectedLocationContext targetContext = resolveContext(project, hierarchyBase);
         String targetDescription = targetContext.hasSymbol()
                 ? targetContext.getSymbolKind() + " `" + targetContext.getSymbolName() + "`"
-                : describeTarget(target);
+                : describeTarget(hierarchyBase);
         String block = CollectedCallHierarchyFormatter.formatBlock(
                 targetDescription,
-                incomingEntries.toString(),
-                outgoingEntries.toString()
+                "caller".equals(relation) ? collectedEntries.toString() : "",
+                "callee".equals(relation) ? collectedEntries.toString() : ""
         );
-        String updatedText = CollectedPromptFormatter.appendToContext(existingEntries, block);
+        String sectionEntry = CollectedCallHierarchyFormatter.formatSectionEntry(block);
+        if (CollectedPromptFormatter.contextSectionContainsLine(existingEntries, CALL_HIERARCHY_SECTION, sectionEntry)) {
+            showMessage(editor, project, "Already exists");
+            return;
+        }
+
+        String updatedText = CollectedPromptFormatter.appendToContextSection(existingEntries, CALL_HIERARCHY_SECTION, sectionEntry);
         try {
             VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, updatedText);
             String path = outputFile == null ? "tmp output file" : outputFile.getPath();
@@ -101,54 +99,18 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
     }
 
-    private static int appendHierarchyEntries(Project project,
-                                              HierarchyTreeStructure treeStructure,
-                                              String relation,
-                                              int maxDepth,
-                                              int nextIndex,
-                                              StringBuilder builder) {
-        if (treeStructure == null) {
-            return nextIndex;
-        }
-
-        Object root = treeStructure.getRootElement();
-        if (root == null) {
-            return nextIndex;
-        }
-
-        TraversalState state = new TraversalState(nextIndex);
-        Set<String> visited = new HashSet<String>();
-        appendHierarchyEntries(project, treeStructure, root, relation, 1, maxDepth, state, builder, visited);
-        return state.nextIndex;
-    }
-
-    private static void appendHierarchyEntries(Project project,
-                                               HierarchyTreeStructure treeStructure,
-                                               Object parentNode,
-                                               String relation,
-                                               int depth,
-                                               int maxDepth,
-                                               TraversalState state,
-                                               StringBuilder builder,
-                                               Set<String> visited) {
-        if (treeStructure == null || parentNode == null || depth > maxDepth || state.remaining <= 0) {
-            return;
-        }
-
-        Object[] children = treeStructure.getChildElements(parentNode);
-        if (children == null) {
-            return;
-        }
-
-        for (int i = 0; i < children.length && state.remaining > 0; i++) {
-            Object child = children[i];
-            PsiElement element = extractPsiElement(child);
-            if (element == null || !element.isValid()) {
+    private static void appendTreeRows(Project project,
+                                       JTree tree,
+                                       String relation,
+                                       StringBuilder builder) {
+        for (int row = 1; row < tree.getRowCount(); row++) {
+            TreePath treePath = tree.getPathForRow(row);
+            if (treePath == null) {
                 continue;
             }
 
-            String visitKey = buildVisitKey(element, relation);
-            if (!visited.add(visitKey)) {
+            PsiElement element = extractPsiElement(treePath.getLastPathComponent());
+            if (element == null || !element.isValid()) {
                 continue;
             }
 
@@ -157,52 +119,103 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                 continue;
             }
 
-            String label = encodeLabel(state.nextIndex++);
+            int depth = Math.max(1, treePath.getPathCount() - 1);
             builder.append(CollectedCallHierarchyFormatter.formatEntry(
-                    label,
                     relation + " depth-" + depth,
                     locationInfo.context,
                     locationInfo.absolutePath,
                     locationInfo.lineNumber
             )).append('\n');
-            state.remaining--;
-
-            appendHierarchyEntries(project, treeStructure, child, relation, depth + 1, maxDepth, state, builder, visited);
         }
     }
 
-    private static HierarchyTreeStructure createHierarchyTreeStructure(HierarchyBrowser browser, String viewType, PsiElement target) {
-        if (browser == null || viewType == null || target == null) {
+    private static CallHierarchyView findCurrentCallHierarchyView(Project project) {
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.HIERARCHY);
+        if (toolWindow == null) {
             return null;
         }
 
-        try {
-            Method method = findMethod(browser.getClass(), "createHierarchyTreeStructure", String.class, PsiElement.class);
-            if (method == null) {
-                return null;
-            }
-            method.setAccessible(true);
-            Object value = method.invoke(browser, viewType, target);
-            if (value instanceof HierarchyTreeStructure) {
-                return (HierarchyTreeStructure) value;
-            }
-        } catch (Exception ignored) {
+        ContentManager contentManager = toolWindow.getContentManagerIfCreated();
+        if (contentManager == null) {
             return null;
+        }
+
+        Content selectedContent = contentManager.getSelectedContent();
+        if (selectedContent == null) {
+            return null;
+        }
+
+        HierarchyBrowserBaseEx browser = getHierarchyBrowser(selectedContent);
+        if (!(browser instanceof CallHierarchyBrowserBase)) {
+            return null;
+        }
+
+        JTree tree = getCurrentTree(browser);
+        if (tree == null) {
+            return null;
+        }
+
+        return new CallHierarchyView((CallHierarchyBrowserBase) browser, tree, getCurrentViewType(browser));
+    }
+
+    private static HierarchyBrowserBaseEx getHierarchyBrowser(Content content) {
+        JComponent actionsContextComponent = content.getActionsContextComponent();
+        HierarchyBrowserBaseEx browser = findHierarchyBrowserInComponent(actionsContextComponent);
+        if (browser != null) {
+            return browser;
+        }
+
+        return findHierarchyBrowserInComponent(content.getComponent());
+    }
+
+    private static HierarchyBrowserBaseEx findHierarchyBrowserInComponent(Component component) {
+        if (component == null) {
+            return null;
+        }
+
+        HierarchyBrowserBaseEx browser = HierarchyBrowserBaseEx.HIERARCHY_BROWSER.getData(
+                DataManager.getInstance().getDataContext(component)
+        );
+        if (browser != null) {
+            return browser;
+        }
+
+        if (component instanceof Container) {
+            Component[] children = ((Container) component).getComponents();
+            for (int i = 0; i < children.length; i++) {
+                HierarchyBrowserBaseEx nested = findHierarchyBrowserInComponent(children[i]);
+                if (nested != null) {
+                    return nested;
+                }
+            }
         }
 
         return null;
     }
 
-    private static Method findMethod(Class<?> type, String name, Class<?> firstArg, Class<?> secondArg) {
-        Class<?> current = type;
-        while (current != null) {
-            try {
-                return current.getDeclaredMethod(name, firstArg, secondArg);
-            } catch (NoSuchMethodException ignored) {
-                current = current.getSuperclass();
-            }
+    private static JTree getCurrentTree(HierarchyBrowserBaseEx browser) {
+        Object value = invokeNoArgMethod(browser, "getCurrentTree");
+        return value instanceof JTree ? (JTree) value : null;
+    }
+
+    private static String getCurrentViewType(HierarchyBrowserBaseEx browser) {
+        Object value = invokeNoArgMethod(browser, "getCurrentViewType");
+        return value instanceof String ? (String) value : "";
+    }
+
+    private static PsiElement getHierarchyBase(HierarchyBrowserBaseEx browser) {
+        Object value = invokeNoArgMethod(browser, "getHierarchyBase");
+        return value instanceof PsiElement ? (PsiElement) value : null;
+    }
+
+    private static String relationForView(String viewType) {
+        if (CallHierarchyBrowserBase.getCallerType().equals(viewType)) {
+            return "caller";
         }
-        return null;
+        if (CallHierarchyBrowserBase.getCalleeType().equals(viewType)) {
+            return "callee";
+        }
+        return "";
     }
 
     private static PsiElement extractPsiElement(Object node) {
@@ -210,78 +223,31 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return (PsiElement) node;
         }
 
-        try {
-            Method method = node.getClass().getMethod("getElement");
-            Object value = method.invoke(node);
+        if (node instanceof HierarchyNodeDescriptor) {
+            Object value = ((HierarchyNodeDescriptor) node).getElement();
             if (value instanceof PsiElement) {
                 return (PsiElement) value;
             }
-        } catch (Exception ignored) {
-            return null;
         }
 
-        return null;
-    }
-
-    private static PsiElement findTargetElement(Project project, Editor editor, AnActionEvent e) {
-        PsiElement directTarget = resolveTargetFromProvider(project, e);
-        if (directTarget != null) {
-            return directTarget;
-        }
-
-        Document document = editor.getDocument();
-        PsiDocumentManager documentManager = PsiDocumentManager.getInstance(project);
-        documentManager.commitDocument(document);
-        PsiFile psiFile = documentManager.getPsiFile(document);
-        if (psiFile == null || psiFile.getTextLength() <= 0) {
-            return null;
-        }
-
-        int offset = Math.max(0, Math.min(editor.getCaretModel().getOffset(), psiFile.getTextLength() - 1));
-        PsiElement element = psiFile.findElementAt(offset);
-        if (element == null && offset > 0) {
-            element = psiFile.findElementAt(offset - 1);
-        }
-
-        PsiElement current = element;
-        while (current != null) {
-            if (current instanceof PsiNamedElement) {
-                return current;
+        Object descriptor = invokeNoArgMethod(node, "getDescriptor");
+        if (descriptor instanceof HierarchyNodeDescriptor) {
+            Object value = ((HierarchyNodeDescriptor) descriptor).getElement();
+            if (value instanceof PsiElement) {
+                return (PsiElement) value;
             }
-            current = current.getParent();
         }
 
-        return null;
-    }
-
-    private static PsiElement resolveTargetFromProvider(Project project, AnActionEvent e) {
-        Editor editor = e.getData(CommonDataKeys.EDITOR);
-        if (editor == null || editor.isDisposed()) {
-            return null;
+        Object userObject = invokeNoArgMethod(node, "getUserObject");
+        if (userObject instanceof HierarchyNodeDescriptor) {
+            Object value = ((HierarchyNodeDescriptor) userObject).getElement();
+            if (value instanceof PsiElement) {
+                return (PsiElement) value;
+            }
         }
 
-        Document document = editor.getDocument();
-        PsiDocumentManager documentManager = PsiDocumentManager.getInstance(project);
-        documentManager.commitDocument(document);
-        PsiFile psiFile = documentManager.getPsiFile(document);
-        if (psiFile == null) {
-            return null;
-        }
-
-        HierarchyProvider provider = LanguageCallHierarchy.INSTANCE.forLanguage(psiFile.getLanguage());
-        if (provider == null) {
-            return null;
-        }
-
-        return provider.getTarget(e.getDataContext());
-    }
-
-    private static Language resolveLanguage(PsiElement target) {
-        PsiFile containingFile = target == null ? null : target.getContainingFile();
-        if (containingFile != null) {
-            return containingFile.getLanguage();
-        }
-        return target == null ? Language.ANY : target.getLanguage();
+        Object value = invokeNoArgMethod(node, "getElement");
+        return value instanceof PsiElement ? (PsiElement) value : null;
     }
 
     private static CollectedLocationContext resolveContext(Project project, PsiElement element) {
@@ -322,10 +288,7 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
 
     private static String getAbsolutePath(VirtualFile virtualFile) {
         String canonicalPath = virtualFile.getCanonicalPath();
-        if (canonicalPath != null && !canonicalPath.isEmpty()) {
-            return canonicalPath;
-        }
-        return virtualFile.getPath();
+        return canonicalPath != null && !canonicalPath.isEmpty() ? canonicalPath : virtualFile.getPath();
     }
 
     private static String describeTarget(PsiElement target) {
@@ -339,48 +302,27 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
     }
 
     private static void showMessage(Editor editor, Project project, String message) {
-        if (editor != null) {
+        if (editor != null && !editor.isDisposed()) {
             HintManager.getInstance().showInformationHint(editor, message);
             return;
         }
-        Messages.showInfoMessage(project, message, "emacsJump");
+        if (project != null) {
+            ToolWindowManager.getInstance(project).notifyByBalloon(ToolWindowId.HIERARCHY, MessageType.INFO, message);
+        }
     }
 
-    private static int decodeLabel(String label) {
-        if (label == null || label.isEmpty()) {
-            return 0;
+    private static Object invokeNoArgMethod(Object target, String methodName) {
+        if (target == null || methodName == null || methodName.isEmpty()) {
+            return null;
         }
 
-        int value = 0;
-        for (int i = 0; i < label.length(); i++) {
-            char current = label.charAt(i);
-            if (current < 'a' || current > 'z') {
-                return 0;
-            }
-            value = value * 26 + (current - 'a' + 1);
+        try {
+            Method method = target.getClass().getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            return method.invoke(target);
+        } catch (Exception ignored) {
+            return null;
         }
-        return value - 1;
-    }
-
-    private static String encodeLabel(int index) {
-        int safeIndex = Math.max(0, index);
-        StringBuilder builder = new StringBuilder();
-        int current = safeIndex;
-        do {
-            builder.insert(0, (char) ('a' + (current % 26)));
-            current = current / 26 - 1;
-        } while (current >= 0);
-        while (builder.length() < 2) {
-            builder.insert(0, 'a');
-        }
-        return builder.toString();
-    }
-
-    private static String buildVisitKey(PsiElement element, String relation) {
-        PsiFile file = element.getContainingFile();
-        VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
-        String path = virtualFile == null ? "" : getAbsolutePath(virtualFile);
-        return relation + ":" + path + ":" + element.getTextOffset();
     }
 
     private static final class LocationInfo {
@@ -395,12 +337,15 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
     }
 
-    private static final class TraversalState {
-        private int nextIndex;
-        private int remaining = MAX_COLLECTED_ITEMS;
+    private static final class CallHierarchyView {
+        private final CallHierarchyBrowserBase browser;
+        private final JTree tree;
+        private final String viewType;
 
-        private TraversalState(int nextIndex) {
-            this.nextIndex = nextIndex;
+        private CallHierarchyView(CallHierarchyBrowserBase browser, JTree tree, String viewType) {
+            this.browser = browser;
+            this.tree = tree;
+            this.viewType = viewType == null ? "" : viewType;
         }
     }
 }

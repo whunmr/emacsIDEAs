@@ -16,39 +16,53 @@ public final class CollectedPromptFormatter {
         }
 
         String template = normalizeTemplate(existingText);
-        int taskIndex = findTaskHeaderIndex(template);
-        StringBuilder builder = new StringBuilder();
-        if (taskIndex < 0) {
-            builder.append(template);
-            if (builder.length() > 0 && builder.charAt(builder.length() - 1) != '\n') {
-                builder.append('\n');
-            }
-            builder.append(safeBlock);
-            if (builder.charAt(builder.length() - 1) != '\n') {
-                builder.append('\n');
-            }
-            return builder.toString();
+        PromptParts parts = splitPrompt(template);
+        String updatedContext = appendMainContext(parts.contextPart, safeBlock);
+        return joinPrompt(updatedContext, parts.tailPart);
+    }
+
+    public static String appendToContextSection(String existingText, String sectionHeader, String sectionLine) {
+        String safeHeader = trimTrailingLineBreaks(sectionHeader);
+        String safeLine = trimTrailingLineBreaks(sectionLine);
+        if (safeHeader.isEmpty() || safeLine.isEmpty()) {
+            return normalizeTemplate(existingText);
         }
 
-        String contextPart = template.substring(0, taskIndex);
-        String tailPart = template.substring(taskIndex);
-        boolean emptyContextBody = trimTrailingLineBreaks(contextPart).equals("Context:");
-        builder.append(contextPart);
-        if (builder.length() > 0 && builder.charAt(builder.length() - 1) != '\n') {
-            builder.append('\n');
+        String template = normalizeTemplate(existingText);
+        PromptParts parts = splitPrompt(template);
+        String updatedContext = appendContextSection(parts.contextPart, safeHeader, safeLine);
+        return joinPrompt(updatedContext, parts.tailPart);
+    }
+
+    public static boolean contextContainsLine(String existingText, String line) {
+        String safeLine = trimTrailingLineBreaks(line);
+        if (safeLine.isEmpty()) {
+            return false;
         }
-        if (!emptyContextBody && builder.toString().endsWith("\n\n")) {
-            builder.setLength(builder.length() - 1);
+
+        String[] lines = splitLines(extractContextPart(normalizeTemplate(existingText)));
+        for (int i = 0; i < lines.length; i++) {
+            if (safeLine.equals(lines[i])) {
+                return true;
+            }
         }
-        builder.append(safeBlock);
-        if (builder.charAt(builder.length() - 1) != '\n') {
-            builder.append('\n');
+        return false;
+    }
+
+    public static boolean contextSectionContainsLine(String existingText, String sectionHeader, String line) {
+        String safeHeader = trimTrailingLineBreaks(sectionHeader);
+        String safeLine = trimTrailingLineBreaks(line);
+        if (safeHeader.isEmpty() || safeLine.isEmpty()) {
+            return false;
         }
-        if (!tailPart.startsWith("\n")) {
-            builder.append('\n');
+
+        String[] lines = splitLines(extractContextSection(normalizeTemplate(existingText), safeHeader));
+        for (int i = 0; i < lines.length; i++) {
+            if (safeLine.equals(lines[i])) {
+                return true;
+            }
         }
-        builder.append(tailPart);
-        return builder.toString();
+        return false;
     }
 
     private static String normalizeTemplate(String text) {
@@ -95,5 +109,105 @@ public final class CollectedPromptFormatter {
             end--;
         }
         return safeText.substring(0, end);
+    }
+
+    private static PromptParts splitPrompt(String template) {
+        int taskIndex = findTaskHeaderIndex(template);
+        if (taskIndex < 0) {
+            return new PromptParts(template, "");
+        }
+        return new PromptParts(template.substring(0, taskIndex), template.substring(taskIndex));
+    }
+
+    private static String joinPrompt(String contextPart, String tailPart) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(trimTrailingLineBreaks(contextPart)).append('\n');
+        if (tailPart != null && !tailPart.isEmpty()) {
+            if (!tailPart.startsWith("\n")) {
+                builder.append('\n');
+            }
+            builder.append(tailPart);
+        }
+        return builder.toString();
+    }
+
+    private static String appendMainContext(String contextPart, String block) {
+        String trimmedContext = trimTrailingLineBreaks(contextPart);
+        int callHierarchyIndex = indexOfSection(trimmedContext, "[Call Hierarchy]");
+        if (callHierarchyIndex >= 0) {
+            String beforeSection = trimTrailingLineBreaks(trimmedContext.substring(0, callHierarchyIndex));
+            String sectionAndAfter = trimmedContext.substring(callHierarchyIndex);
+            if (trimTrailingLineBreaks(beforeSection).equals("Context:")) {
+                return beforeSection + "\n\n" + block + "\n\n" + sectionAndAfter;
+            }
+            return beforeSection + "\n" + block + "\n\n" + sectionAndAfter;
+        }
+
+        if (trimmedContext.equals("Context:")) {
+            return trimmedContext + "\n\n" + block + '\n';
+        }
+        return trimmedContext + "\n" + block + '\n';
+    }
+
+    private static String appendContextSection(String contextPart, String sectionHeader, String sectionLine) {
+        String trimmedContext = trimTrailingLineBreaks(contextPart);
+        int sectionIndex = indexOfSection(trimmedContext, sectionHeader);
+        if (sectionIndex < 0) {
+            if (trimmedContext.equals("Context:")) {
+                return trimmedContext + "\n\n" + sectionHeader + "\n" + sectionLine + '\n';
+            }
+            return trimmedContext + "\n\n" + sectionHeader + "\n" + sectionLine + '\n';
+        }
+
+        String beforeSection = trimmedContext.substring(0, sectionIndex);
+        String sectionBody = trimmedContext.substring(sectionIndex);
+        return trimTrailingLineBreaks(beforeSection) + "\n\n" + trimTrailingLineBreaks(sectionBody) + "\n" + sectionLine + '\n';
+    }
+
+    private static String extractContextPart(String template) {
+        return splitPrompt(template).contextPart;
+    }
+
+    private static String extractContextSection(String template, String sectionHeader) {
+        String contextPart = trimTrailingLineBreaks(extractContextPart(template));
+        int sectionIndex = indexOfSection(contextPart, sectionHeader);
+        if (sectionIndex < 0) {
+            return "";
+        }
+        String sectionBody = contextPart.substring(sectionIndex);
+        String prefix = sectionHeader + "\n";
+        if (!sectionBody.startsWith(prefix)) {
+            return "";
+        }
+        return sectionBody.substring(prefix.length());
+    }
+
+    private static int indexOfSection(String contextPart, String sectionHeader) {
+        int index = contextPart.indexOf("\n" + sectionHeader + "\n");
+        if (index >= 0) {
+            return index + 1;
+        }
+        if (contextPart.startsWith(sectionHeader + "\n")) {
+            return 0;
+        }
+        return -1;
+    }
+
+    private static String[] splitLines(String text) {
+        String safeText = trimTrailingLineBreaks(text).replace("\r\n", "\n").replace('\r', '\n');
+        if (safeText.isEmpty()) {
+            return new String[0];
+        }
+        return safeText.split("\n");
+    }
+
+    private static final class PromptParts {
+        private final String contextPart;
+        private final String tailPart;
+
+        private PromptParts(String contextPart, String tailPart) {
+            this.contextPart = contextPart == null ? "" : contextPart;
+            this.tailPart = tailPart == null ? "" : tailPart;
+        }
     }
 }
