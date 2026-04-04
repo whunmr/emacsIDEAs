@@ -32,6 +32,8 @@ import java.awt.Container;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class CollectCallHierarchyAction extends com.intellij.openapi.project.DumbAwareAction {
     private static final String CALL_HIERARCHY_SECTION = "[Call Hierarchy]";
@@ -401,19 +403,31 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
     }
 
     private static PsiElement coercePsiElement(Object value) {
+        return coercePsiElement(value, new IdentityHashMap<Object, Boolean>());
+    }
+
+    private static PsiElement coercePsiElement(Object value, Map<Object, Boolean> visited) {
+        if (value == null) {
+            return null;
+        }
+        if (visited.containsKey(value)) {
+            return null;
+        }
+        visited.put(value, Boolean.TRUE);
+
         if (value instanceof PsiElement) {
             return (PsiElement) value;
         }
         if (value instanceof SmartPsiElementPointer) {
             Object pointerElement = ((SmartPsiElementPointer<?>) value).getElement();
-            return pointerElement instanceof PsiElement ? (PsiElement) pointerElement : null;
+            return coercePsiElement(pointerElement, visited);
         }
         if (value instanceof HierarchyNodeDescriptor) {
-            return coercePsiElement(((HierarchyNodeDescriptor) value).getElement());
+            return coercePsiElement(((HierarchyNodeDescriptor) value).getElement(), visited);
         }
         if (value instanceof Collection) {
             for (Object item : (Collection<?>) value) {
-                PsiElement element = coercePsiElement(item);
+                PsiElement element = coercePsiElement(item, visited);
                 if (element != null) {
                     return element;
                 }
@@ -422,7 +436,7 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         if (value instanceof Object[]) {
             Object[] array = (Object[]) value;
             for (int i = 0; i < array.length; i++) {
-                PsiElement element = coercePsiElement(array[i]);
+                PsiElement element = coercePsiElement(array[i], visited);
                 if (element != null) {
                     return element;
                 }
@@ -435,7 +449,7 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             if (nested == value) {
                 continue;
             }
-            PsiElement element = coercePsiElement(nested);
+            PsiElement element = coercePsiElement(nested, visited);
             if (element != null) {
                 return element;
             }
