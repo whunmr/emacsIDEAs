@@ -20,6 +20,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
@@ -57,13 +58,10 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
             return;
         }
 
-        Collection<PsiElement> elements = PsiTreeUtil.findChildrenOfAnyType(
+        Collection<PsiElement> elements = collectSelectionElements(
                 selectionRoot,
-                GoTypeSpec.class,
-                GoTypeReferenceExpression.class,
-                GoReferenceExpression.class,
-                GoNamedElement.class,
-                GoParameterDeclaration.class
+                selectionModel.getSelectionStart(),
+                selectionModel.getSelectionEnd()
         );
 
         Map<String, TypeLocation> collectedTypes = new LinkedHashMap<String, TypeLocation>();
@@ -135,6 +133,78 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
         }
         PsiElement common = PsiTreeUtil.findCommonParent(startElement, endElement);
         return common != null ? common : psiFile;
+    }
+
+    private static Collection<PsiElement> collectSelectionElements(PsiElement selectionRoot, int selectionStart, int selectionEnd) {
+        Set<PsiElement> elements = new LinkedHashSet<PsiElement>();
+        if (selectionRoot == null) {
+            return elements;
+        }
+
+        com.intellij.psi.PsiFile psiFile = selectionRoot.getContainingFile();
+        if (psiFile == null || psiFile.getTextLength() <= 0) {
+            return elements;
+        }
+
+        int safeStart = Math.max(0, Math.min(selectionStart, psiFile.getTextLength() - 1));
+        int safeEnd = Math.max(safeStart, Math.min(Math.max(selectionStart, selectionEnd - 1), psiFile.getTextLength() - 1));
+        addNearestCollectableAnchor(psiFile.findElementAt(safeStart), selectionRoot, selectionStart, selectionEnd, elements);
+        addNearestCollectableAnchor(psiFile.findElementAt(safeEnd), selectionRoot, selectionStart, selectionEnd, elements);
+
+        Collection<PsiElement> descendants = PsiTreeUtil.findChildrenOfAnyType(
+                selectionRoot,
+                GoTypeSpec.class,
+                GoTypeReferenceExpression.class,
+                GoReferenceExpression.class,
+                GoNamedElement.class,
+                GoParameterDeclaration.class
+        );
+        for (PsiElement element : descendants) {
+            if (intersectsSelection(element, selectionStart, selectionEnd)) {
+                elements.add(element);
+            }
+        }
+
+        return elements;
+    }
+
+    private static void addNearestCollectableAnchor(PsiElement anchor,
+                                                    PsiElement selectionRoot,
+                                                    int selectionStart,
+                                                    int selectionEnd,
+                                                    Set<PsiElement> elements) {
+        PsiElement current = anchor;
+        while (current != null) {
+            if (isCollectableElement(current) && intersectsSelection(current, selectionStart, selectionEnd)) {
+                elements.add(current);
+                return;
+            }
+            if (current == selectionRoot) {
+                return;
+            }
+            current = current.getParent();
+        }
+    }
+
+    private static boolean isCollectableElement(PsiElement element) {
+        return element instanceof GoTypeSpec
+                || element instanceof GoTypeReferenceExpression
+                || element instanceof GoReferenceExpression
+                || element instanceof GoNamedElement
+                || element instanceof GoParameterDeclaration;
+    }
+
+    private static boolean intersectsSelection(PsiElement element, int selectionStart, int selectionEnd) {
+        if (element == null || selectionEnd <= selectionStart) {
+            return false;
+        }
+
+        TextRange textRange = element.getTextRange();
+        if (textRange == null) {
+            return false;
+        }
+
+        return textRange.getStartOffset() < selectionEnd && textRange.getEndOffset() > selectionStart;
     }
 
     private static void collectFromElement(Project project, PsiElement element, Map<String, TypeLocation> collectedTypes) {

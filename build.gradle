@@ -41,6 +41,7 @@ sourceSets {
 dependencies {
     intellijPlatform {
         create(providers.gradleProperty('platformType'), providers.gradleProperty('platformVersion'))
+        compatiblePlugin('org.jetbrains.plugins.go')
         instrumentationTools()
         pluginVerifier()
         zipSigner()
