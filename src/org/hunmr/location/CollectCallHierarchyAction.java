@@ -30,9 +30,11 @@ import javax.swing.tree.TreePath;
 import java.awt.Component;
 import java.awt.Container;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CollectCallHierarchyAction extends com.intellij.openapi.project.DumbAwareAction {
@@ -327,6 +329,16 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         if (node instanceof HierarchyNodeDescriptor) {
+            PsiElement descriptorPsiElement = coercePsiElement(invokeNoArgMethod(node, "getPsiElement"));
+            if (descriptorPsiElement != null) {
+                return descriptorPsiElement;
+            }
+
+            PsiElement descriptorReferenceElement = extractReferenceElement((HierarchyNodeDescriptor) node);
+            if (descriptorReferenceElement != null) {
+                return descriptorReferenceElement;
+            }
+
             PsiElement descriptorElement = coercePsiElement(((HierarchyNodeDescriptor) node).getElement());
             if (descriptorElement != null) {
                 return descriptorElement;
@@ -339,6 +351,16 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return descriptorElement;
         }
         if (descriptor instanceof HierarchyNodeDescriptor) {
+            PsiElement hierarchyDescriptorPsiElement = coercePsiElement(invokeNoArgMethod(descriptor, "getPsiElement"));
+            if (hierarchyDescriptorPsiElement != null) {
+                return hierarchyDescriptorPsiElement;
+            }
+
+            PsiElement hierarchyDescriptorReferenceElement = extractReferenceElement((HierarchyNodeDescriptor) descriptor);
+            if (hierarchyDescriptorReferenceElement != null) {
+                return hierarchyDescriptorReferenceElement;
+            }
+
             PsiElement hierarchyDescriptorElement = coercePsiElement(((HierarchyNodeDescriptor) descriptor).getElement());
             if (hierarchyDescriptorElement != null) {
                 return hierarchyDescriptorElement;
@@ -351,6 +373,16 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return userObjectElement;
         }
         if (userObject instanceof HierarchyNodeDescriptor) {
+            PsiElement hierarchyUserObjectPsiElement = coercePsiElement(invokeNoArgMethod(userObject, "getPsiElement"));
+            if (hierarchyUserObjectPsiElement != null) {
+                return hierarchyUserObjectPsiElement;
+            }
+
+            PsiElement hierarchyUserObjectReferenceElement = extractReferenceElement((HierarchyNodeDescriptor) userObject);
+            if (hierarchyUserObjectReferenceElement != null) {
+                return hierarchyUserObjectReferenceElement;
+            }
+
             PsiElement hierarchyUserObjectElement = coercePsiElement(((HierarchyNodeDescriptor) userObject).getElement());
             if (hierarchyUserObjectElement != null) {
                 return hierarchyUserObjectElement;
@@ -400,6 +432,12 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
 
     private static LocationInfo buildLocationInfo(Project project, PsiElement element, HierarchyNodeDescriptor descriptor) {
         PsiElement locationElement = normalizeLocationElement(element);
+        if (locationElement == null && descriptor != null) {
+            locationElement = normalizeLocationElement(coercePsiElement(invokeNoArgMethod(descriptor, "getPsiElement")));
+        }
+        if (locationElement == null && descriptor != null) {
+            locationElement = normalizeLocationElement(extractReferenceElement(descriptor));
+        }
         if (locationElement == null && descriptor != null) {
             locationElement = normalizeLocationElement(coercePsiElement(descriptor.getElement()));
         }
@@ -502,7 +540,20 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return coercePsiElement(pointerElement, visited);
         }
         if (value instanceof HierarchyNodeDescriptor) {
-            return coercePsiElement(((HierarchyNodeDescriptor) value).getElement(), visited);
+            PsiElement psiElement = coercePsiElement(invokeNoArgMethod(value, "getPsiElement"), visited);
+            if (psiElement != null) {
+                return psiElement;
+            }
+
+            PsiElement referenceElement = extractReferenceElement((HierarchyNodeDescriptor) value);
+            if (referenceElement != null) {
+                return referenceElement;
+            }
+
+            PsiElement element = coercePsiElement(((HierarchyNodeDescriptor) value).getElement(), visited);
+            if (element != null) {
+                return element;
+            }
         }
         if (value instanceof Collection) {
             for (Object item : (Collection<?>) value) {
@@ -522,7 +573,7 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             }
         }
 
-        String[] accessorNames = {"getElement", "getPsiElement", "getTargetElement", "getNavigationElement", "getOriginalElement"};
+        String[] accessorNames = {"getPsiElement", "getElement", "getTargetElement", "getNavigationElement", "getOriginalElement"};
         for (int i = 0; i < accessorNames.length; i++) {
             Object nested = invokeNoArgMethod(value, accessorNames[i]);
             if (nested == value) {
@@ -534,6 +585,48 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             }
         }
 
+        return null;
+    }
+
+    private static PsiElement extractReferenceElement(HierarchyNodeDescriptor descriptor) {
+        if (descriptor == null) {
+            return null;
+        }
+
+        Object fieldValue = getFieldValue(descriptor, "myReferencePointers");
+        if (!(fieldValue instanceof List)) {
+            return null;
+        }
+
+        List<?> pointers = (List<?>) fieldValue;
+        for (int i = 0; i < pointers.size(); i++) {
+            PsiElement element = coercePsiElement(pointers.get(i));
+            if (element != null) {
+                PsiElement parent = element.getParent();
+                if (parent != null && parent.isValid()) {
+                    return parent;
+                }
+                return element;
+            }
+        }
+        return null;
+    }
+
+    private static Object getFieldValue(Object target, String fieldName) {
+        if (target == null || fieldName == null || fieldName.isEmpty()) {
+            return null;
+        }
+
+        Class<?> current = target.getClass();
+        while (current != null) {
+            try {
+                Field field = current.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return field.get(target);
+            } catch (Exception ignored) {
+                current = current.getSuperclass();
+            }
+        }
         return null;
     }
 
