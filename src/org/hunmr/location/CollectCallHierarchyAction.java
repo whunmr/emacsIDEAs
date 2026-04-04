@@ -74,10 +74,11 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                 PluginConfig.getInstance()._promptHeader
         );
         StringBuilder collectedEntries = new StringBuilder();
-        appendTreeRows(project, tree, relation, collectedEntries);
+        StringBuilder debugInfo = new StringBuilder();
+        appendTreeRows(project, tree, relation, collectedEntries, debugInfo);
 
         if (collectedEntries.length() == 0) {
-            showMessage(editor, project, "Current Call Hierarchy view has no visible rows to collect");
+            showMessage(editor, project, "Current Call Hierarchy view has no visible rows to collect; " + debugInfo.toString());
             return;
         }
 
@@ -114,19 +115,20 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
     private static void appendTreeRows(Project project,
                                        JTree tree,
                                        String relation,
-                                       StringBuilder builder) {
+                                       StringBuilder builder,
+                                       StringBuilder debugInfo) {
         for (int row = 1; row < tree.getRowCount(); row++) {
             TreePath treePath = tree.getPathForRow(row);
             if (treePath == null) {
+                appendDebugInfo(debugInfo, "r" + row + ":path=null");
                 continue;
             }
 
-            PsiElement element = extractPsiElement(treePath.getLastPathComponent());
-            if (element == null || !element.isValid()) {
-                continue;
-            }
-
-            LocationInfo locationInfo = buildLocationInfo(project, element);
+            Object rowNode = treePath.getLastPathComponent();
+            HierarchyNodeDescriptor descriptor = extractHierarchyDescriptor(rowNode);
+            PsiElement element = extractPsiElement(rowNode);
+            LocationInfo locationInfo = buildLocationInfo(project, element, descriptor);
+            appendDebugInfo(debugInfo, buildRowDebug(row, rowNode, descriptor, element, locationInfo));
             if (locationInfo == null) {
                 continue;
             }
@@ -139,6 +141,58 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                     locationInfo.lineNumber
             )).append('\n');
         }
+    }
+
+    private static void appendDebugInfo(StringBuilder debugInfo, String entry) {
+        if (debugInfo == null || entry == null || entry.isEmpty()) {
+            return;
+        }
+        int existingCount = 0;
+        for (int i = 0; i < debugInfo.length(); i++) {
+            if (debugInfo.charAt(i) == ';') {
+                existingCount++;
+            }
+        }
+        if (existingCount >= 3) {
+            return;
+        }
+        if (debugInfo.length() > 0) {
+            debugInfo.append("; ");
+        }
+        debugInfo.append(entry);
+    }
+
+    private static String buildRowDebug(int row,
+                                        Object rowNode,
+                                        HierarchyNodeDescriptor descriptor,
+                                        PsiElement element,
+                                        LocationInfo locationInfo) {
+        PsiElement descriptorElement = descriptor == null ? null : coercePsiElement(descriptor.getElement());
+        PsiElement normalizedElement = normalizeLocationElement(element);
+        PsiElement normalizedDescriptorElement = normalizeLocationElement(descriptorElement);
+        PsiFile descriptorFile = descriptor == null ? null : descriptor.getContainingFile();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("r").append(row)
+                .append("[n=").append(simpleName(rowNode))
+                .append(",d=").append(simpleName(descriptor))
+                .append(",e=").append(simpleName(element))
+                .append(",ne=").append(simpleName(normalizedElement))
+                .append(",de=").append(simpleName(descriptorElement))
+                .append(",nde=").append(simpleName(normalizedDescriptorElement))
+                .append(",df=").append(descriptorFile != null ? "Y" : "N")
+                .append(",loc=").append(locationInfo != null ? "Y" : "N")
+                .append("]");
+        return builder.toString();
+    }
+
+    private static String simpleName(Object value) {
+        if (value == null) {
+            return "-";
+        }
+        Class<?> type = value instanceof Class ? (Class<?>) value : value.getClass();
+        String simpleName = type.getSimpleName();
+        return simpleName == null || simpleName.isEmpty() ? type.getName() : simpleName;
     }
 
     private static CallHierarchyView findCurrentCallHierarchyView(Project project) {
@@ -306,6 +360,24 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         return coercePsiElement(invokeNoArgMethod(node, "getElement"));
     }
 
+    private static HierarchyNodeDescriptor extractHierarchyDescriptor(Object node) {
+        if (node instanceof HierarchyNodeDescriptor) {
+            return (HierarchyNodeDescriptor) node;
+        }
+
+        Object descriptor = invokeNoArgMethod(node, "getDescriptor");
+        if (descriptor instanceof HierarchyNodeDescriptor) {
+            return (HierarchyNodeDescriptor) descriptor;
+        }
+
+        Object userObject = invokeNoArgMethod(node, "getUserObject");
+        if (userObject instanceof HierarchyNodeDescriptor) {
+            return (HierarchyNodeDescriptor) userObject;
+        }
+
+        return null;
+    }
+
     private static CollectedLocationContext resolveContext(Project project, PsiElement element) {
         if (project == null || element == null) {
             return CollectedLocationContext.EMPTY;
@@ -326,13 +398,16 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         return CollectedLocationContextResolver.resolve(project, document, offset, offset, false);
     }
 
-    private static LocationInfo buildLocationInfo(Project project, PsiElement element) {
+    private static LocationInfo buildLocationInfo(Project project, PsiElement element, HierarchyNodeDescriptor descriptor) {
         PsiElement locationElement = normalizeLocationElement(element);
-        if (locationElement == null) {
-            return null;
+        if (locationElement == null && descriptor != null) {
+            locationElement = normalizeLocationElement(coercePsiElement(descriptor.getElement()));
         }
 
-        PsiFile file = locationElement.getContainingFile();
+        PsiFile file = locationElement == null ? null : locationElement.getContainingFile();
+        if (file == null && descriptor != null) {
+            file = descriptor.getContainingFile();
+        }
         VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
         if (virtualFile == null) {
             return null;
@@ -343,9 +418,13 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         int lineNumber = 0;
         CollectedLocationContext context = CollectedLocationContext.EMPTY;
         if (document != null) {
-            int safeOffset = Math.max(0, Math.min(locationElement.getTextOffset(), Math.max(0, document.getTextLength() - 1)));
-            lineNumber = document.getLineNumber(safeOffset) + 1;
-            context = CollectedLocationContextResolver.resolve(project, document, safeOffset, safeOffset, false);
+            if (locationElement != null) {
+                int safeOffset = Math.max(0, Math.min(locationElement.getTextOffset(), Math.max(0, document.getTextLength() - 1)));
+                lineNumber = document.getLineNumber(safeOffset) + 1;
+                context = CollectedLocationContextResolver.resolve(project, document, safeOffset, safeOffset, false);
+            } else if (document.getLineCount() > 0) {
+                lineNumber = 1;
+            }
         }
 
         return new LocationInfo(absolutePath, lineNumber, context);
