@@ -56,17 +56,30 @@ public final class CollectedUsageFormatterTestRunner {
                 java.util.List<String> reads = new java.util.ArrayList<String>();
                 reads.add("- (ab)= [read] `value`  (at /tmp/x.go:2)");
                 grouped.put("read", reads);
-                assertEquals("Usages:\n[call]\n- (aa)= [call] `foo()`  (at /tmp/x.go:1)\n[read]\n- (ab)= [read] `value`  (at /tmp/x.go:2)\n",
+                assertEquals("- Usages:\n- [call]\n  - (aa)= [call] `foo()`  (at /tmp/x.go:1)\n- [read]\n  - (ab)= [read] `value`  (at /tmp/x.go:2)\n",
                         CollectedUsageFormatter.formatBlock("Usages", grouped),
                         "usage blocks should emit category headings");
+            }
+        });
+
+        run("usage block keeps descriptive title", new Runnable() {
+            @Override
+            public void run() {
+                java.util.Map<String, java.util.List<String>> grouped = new java.util.LinkedHashMap<String, java.util.List<String>>();
+                java.util.List<String> refs = new java.util.ArrayList<String>();
+                refs.add("- (aa)= [reference] `loadWidgetIds()`  (at /tmp/x.go:1)");
+                grouped.put("reference", refs);
+                assertEquals("- Usages (method `loadWidgetIds`):\n- [reference]\n  - (aa)= [reference] `loadWidgetIds()`  (at /tmp/x.go:1)\n",
+                        CollectedUsageFormatter.formatBlock("Usages (method `loadWidgetIds`)", grouped),
+                        "usage title should preserve the described target");
             }
         });
 
         run("usage section block keeps entries on separate indented lines", new Runnable() {
             @Override
             public void run() {
-                assertEquals("Usages:\n  [call]\n  - (aa)= [call] `foo()`  (at /tmp/x.go:1)",
-                        CollectedUsageFormatter.formatSectionBlock("Usages:\n[call]\n- (aa)= [call] `foo()`  (at /tmp/x.go:1)\n"),
+                assertEquals("- Usages:\n  - [call]\n    - (aa)= [call] `foo()`  (at /tmp/x.go:1)",
+                        CollectedUsageFormatter.formatSectionBlock("- Usages:\n- [call]\n  - (aa)= [call] `foo()`  (at /tmp/x.go:1)\n"),
                         "usage section block should keep one usage per line with indentation");
             }
         });

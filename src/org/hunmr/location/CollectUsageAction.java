@@ -18,14 +18,18 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import com.intellij.usages.ReadWriteAccessUsage;
 import com.intellij.usages.Usage;
+import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageInfo2UsageAdapter;
 import com.intellij.usages.UsageView;
 import com.intellij.usages.UsageViewManager;
+import com.intellij.usages.UsageViewPresentation;
 import com.intellij.usages.impl.rules.UsageType;
 import com.intellij.usages.impl.rules.UsageTypeProvider;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageInFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiNamedElement;
 import org.hunmr.options.PluginConfig;
 import javax.swing.JComponent;
 import java.awt.Component;
@@ -99,7 +103,7 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             return;
         }
 
-        String block = CollectedUsageFormatter.formatBlock("Usages", groupedEntries);
+        String block = CollectedUsageFormatter.formatBlock(buildUsageBlockTitle(project, usageView), groupedEntries);
         String updatedText = CollectedPromptFormatter.appendToContextSection(
                 existingEntries,
                 USAGES_SECTION,
@@ -429,6 +433,162 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             return "other";
         }
         normalized = normalized.replace(' ', '-');
+        return normalized;
+    }
+
+    private static String buildUsageBlockTitle(Project project, UsageView usageView) {
+        String targetDescription = resolveUsageTargetDescription(project, usageView);
+        if (targetDescription.isEmpty()) {
+            return "Usages";
+        }
+        return "Usages (" + targetDescription + ")";
+    }
+
+    private static String resolveUsageTargetDescription(Project project, UsageView usageView) {
+        UsageTarget[] usageTargets = getUsageTargets(usageView);
+        if (usageTargets != null) {
+            for (int i = 0; i < usageTargets.length; i++) {
+                String description = describeUsageTarget(project, usageTargets[i]);
+                if (!description.isEmpty()) {
+                    return description;
+                }
+            }
+        }
+
+        UsageViewPresentation presentation = usageView == null ? null : usageView.getPresentation();
+        if (presentation == null) {
+            return "";
+        }
+
+        String[] candidates = {
+                presentation.getTargetsNodeText(),
+                presentation.getTabText(),
+                presentation.getTabName(),
+                presentation.getSearchString()
+        };
+        for (int i = 0; i < candidates.length; i++) {
+            String normalized = normalizeUsagePresentationText(candidates[i]);
+            if (!normalized.isEmpty()) {
+                return normalized;
+            }
+        }
+        return "";
+    }
+
+    private static UsageTarget[] getUsageTargets(UsageView usageView) {
+        if (usageView == null || usageView.getComponent() == null) {
+            return null;
+        }
+        return UsageView.USAGE_TARGETS_KEY.getData(DataManager.getInstance().getDataContext(usageView.getComponent()));
+    }
+
+    private static String describeUsageTarget(Project project, UsageTarget usageTarget) {
+        if (usageTarget == null || !usageTarget.isValid()) {
+            return "";
+        }
+
+        if (usageTarget instanceof PsiElement) {
+            PsiElement element = (PsiElement) usageTarget;
+            String structured = describePsiElement(project, element);
+            if (!structured.isEmpty()) {
+                return structured;
+            }
+        }
+
+        String name = usageTarget.getName();
+        if (name != null && !name.trim().isEmpty()) {
+            return "`" + name.trim() + "`";
+        }
+
+        return normalizeUsagePresentationText(String.valueOf(usageTarget));
+    }
+
+    private static String describePsiElement(Project project, PsiElement element) {
+        if (element == null || !element.isValid()) {
+            return "";
+        }
+
+        if (element instanceof PsiNamedElement) {
+            String name = ((PsiNamedElement) element).getName();
+            String kind = inferKind(element);
+            if (name != null && !name.trim().isEmpty() && !kind.isEmpty()) {
+                return kind + " `" + name.trim() + "`";
+            }
+            if (name != null && !name.trim().isEmpty()) {
+                return "`" + name.trim() + "`";
+            }
+        }
+
+        CollectedLocationContext context = resolveUsageTargetContext(project, element);
+        if (context.hasSymbol()) {
+            return context.getSymbolKind() + " `" + context.getSymbolName() + "`";
+        }
+
+        return "";
+    }
+
+    private static CollectedLocationContext resolveUsageTargetContext(Project project, PsiElement element) {
+        if (project == null || element == null) {
+            return CollectedLocationContext.EMPTY;
+        }
+
+        PsiFile file = element.getContainingFile();
+        VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
+        Document document = virtualFile == null ? null : FileDocumentManager.getInstance().getDocument(virtualFile);
+        if (document == null) {
+            return CollectedLocationContext.EMPTY;
+        }
+
+        int offset = Math.max(0, element.getTextOffset());
+        return CollectedLocationContextResolver.resolve(project, document, offset, offset, false);
+    }
+
+    private static String inferKind(PsiElement element) {
+        String simpleName = element.getClass().getSimpleName().toLowerCase();
+        if (simpleName.contains("method")) {
+            return "method";
+        }
+        if (simpleName.contains("function")) {
+            return "function";
+        }
+        if (simpleName.contains("class")) {
+            return "class";
+        }
+        if (simpleName.contains("interface")) {
+            return "interface";
+        }
+        if (simpleName.contains("struct")) {
+            return "struct";
+        }
+        if (simpleName.contains("field")) {
+            return "field";
+        }
+        if (simpleName.contains("type")) {
+            return "type";
+        }
+        return "";
+    }
+
+    private static String normalizeUsagePresentationText(String text) {
+        String safeText = text == null ? "" : text.trim();
+        if (safeText.isEmpty()) {
+            return "";
+        }
+
+        String normalized = safeText;
+        normalized = normalized.replaceFirst("(?i)^find\\s+usages\\s+of\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^usages\\s+of\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^usage\\s+of\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^methods?\\s+to\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^functions?\\s+to\\s+", "");
+        normalized = normalized.trim();
+        if (normalized.isEmpty()) {
+            return "";
+        }
+
+        if (normalized.indexOf('`') >= 0) {
+            return normalized;
+        }
         return normalized;
     }
 

@@ -236,6 +236,32 @@ public final class CollectedLocationFormatterTestRunner {
                         "duplicate check should ignore the auto label");
             }
         });
+
+        run("location duplicate ignores reasons", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n- <a>= struct `WidgetCache` in package `pkg/cache`  (at /tmp/cache.go:18) \\n reason: field type of `WidgetService.widgetCache`\n\nTask:\n- \n\nConstraints:\n- \n";
+                assertTrue(CollectedLocationFormatter.containsDuplicate(
+                                existing,
+                                "- <b>= struct `WidgetCache` in package `pkg/cache`  (at /tmp/cache.go:18) \\n reason: referenced variable type"
+                        ),
+                        "duplicate check should ignore reason text");
+            }
+        });
+
+        run("merge duplicate entry adds first reason when missing", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n- <a>= struct `widgetChannelInfo` in package `pkg/stats`  (at /tmp/stats.go:250)\n\nTask:\n- \n\nConstraints:\n- \n";
+                String merged = CollectedLocationFormatter.mergeDuplicateEntry(
+                        existing,
+                        "- <b>= struct `widgetChannelInfo` in package `pkg/stats`  (at /tmp/stats.go:250) \\n reason: named element type \\n reason: referenced variable type"
+                );
+                assertEquals("Context:\n\n- <a>= struct `widgetChannelInfo` in package `pkg/stats`  (at /tmp/stats.go:250) \\n reason: named element type\n\nTask:\n- \n\nConstraints:\n- \n",
+                        merged,
+                        "first reason should be merged into the existing duplicate entry");
+            }
+        });
     }
 
     private static void run(String name, Runnable test) {

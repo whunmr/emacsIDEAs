@@ -38,14 +38,14 @@ public final class CollectedUsageFormatter {
 
     public static String formatBlock(String title, java.util.Map<String, java.util.List<String>> groupedEntries) {
         StringBuilder builder = new StringBuilder();
-        builder.append(title).append(":\n");
+        builder.append("- ").append(title).append(":\n");
         for (java.util.Map.Entry<String, java.util.List<String>> entry : groupedEntries.entrySet()) {
             if (entry.getValue() == null || entry.getValue().isEmpty()) {
                 continue;
             }
-            builder.append('[').append(entry.getKey()).append("]\n");
+            builder.append("- [").append(entry.getKey()).append("]\n");
             for (String line : entry.getValue()) {
-                builder.append(line).append('\n');
+                builder.append("  ").append(line).append('\n');
             }
         }
         return builder.toString();

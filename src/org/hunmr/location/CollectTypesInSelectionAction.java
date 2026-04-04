@@ -78,12 +78,13 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
                 CollectedOutputFileManager.getCurrentText(project),
                 config._promptHeader
         );
+        String mergedEntries = existingEntries;
         String nextLabel = CollectedLocationFormatter.nextLabel(existingEntries);
         int nextIndex = decodeLabel(nextLabel);
         StringBuilder contextBlock = new StringBuilder();
-        StringBuilder duplicateProbe = new StringBuilder(existingEntries);
         boolean matchedAnyType = false;
         boolean skippedDuplicate = false;
+        boolean mergedExistingEntry = false;
 
         for (TypeLocation location : collectedTypes.values()) {
             if (!matchesProjectFilter(project, config._collectTypesInSelectionProjectOnly, location.absolutePath)) {
@@ -112,23 +113,35 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
                 lineBuilder.append(" \\n reason: ").append(reason);
             }
             String finalEntry = lineBuilder.toString();
-            if (CollectedLocationFormatter.containsDuplicate(duplicateProbe.toString(), finalEntry)) {
+            String updatedMergedEntries = CollectedLocationFormatter.mergeDuplicateEntry(mergedEntries, finalEntry);
+            if (!updatedMergedEntries.equals(mergedEntries)) {
+                mergedEntries = updatedMergedEntries;
+                mergedExistingEntry = true;
+                skippedDuplicate = true;
+                continue;
+            }
+
+            String duplicateProbeText = mergedEntries + (contextBlock.length() == 0 ? "" : "\n" + contextBlock.toString());
+            if (CollectedLocationFormatter.containsDuplicate(duplicateProbeText, finalEntry)) {
                 skippedDuplicate = true;
                 continue;
             }
 
             contextBlock.append(finalEntry).append('\n');
-            duplicateProbe.append('\n').append(finalEntry);
         }
 
         if (contextBlock.length() == 0) {
+            if (mergedExistingEntry) {
+                CollectLocationsAction.writeOutput(project, editor, mergedEntries);
+                return;
+            }
             HintManager.getInstance().showInformationHint(editor, matchedAnyType && skippedDuplicate
                     ? "Already exists"
                     : "No Go types matched selection filters");
             return;
         }
 
-        String updatedText = CollectedPromptFormatter.appendToContext(existingEntries, contextBlock.toString());
+        String updatedText = CollectedPromptFormatter.appendToContext(mergedEntries, contextBlock.toString());
         CollectLocationsAction.writeOutput(project, editor, updatedText);
     }
 
