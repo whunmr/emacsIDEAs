@@ -68,6 +68,24 @@ public final class CollectedUsageFormatter {
         return builder.toString();
     }
 
+    static String describeUsagePresentation(String targetsNodeText,
+                                           String searchString,
+                                           String tabText,
+                                           String tabName) {
+        String kind = extractUsagePresentationKind(targetsNodeText);
+        String name = firstNonEmptyUsageName(searchString, tabText, tabName);
+        if (!kind.isEmpty() && !name.isEmpty()) {
+            return kind + " " + name;
+        }
+        if (!name.isEmpty()) {
+            return name;
+        }
+        if (!kind.isEmpty()) {
+            return kind;
+        }
+        return firstNonEmptyPresentationText(targetsNodeText, tabText, tabName, searchString);
+    }
+
     private static String formatContainer(CollectedLocationContext context) {
         CollectedLocationContext safeContext = context == null ? CollectedLocationContext.EMPTY : context;
         if (safeContext.hasContainer()) {
@@ -109,6 +127,125 @@ public final class CollectedUsageFormatter {
             return "aa";
         }
         return safeLabel;
+    }
+
+    private static String extractUsagePresentationKind(String text) {
+        String normalized = normalizeUsagePresentationText(text);
+        if (normalized.isEmpty()) {
+            return "";
+        }
+
+        String lowerCase = normalized.toLowerCase();
+        if ("method".equals(lowerCase) || "methods".equals(lowerCase)) {
+            return "Method";
+        }
+        if ("function".equals(lowerCase) || "functions".equals(lowerCase)) {
+            return "Function";
+        }
+        if ("class".equals(lowerCase) || "classes".equals(lowerCase)) {
+            return "Class";
+        }
+        if ("interface".equals(lowerCase) || "interfaces".equals(lowerCase)) {
+            return "Interface";
+        }
+        if ("struct".equals(lowerCase) || "structs".equals(lowerCase)) {
+            return "Struct";
+        }
+        if ("type".equals(lowerCase) || "types".equals(lowerCase)) {
+            return "Type";
+        }
+        if ("field".equals(lowerCase) || "fields".equals(lowerCase)) {
+            return "Field";
+        }
+
+        if (normalized.length() == 1) {
+            return normalized.toUpperCase();
+        }
+        return Character.toUpperCase(normalized.charAt(0)) + normalized.substring(1);
+    }
+
+    private static String firstNonEmptyUsageName(String... candidates) {
+        if (candidates == null) {
+            return "";
+        }
+
+        for (int i = 0; i < candidates.length; i++) {
+            String usageName = normalizeUsageTargetName(candidates[i]);
+            if (!usageName.isEmpty()) {
+                return usageName;
+            }
+        }
+        return "";
+    }
+
+    private static String firstNonEmptyPresentationText(String... candidates) {
+        if (candidates == null) {
+            return "";
+        }
+
+        for (int i = 0; i < candidates.length; i++) {
+            String normalized = normalizeUsagePresentationText(candidates[i]);
+            if (!normalized.isEmpty()) {
+                return normalized;
+            }
+        }
+        return "";
+    }
+
+    private static String normalizeUsageTargetName(String text) {
+        String normalized = normalizeUsagePresentationText(text);
+        if (normalized.isEmpty()) {
+            return "";
+        }
+
+        normalized = normalized.replaceFirst("(?i)\\s+in\\s+all\\s+places\\s*$", "");
+        normalized = normalized.replaceFirst("(?i)\\s+in\\s+project\\s*$", "");
+        normalized = normalized.replaceFirst("(?i)\\s+in\\s+.*$", "");
+        normalized = normalized.replaceFirst("(?i)^methods?\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^functions?\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^classes?\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^interfaces?\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^structs?\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^types?\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^fields?\\s+", "");
+        normalized = normalized.trim();
+
+        String lowerCase = normalized.toLowerCase();
+        if (normalized.isEmpty()
+                || "method".equals(lowerCase)
+                || "function".equals(lowerCase)
+                || "class".equals(lowerCase)
+                || "interface".equals(lowerCase)
+                || "struct".equals(lowerCase)
+                || "type".equals(lowerCase)
+                || "field".equals(lowerCase)) {
+            return "";
+        }
+
+        return normalized;
+    }
+
+    private static String normalizeUsagePresentationText(String text) {
+        String safeText = text == null ? "" : text.trim();
+        if (safeText.isEmpty()) {
+            return "";
+        }
+
+        String normalized = safeText;
+        normalized = normalized.replaceFirst("(?i)^find\\s+usages\\s+of\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^usages\\s+of\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^usage\\s+of\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^methods?\\s+to\\s+", "");
+        normalized = normalized.replaceFirst("(?i)^functions?\\s+to\\s+", "");
+        normalized = normalized.trim();
+        if (normalized.isEmpty()) {
+            return "";
+        }
+
+        if (normalized.indexOf('`') >= 0) {
+            return normalized;
+        }
+        return normalized;
     }
 
     private static String trimTrailingLineBreaks(String text) {

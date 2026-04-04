@@ -83,6 +83,20 @@ public final class CollectedUsageFormatterTestRunner {
                         "usage section block should keep one usage per line with indentation");
             }
         });
+
+        run("usage title extracts name from presentation", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("Method fetchWidgetMap",
+                        CollectedUsageFormatter.describeUsagePresentation(
+                                "Method",
+                                "fetchWidgetMap",
+                                "fetchWidgetMap in All Places",
+                                ""
+                        ),
+                        "usage title should combine kind and symbol name from the usage presentation");
+            }
+        });
     }
 
     private static void run(String name, Runnable test) {

@@ -291,7 +291,8 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
 
     private static void writeOutput(Project project, AnActionEvent e, String text, int collectedCount) {
         try {
-            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, text);
+            Editor editor = e == null ? null : e.getData(CommonDataKeys.EDITOR);
+            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, text, editor);
             String path = outputFile == null ? "tmp output file" : outputFile.getPath();
             showMessage(e, project, "Collected " + collectedCount + " usages into " + path);
         } catch (java.io.IOException exception) {
@@ -445,6 +446,17 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
     }
 
     private static String resolveUsageTargetDescription(Project project, UsageView usageView) {
+        UsageViewPresentation presentation = usageView == null ? null : usageView.getPresentation();
+        String presentationDescription = CollectedUsageFormatter.describeUsagePresentation(
+                presentation == null ? null : presentation.getTargetsNodeText(),
+                presentation == null ? null : presentation.getSearchString(),
+                presentation == null ? null : presentation.getTabText(),
+                presentation == null ? null : presentation.getTabName()
+        );
+        if (!presentationDescription.isEmpty()) {
+            return presentationDescription;
+        }
+
         UsageTarget[] usageTargets = getUsageTargets(usageView);
         if (usageTargets != null) {
             for (int i = 0; i < usageTargets.length; i++) {
@@ -455,24 +467,16 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             }
         }
 
-        UsageViewPresentation presentation = usageView == null ? null : usageView.getPresentation();
         if (presentation == null) {
             return "";
         }
 
-        String[] candidates = {
+        return firstNonEmptyPresentationText(
                 presentation.getTargetsNodeText(),
                 presentation.getTabText(),
                 presentation.getTabName(),
                 presentation.getSearchString()
-        };
-        for (int i = 0; i < candidates.length; i++) {
-            String normalized = normalizeUsagePresentationText(candidates[i]);
-            if (!normalized.isEmpty()) {
-                return normalized;
-            }
-        }
-        return "";
+        );
     }
 
     private static UsageTarget[] getUsageTargets(UsageView usageView) {
@@ -590,6 +594,20 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             return normalized;
         }
         return normalized;
+    }
+
+    private static String firstNonEmptyPresentationText(String... candidates) {
+        if (candidates == null) {
+            return "";
+        }
+
+        for (int i = 0; i < candidates.length; i++) {
+            String normalized = normalizeUsagePresentationText(candidates[i]);
+            if (!normalized.isEmpty()) {
+                return normalized;
+            }
+        }
+        return "";
     }
 
     private static final class UsageLineInfo {

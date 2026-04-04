@@ -106,9 +106,7 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                 CollectedCallHierarchyFormatter.formatSectionBlock(block)
         );
         try {
-            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, updatedText);
-            String path = outputFile == null ? "tmp output file" : outputFile.getPath();
-            showMessage(editor, project, "Collected call hierarchy into " + path);
+            CollectedOutputFileManager.replaceAndOpen(project, updatedText, editor);
         } catch (IOException exception) {
             showMessage(editor, project, "Failed to write collected call hierarchy: " + exception.getMessage());
         }
