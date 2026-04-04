@@ -81,6 +81,9 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
         String nextLabel = CollectedLocationFormatter.nextLabel(existingEntries);
         int nextIndex = decodeLabel(nextLabel);
         StringBuilder contextBlock = new StringBuilder();
+        StringBuilder duplicateProbe = new StringBuilder(existingEntries);
+        boolean matchedAnyType = false;
+        boolean skippedDuplicate = false;
 
         for (TypeLocation location : collectedTypes.values()) {
             if (!matchesProjectFilter(project, config._collectTypesInSelectionProjectOnly, location.absolutePath)) {
@@ -89,6 +92,7 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
             if (!matchesFilters(location.importPath, includeFilters, excludeFilters)) {
                 continue;
             }
+            matchedAnyType = true;
 
             String label = encodeLabel(nextIndex++);
             String entry = CollectedLocationFormatter.formatEntry(
@@ -107,11 +111,20 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
             for (String reason : location.reasons) {
                 lineBuilder.append(" \\n reason: ").append(reason);
             }
-            contextBlock.append(lineBuilder).append('\n');
+            String finalEntry = lineBuilder.toString();
+            if (CollectedLocationFormatter.containsDuplicate(duplicateProbe.toString(), finalEntry)) {
+                skippedDuplicate = true;
+                continue;
+            }
+
+            contextBlock.append(finalEntry).append('\n');
+            duplicateProbe.append('\n').append(finalEntry);
         }
 
         if (contextBlock.length() == 0) {
-            HintManager.getInstance().showInformationHint(editor, "No Go types matched selection filters");
+            HintManager.getInstance().showInformationHint(editor, matchedAnyType && skippedDuplicate
+                    ? "Already exists"
+                    : "No Go types matched selection filters");
             return;
         }
 
