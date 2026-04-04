@@ -184,7 +184,8 @@ public final class CollectedPromptFormatter {
 
         String beforeSection = trimmedContext.substring(0, sectionIndex);
         String sectionBody = trimmedContext.substring(sectionIndex);
-        return trimTrailingLineBreaks(beforeSection) + "\n\n" + trimTrailingLineBreaks(sectionBody) + "\n" + sectionLine + '\n';
+        String separator = sectionLine.indexOf('\n') >= 0 ? "\n\n" : "\n";
+        return trimTrailingLineBreaks(beforeSection) + "\n\n" + trimTrailingLineBreaks(sectionBody) + separator + sectionLine + '\n';
     }
 
     private static String extractContextPart(String template) {

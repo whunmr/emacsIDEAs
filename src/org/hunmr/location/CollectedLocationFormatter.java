@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 public final class CollectedLocationFormatter {
     private static final Pattern LABEL_PATTERN = Pattern.compile("(?m)^-?\\s*<([a-z]+)>=");
+    private static final String REASON_MARKER = " \\n reason: ";
 
     private CollectedLocationFormatter() {
     }
@@ -39,7 +40,12 @@ public final class CollectedLocationFormatter {
 
     public static String duplicateKey(String entry) {
         String safeEntry = stripTrailingLineBreaks(entry == null ? "" : entry).trim();
-        return safeEntry.replaceFirst("^-\\s*<[a-z]+>=\\s*", "");
+        String withoutLabel = safeEntry.replaceFirst("^-\\s*<[a-z]+>=\\s*", "");
+        int reasonIndex = withoutLabel.indexOf(REASON_MARKER);
+        if (reasonIndex >= 0) {
+            return withoutLabel.substring(0, reasonIndex).trim();
+        }
+        return withoutLabel;
     }
 
     public static boolean containsDuplicate(String promptText, String entry) {
@@ -56,6 +62,32 @@ public final class CollectedLocationFormatter {
             }
         }
         return false;
+    }
+
+    public static String mergeDuplicateEntry(String promptText, String entry) {
+        String safePromptText = promptText == null ? "" : promptText;
+        String safeEntry = stripTrailingLineBreaks(entry == null ? "" : entry);
+        String targetKey = duplicateKey(safeEntry);
+        if (targetKey.isEmpty() || safePromptText.isEmpty()) {
+            return safePromptText;
+        }
+
+        String normalized = safePromptText.replace("\r\n", "\n").replace('\r', '\n');
+        String[] lines = normalized.split("\n", -1);
+        for (int i = 0; i < lines.length; i++) {
+            if (!targetKey.equals(duplicateKey(lines[i]))) {
+                continue;
+            }
+
+            String merged = mergeReason(lines[i], safeEntry);
+            if (!merged.equals(lines[i])) {
+                lines[i] = merged;
+                return joinLines(lines);
+            }
+            return safePromptText;
+        }
+
+        return safePromptText;
     }
 
     public static String formatEntry(String label,
@@ -138,6 +170,34 @@ public final class CollectedLocationFormatter {
         return "```" + inlineLineBreaks(firstLines(safeSelectedText, 3)) + "```";
     }
 
+    private static String mergeReason(String existingLine, String newEntry) {
+        String safeExistingLine = stripTrailingLineBreaks(existingLine == null ? "" : existingLine);
+        if (safeExistingLine.indexOf(REASON_MARKER) >= 0) {
+            return safeExistingLine;
+        }
+
+        int reasonIndex = stripTrailingLineBreaks(newEntry == null ? "" : newEntry).indexOf(REASON_MARKER);
+        if (reasonIndex < 0) {
+            return safeExistingLine;
+        }
+
+        String firstReason = extractFirstReason(newEntry.substring(reasonIndex + REASON_MARKER.length()));
+        if (firstReason.isEmpty()) {
+            return safeExistingLine;
+        }
+
+        return safeExistingLine + REASON_MARKER + firstReason;
+    }
+
+    private static String extractFirstReason(String text) {
+        String safeText = text == null ? "" : text;
+        int nextReasonIndex = safeText.indexOf(REASON_MARKER);
+        if (nextReasonIndex >= 0) {
+            return safeText.substring(0, nextReasonIndex).trim();
+        }
+        return safeText.trim();
+    }
+
     private static boolean containsSelectedText(String symbolDescription, String selectedText) {
         String safeDescription = symbolDescription == null ? "" : symbolDescription;
         String safeSelectedText = selectedText == null ? "" : selectedText.trim();
@@ -205,6 +265,21 @@ public final class CollectedLocationFormatter {
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < count && i < lines.length; i++) {
+            if (i > 0) {
+                builder.append('\n');
+            }
+            builder.append(lines[i]);
+        }
+        return builder.toString();
+    }
+
+    private static String joinLines(String[] lines) {
+        if (lines == null || lines.length == 0) {
+            return "";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
             if (i > 0) {
                 builder.append('\n');
             }

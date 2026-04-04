@@ -29,6 +29,7 @@ import org.hunmr.common.SimpleEditorAction;
 import org.hunmr.options.PluginConfig;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -77,9 +78,13 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
                 CollectedOutputFileManager.getCurrentText(project),
                 config._promptHeader
         );
+        String mergedEntries = existingEntries;
         String nextLabel = CollectedLocationFormatter.nextLabel(existingEntries);
         int nextIndex = decodeLabel(nextLabel);
         StringBuilder contextBlock = new StringBuilder();
+        boolean matchedAnyType = false;
+        boolean skippedDuplicate = false;
+        boolean mergedExistingEntry = false;
 
         for (TypeLocation location : collectedTypes.values()) {
             if (!matchesProjectFilter(project, config._collectTypesInSelectionProjectOnly, location.absolutePath)) {
@@ -88,6 +93,7 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
             if (!matchesFilters(location.importPath, includeFilters, excludeFilters)) {
                 continue;
             }
+            matchedAnyType = true;
 
             String label = encodeLabel(nextIndex++);
             String entry = CollectedLocationFormatter.formatEntry(
@@ -106,15 +112,36 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
             for (String reason : location.reasons) {
                 lineBuilder.append(" \\n reason: ").append(reason);
             }
-            contextBlock.append(lineBuilder).append('\n');
+            String finalEntry = lineBuilder.toString();
+            String updatedMergedEntries = CollectedLocationFormatter.mergeDuplicateEntry(mergedEntries, finalEntry);
+            if (!updatedMergedEntries.equals(mergedEntries)) {
+                mergedEntries = updatedMergedEntries;
+                mergedExistingEntry = true;
+                skippedDuplicate = true;
+                continue;
+            }
+
+            String duplicateProbeText = mergedEntries + (contextBlock.length() == 0 ? "" : "\n" + contextBlock.toString());
+            if (CollectedLocationFormatter.containsDuplicate(duplicateProbeText, finalEntry)) {
+                skippedDuplicate = true;
+                continue;
+            }
+
+            contextBlock.append(finalEntry).append('\n');
         }
 
         if (contextBlock.length() == 0) {
-            HintManager.getInstance().showInformationHint(editor, "No Go types matched selection filters");
+            if (mergedExistingEntry) {
+                CollectLocationsAction.writeOutput(project, editor, mergedEntries);
+                return;
+            }
+            HintManager.getInstance().showInformationHint(editor, matchedAnyType && skippedDuplicate
+                    ? "Already exists"
+                    : "No Go types matched selection filters");
             return;
         }
 
-        String updatedText = CollectedPromptFormatter.appendToContext(existingEntries, contextBlock.toString());
+        String updatedText = CollectedPromptFormatter.appendToContext(mergedEntries, contextBlock.toString());
         CollectLocationsAction.writeOutput(project, editor, updatedText);
     }
 
@@ -279,11 +306,28 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
         }
 
         if (type instanceof GoSpecType) {
-            GoTypeSpec typeSpec = ((GoSpecType) type).getTypeSpec();
+            GoTypeSpec typeSpec = resolveTypeSpec(type);
             if (typeSpec != null) {
                 addResolvedType(project, typeSpec, reason, collectedTypes);
             }
         }
+    }
+
+    private static GoTypeSpec resolveTypeSpec(GoType type) {
+        if (type == null) {
+            return null;
+        }
+
+        try {
+            Method method = type.getClass().getMethod("getTypeSpec");
+            Object value = method.invoke(type);
+            if (value instanceof GoTypeSpec) {
+                return (GoTypeSpec) value;
+            }
+        } catch (Exception ignored) {
+        }
+
+        return PsiTreeUtil.getParentOfType(type, GoTypeSpec.class, false);
     }
 
     private static void addResolvedType(Project project,

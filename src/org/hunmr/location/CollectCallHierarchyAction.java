@@ -19,6 +19,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import org.hunmr.options.PluginConfig;
@@ -29,7 +30,12 @@ import javax.swing.tree.TreePath;
 import java.awt.Component;
 import java.awt.Container;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CollectCallHierarchyAction extends com.intellij.openapi.project.DumbAwareAction {
     private static final String CALL_HIERARCHY_SECTION = "[Call Hierarchy]";
@@ -70,10 +76,11 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                 PluginConfig.getInstance()._promptHeader
         );
         StringBuilder collectedEntries = new StringBuilder();
-        appendTreeRows(project, tree, relation, collectedEntries);
+        StringBuilder debugInfo = new StringBuilder();
+        appendTreeRows(project, tree, relation, collectedEntries, debugInfo);
 
         if (collectedEntries.length() == 0) {
-            showMessage(editor, project, "Current Call Hierarchy view has no visible rows to collect");
+            showMessage(editor, project, "Current Call Hierarchy view has no visible rows to collect; " + debugInfo.toString());
             return;
         }
 
@@ -87,17 +94,19 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                 "caller".equals(relation) ? collectedEntries.toString() : "",
                 "callee".equals(relation) ? collectedEntries.toString() : ""
         );
-        String sectionEntry = CollectedCallHierarchyFormatter.formatSectionEntry(block);
+        String sectionEntry = CollectedCallHierarchyFormatter.formatSectionBlock(block);
         if (CollectedPromptFormatter.contextSectionContainsLine(existingEntries, CALL_HIERARCHY_SECTION, sectionEntry)) {
             showMessage(editor, project, "Already exists");
             return;
         }
 
-        String updatedText = CollectedPromptFormatter.appendToContextSection(existingEntries, CALL_HIERARCHY_SECTION, sectionEntry);
+        String updatedText = CollectedPromptFormatter.appendToContextSection(
+                existingEntries,
+                CALL_HIERARCHY_SECTION,
+                CollectedCallHierarchyFormatter.formatSectionBlock(block)
+        );
         try {
-            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, updatedText);
-            String path = outputFile == null ? "tmp output file" : outputFile.getPath();
-            showMessage(editor, project, "Collected call hierarchy into " + path);
+            CollectedOutputFileManager.replaceAndOpen(project, updatedText, editor);
         } catch (IOException exception) {
             showMessage(editor, project, "Failed to write collected call hierarchy: " + exception.getMessage());
         }
@@ -106,19 +115,20 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
     private static void appendTreeRows(Project project,
                                        JTree tree,
                                        String relation,
-                                       StringBuilder builder) {
+                                       StringBuilder builder,
+                                       StringBuilder debugInfo) {
         for (int row = 1; row < tree.getRowCount(); row++) {
             TreePath treePath = tree.getPathForRow(row);
             if (treePath == null) {
+                appendDebugInfo(debugInfo, "r" + row + ":path=null");
                 continue;
             }
 
-            PsiElement element = extractPsiElement(treePath.getLastPathComponent());
-            if (element == null || !element.isValid()) {
-                continue;
-            }
-
-            LocationInfo locationInfo = buildLocationInfo(project, element);
+            Object rowNode = treePath.getLastPathComponent();
+            HierarchyNodeDescriptor descriptor = extractHierarchyDescriptor(rowNode);
+            PsiElement element = extractPsiElement(rowNode);
+            LocationInfo locationInfo = buildLocationInfo(project, element, descriptor);
+            appendDebugInfo(debugInfo, buildRowDebug(row, rowNode, descriptor, element, locationInfo));
             if (locationInfo == null) {
                 continue;
             }
@@ -133,6 +143,58 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
     }
 
+    private static void appendDebugInfo(StringBuilder debugInfo, String entry) {
+        if (debugInfo == null || entry == null || entry.isEmpty()) {
+            return;
+        }
+        int existingCount = 0;
+        for (int i = 0; i < debugInfo.length(); i++) {
+            if (debugInfo.charAt(i) == ';') {
+                existingCount++;
+            }
+        }
+        if (existingCount >= 3) {
+            return;
+        }
+        if (debugInfo.length() > 0) {
+            debugInfo.append("; ");
+        }
+        debugInfo.append(entry);
+    }
+
+    private static String buildRowDebug(int row,
+                                        Object rowNode,
+                                        HierarchyNodeDescriptor descriptor,
+                                        PsiElement element,
+                                        LocationInfo locationInfo) {
+        PsiElement descriptorElement = descriptor == null ? null : coercePsiElement(descriptor.getElement());
+        PsiElement normalizedElement = normalizeLocationElement(element);
+        PsiElement normalizedDescriptorElement = normalizeLocationElement(descriptorElement);
+        PsiFile descriptorFile = descriptor == null ? null : descriptor.getContainingFile();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("r").append(row)
+                .append("[n=").append(simpleName(rowNode))
+                .append(",d=").append(simpleName(descriptor))
+                .append(",e=").append(simpleName(element))
+                .append(",ne=").append(simpleName(normalizedElement))
+                .append(",de=").append(simpleName(descriptorElement))
+                .append(",nde=").append(simpleName(normalizedDescriptorElement))
+                .append(",df=").append(descriptorFile != null ? "Y" : "N")
+                .append(",loc=").append(locationInfo != null ? "Y" : "N")
+                .append("]");
+        return builder.toString();
+    }
+
+    private static String simpleName(Object value) {
+        if (value == null) {
+            return "-";
+        }
+        Class<?> type = value instanceof Class ? (Class<?>) value : value.getClass();
+        String simpleName = type.getSimpleName();
+        return simpleName == null || simpleName.isEmpty() ? type.getName() : simpleName;
+    }
+
     private static CallHierarchyView findCurrentCallHierarchyView(Project project) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.HIERARCHY);
         if (toolWindow == null) {
@@ -140,16 +202,43 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         ContentManager contentManager = toolWindow.getContentManagerIfCreated();
-        if (contentManager == null) {
+        if (contentManager != null) {
+            Content selectedContent = contentManager.getSelectedContent();
+            CallHierarchyView selectedView = toCallHierarchyView(selectedContent);
+            if (selectedView != null) {
+                return selectedView;
+            }
+
+            Content[] contents = contentManager.getContents();
+            for (int i = 0; i < contents.length; i++) {
+                if (contents[i] == selectedContent) {
+                    continue;
+                }
+
+                CallHierarchyView contentView = toCallHierarchyView(contents[i]);
+                if (contentView != null) {
+                    return contentView;
+                }
+            }
+        }
+
+        HierarchyBrowserBaseEx browser = findHierarchyBrowserInComponent(getToolWindowComponent(toolWindow));
+        if (browser instanceof CallHierarchyBrowserBase) {
+            JTree tree = getCurrentTree(browser);
+            if (tree != null) {
+                return new CallHierarchyView((CallHierarchyBrowserBase) browser, tree, getCurrentViewType(browser));
+            }
+        }
+
+        return null;
+    }
+
+    private static CallHierarchyView toCallHierarchyView(Content content) {
+        if (content == null) {
             return null;
         }
 
-        Content selectedContent = contentManager.getSelectedContent();
-        if (selectedContent == null) {
-            return null;
-        }
-
-        HierarchyBrowserBaseEx browser = getHierarchyBrowser(selectedContent);
+        HierarchyBrowserBaseEx browser = getHierarchyBrowser(content);
         if (!(browser instanceof CallHierarchyBrowserBase)) {
             return null;
         }
@@ -177,6 +266,10 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return null;
         }
 
+        if (component instanceof HierarchyBrowserBaseEx) {
+            return (HierarchyBrowserBaseEx) component;
+        }
+
         HierarchyBrowserBaseEx browser = HierarchyBrowserBaseEx.HIERARCHY_BROWSER.getData(
                 DataManager.getInstance().getDataContext(component)
         );
@@ -195,6 +288,11 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         return null;
+    }
+
+    private static Component getToolWindowComponent(ToolWindow toolWindow) {
+        Object value = invokeNoArgMethod(toolWindow, "getComponent");
+        return value instanceof Component ? (Component) value : null;
     }
 
     private static JTree getCurrentTree(HierarchyBrowserBaseEx browser) {
@@ -223,35 +321,91 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
     }
 
     private static PsiElement extractPsiElement(Object node) {
-        if (node instanceof PsiElement) {
-            return (PsiElement) node;
+        PsiElement direct = coercePsiElement(node);
+        if (direct != null) {
+            return direct;
         }
 
         if (node instanceof HierarchyNodeDescriptor) {
-            Object value = ((HierarchyNodeDescriptor) node).getElement();
-            if (value instanceof PsiElement) {
-                return (PsiElement) value;
+            PsiElement descriptorPsiElement = coercePsiElement(invokeNoArgMethod(node, "getPsiElement"));
+            if (descriptorPsiElement != null) {
+                return descriptorPsiElement;
+            }
+
+            PsiElement descriptorReferenceElement = extractReferenceElement((HierarchyNodeDescriptor) node);
+            if (descriptorReferenceElement != null) {
+                return descriptorReferenceElement;
+            }
+
+            PsiElement descriptorElement = coercePsiElement(((HierarchyNodeDescriptor) node).getElement());
+            if (descriptorElement != null) {
+                return descriptorElement;
             }
         }
 
         Object descriptor = invokeNoArgMethod(node, "getDescriptor");
+        PsiElement descriptorElement = coercePsiElement(descriptor);
+        if (descriptorElement != null) {
+            return descriptorElement;
+        }
         if (descriptor instanceof HierarchyNodeDescriptor) {
-            Object value = ((HierarchyNodeDescriptor) descriptor).getElement();
-            if (value instanceof PsiElement) {
-                return (PsiElement) value;
+            PsiElement hierarchyDescriptorPsiElement = coercePsiElement(invokeNoArgMethod(descriptor, "getPsiElement"));
+            if (hierarchyDescriptorPsiElement != null) {
+                return hierarchyDescriptorPsiElement;
+            }
+
+            PsiElement hierarchyDescriptorReferenceElement = extractReferenceElement((HierarchyNodeDescriptor) descriptor);
+            if (hierarchyDescriptorReferenceElement != null) {
+                return hierarchyDescriptorReferenceElement;
+            }
+
+            PsiElement hierarchyDescriptorElement = coercePsiElement(((HierarchyNodeDescriptor) descriptor).getElement());
+            if (hierarchyDescriptorElement != null) {
+                return hierarchyDescriptorElement;
             }
         }
 
         Object userObject = invokeNoArgMethod(node, "getUserObject");
+        PsiElement userObjectElement = coercePsiElement(userObject);
+        if (userObjectElement != null) {
+            return userObjectElement;
+        }
         if (userObject instanceof HierarchyNodeDescriptor) {
-            Object value = ((HierarchyNodeDescriptor) userObject).getElement();
-            if (value instanceof PsiElement) {
-                return (PsiElement) value;
+            PsiElement hierarchyUserObjectPsiElement = coercePsiElement(invokeNoArgMethod(userObject, "getPsiElement"));
+            if (hierarchyUserObjectPsiElement != null) {
+                return hierarchyUserObjectPsiElement;
+            }
+
+            PsiElement hierarchyUserObjectReferenceElement = extractReferenceElement((HierarchyNodeDescriptor) userObject);
+            if (hierarchyUserObjectReferenceElement != null) {
+                return hierarchyUserObjectReferenceElement;
+            }
+
+            PsiElement hierarchyUserObjectElement = coercePsiElement(((HierarchyNodeDescriptor) userObject).getElement());
+            if (hierarchyUserObjectElement != null) {
+                return hierarchyUserObjectElement;
             }
         }
 
-        Object value = invokeNoArgMethod(node, "getElement");
-        return value instanceof PsiElement ? (PsiElement) value : null;
+        return coercePsiElement(invokeNoArgMethod(node, "getElement"));
+    }
+
+    private static HierarchyNodeDescriptor extractHierarchyDescriptor(Object node) {
+        if (node instanceof HierarchyNodeDescriptor) {
+            return (HierarchyNodeDescriptor) node;
+        }
+
+        Object descriptor = invokeNoArgMethod(node, "getDescriptor");
+        if (descriptor instanceof HierarchyNodeDescriptor) {
+            return (HierarchyNodeDescriptor) descriptor;
+        }
+
+        Object userObject = invokeNoArgMethod(node, "getUserObject");
+        if (userObject instanceof HierarchyNodeDescriptor) {
+            return (HierarchyNodeDescriptor) userObject;
+        }
+
+        return null;
     }
 
     private static CollectedLocationContext resolveContext(Project project, PsiElement element) {
@@ -259,19 +413,37 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return CollectedLocationContext.EMPTY;
         }
 
+        PsiElement locationElement = normalizeLocationElement(element);
         PsiFile file = element.getContainingFile();
+        if (locationElement != null) {
+            file = locationElement.getContainingFile();
+        }
         VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
         Document document = virtualFile == null ? null : FileDocumentManager.getInstance().getDocument(virtualFile);
         if (document == null) {
             return CollectedLocationContext.EMPTY;
         }
 
-        int offset = Math.max(0, element.getTextOffset());
+        int offset = Math.max(0, locationElement == null ? element.getTextOffset() : locationElement.getTextOffset());
         return CollectedLocationContextResolver.resolve(project, document, offset, offset, false);
     }
 
-    private static LocationInfo buildLocationInfo(Project project, PsiElement element) {
-        PsiFile file = element.getContainingFile();
+    private static LocationInfo buildLocationInfo(Project project, PsiElement element, HierarchyNodeDescriptor descriptor) {
+        PsiElement locationElement = normalizeLocationElement(element);
+        if (locationElement == null && descriptor != null) {
+            locationElement = normalizeLocationElement(coercePsiElement(invokeNoArgMethod(descriptor, "getPsiElement")));
+        }
+        if (locationElement == null && descriptor != null) {
+            locationElement = normalizeLocationElement(extractReferenceElement(descriptor));
+        }
+        if (locationElement == null && descriptor != null) {
+            locationElement = normalizeLocationElement(coercePsiElement(descriptor.getElement()));
+        }
+
+        PsiFile file = locationElement == null ? null : locationElement.getContainingFile();
+        if (file == null && descriptor != null) {
+            file = descriptor.getContainingFile();
+        }
         VirtualFile virtualFile = file == null ? null : file.getVirtualFile();
         if (virtualFile == null) {
             return null;
@@ -282,9 +454,13 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         int lineNumber = 0;
         CollectedLocationContext context = CollectedLocationContext.EMPTY;
         if (document != null) {
-            int safeOffset = Math.max(0, Math.min(element.getTextOffset(), Math.max(0, document.getTextLength() - 1)));
-            lineNumber = document.getLineNumber(safeOffset) + 1;
-            context = CollectedLocationContextResolver.resolve(project, document, safeOffset, safeOffset, false);
+            if (locationElement != null) {
+                int safeOffset = Math.max(0, Math.min(locationElement.getTextOffset(), Math.max(0, document.getTextLength() - 1)));
+                lineNumber = document.getLineNumber(safeOffset) + 1;
+                context = CollectedLocationContextResolver.resolve(project, document, safeOffset, safeOffset, false);
+            } else if (document.getLineCount() > 0) {
+                lineNumber = 1;
+            }
         }
 
         return new LocationInfo(absolutePath, lineNumber, context);
@@ -305,6 +481,153 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         return "`<unknown>`";
     }
 
+    private static PsiElement normalizeLocationElement(PsiElement element) {
+        PsiElement candidate = coercePsiElement(element);
+        if (hasPhysicalLocation(candidate)) {
+            return candidate;
+        }
+
+        PsiElement navigationElement = candidate == null ? null : coercePsiElement(candidate.getNavigationElement());
+        if (hasPhysicalLocation(navigationElement)) {
+            return navigationElement;
+        }
+
+        PsiElement originalElement = candidate == null ? null : coercePsiElement(candidate.getOriginalElement());
+        if (hasPhysicalLocation(originalElement)) {
+            return originalElement;
+        }
+
+        if (candidate != null && candidate.isValid()) {
+            return candidate;
+        }
+        if (navigationElement != null && navigationElement.isValid()) {
+            return navigationElement;
+        }
+        if (originalElement != null && originalElement.isValid()) {
+            return originalElement;
+        }
+        return null;
+    }
+
+    private static boolean hasPhysicalLocation(PsiElement element) {
+        if (element == null || !element.isValid()) {
+            return false;
+        }
+        PsiFile file = element.getContainingFile();
+        return file != null && file.getVirtualFile() != null;
+    }
+
+    private static PsiElement coercePsiElement(Object value) {
+        return coercePsiElement(value, new IdentityHashMap<Object, Boolean>());
+    }
+
+    private static PsiElement coercePsiElement(Object value, Map<Object, Boolean> visited) {
+        if (value == null) {
+            return null;
+        }
+        if (visited.containsKey(value)) {
+            return null;
+        }
+        visited.put(value, Boolean.TRUE);
+
+        if (value instanceof PsiElement) {
+            return (PsiElement) value;
+        }
+        if (value instanceof SmartPsiElementPointer) {
+            Object pointerElement = ((SmartPsiElementPointer<?>) value).getElement();
+            return coercePsiElement(pointerElement, visited);
+        }
+        if (value instanceof HierarchyNodeDescriptor) {
+            PsiElement psiElement = coercePsiElement(invokeNoArgMethod(value, "getPsiElement"), visited);
+            if (psiElement != null) {
+                return psiElement;
+            }
+
+            PsiElement referenceElement = extractReferenceElement((HierarchyNodeDescriptor) value);
+            if (referenceElement != null) {
+                return referenceElement;
+            }
+
+            PsiElement element = coercePsiElement(((HierarchyNodeDescriptor) value).getElement(), visited);
+            if (element != null) {
+                return element;
+            }
+        }
+        if (value instanceof Collection) {
+            for (Object item : (Collection<?>) value) {
+                PsiElement element = coercePsiElement(item, visited);
+                if (element != null) {
+                    return element;
+                }
+            }
+        }
+        if (value instanceof Object[]) {
+            Object[] array = (Object[]) value;
+            for (int i = 0; i < array.length; i++) {
+                PsiElement element = coercePsiElement(array[i], visited);
+                if (element != null) {
+                    return element;
+                }
+            }
+        }
+
+        String[] accessorNames = {"getPsiElement", "getElement", "getTargetElement", "getNavigationElement", "getOriginalElement"};
+        for (int i = 0; i < accessorNames.length; i++) {
+            Object nested = invokeNoArgMethod(value, accessorNames[i]);
+            if (nested == value) {
+                continue;
+            }
+            PsiElement element = coercePsiElement(nested, visited);
+            if (element != null) {
+                return element;
+            }
+        }
+
+        return null;
+    }
+
+    private static PsiElement extractReferenceElement(HierarchyNodeDescriptor descriptor) {
+        if (descriptor == null) {
+            return null;
+        }
+
+        Object fieldValue = getFieldValue(descriptor, "myReferencePointers");
+        if (!(fieldValue instanceof List)) {
+            return null;
+        }
+
+        List<?> pointers = (List<?>) fieldValue;
+        for (int i = 0; i < pointers.size(); i++) {
+            PsiElement element = coercePsiElement(pointers.get(i));
+            if (element != null) {
+                PsiElement parent = element.getParent();
+                if (parent != null && parent.isValid()) {
+                    return parent;
+                }
+                return element;
+            }
+        }
+        return null;
+    }
+
+    private static Object getFieldValue(Object target, String fieldName) {
+        if (target == null || fieldName == null || fieldName.isEmpty()) {
+            return null;
+        }
+
+        Class<?> current = target.getClass();
+        while (current != null) {
+            try {
+                Field field = current.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return field.get(target);
+            } catch (Exception ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        return null;
+    }
+
     private static void showMessage(Editor editor, Project project, String message) {
         if (editor != null && !editor.isDisposed()) {
             HintManager.getInstance().showInformationHint(editor, message);
@@ -321,12 +644,27 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         try {
-            Method method = target.getClass().getDeclaredMethod(methodName);
+            Method method = findNoArgMethod(target.getClass(), methodName);
+            if (method == null) {
+                return null;
+            }
             method.setAccessible(true);
             return method.invoke(target);
         } catch (Exception ignored) {
             return null;
         }
+    }
+
+    private static Method findNoArgMethod(Class<?> type, String methodName) {
+        Class<?> current = type;
+        while (current != null) {
+            try {
+                return current.getDeclaredMethod(methodName);
+            } catch (NoSuchMethodException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        return null;
     }
 
     private static final class LocationInfo {

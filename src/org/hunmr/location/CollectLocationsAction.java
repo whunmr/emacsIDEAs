@@ -107,7 +107,7 @@ public class CollectLocationsAction extends SimpleEditorAction {
 
     static void writeOutput(Project project, Editor editor, String text) {
         try {
-            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, text);
+            VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, text, editor);
             String path = outputFile == null ? "tmp output file" : outputFile.getPath();
             HintManager.getInstance().showInformationHint(editor, "Collected into " + path);
         } catch (IOException exception) {

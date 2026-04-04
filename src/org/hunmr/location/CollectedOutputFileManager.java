@@ -3,6 +3,9 @@ package org.hunmr.location;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -10,6 +13,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.IdeFocusManager;
 
 import javax.swing.SwingConstants;
 import java.io.File;
@@ -45,7 +49,11 @@ public final class CollectedOutputFileManager {
     }
 
     public static VirtualFile appendAndOpen(Project project, String text) throws IOException {
-        return replaceAndOpen(project, mergeCurrentText(project, text));
+        return replaceAndOpen(project, mergeCurrentText(project, text), null);
+    }
+
+    public static VirtualFile appendAndOpen(Project project, String text, Editor sourceEditor) throws IOException {
+        return replaceAndOpen(project, mergeCurrentText(project, text), sourceEditor);
     }
 
     public static Path getOutputDirectoryPath() {
@@ -58,22 +66,32 @@ public final class CollectedOutputFileManager {
     }
 
     public static VirtualFile replaceAndOpen(Project project, String text) throws IOException {
+        return replaceAndOpen(project, text, null);
+    }
+
+    public static VirtualFile replaceAndOpen(Project project, String text, Editor sourceEditor) throws IOException {
         if (project == null || text == null || text.isEmpty()) {
             return null;
         }
 
-        VirtualFile outputFile = findOpenOutputFile(project);
-        if (outputFile == null) {
-            outputFile = createNewOutputFile(project);
-            openInRightSplit(project, outputFile);
-        }
+        FocusRestoreState focusRestoreState = FocusRestoreState.capture(project, sourceEditor);
+        VirtualFile outputFile = null;
+        try {
+            outputFile = findOpenOutputFile(project);
+            if (outputFile == null) {
+                outputFile = createNewOutputFile(project);
+                openInRightSplit(project, outputFile);
+            }
 
-        replaceText(project, outputFile, text);
-        Document document = getOrCreateDocument(outputFile);
-        if (document != null) {
-            FileDocumentManager.getInstance().saveDocument(document);
+            replaceText(project, outputFile, text);
+            Document document = getOrCreateDocument(outputFile);
+            if (document != null) {
+                FileDocumentManager.getInstance().saveDocument(document);
+            }
+            return outputFile;
+        } finally {
+            focusRestoreState.restore(project);
         }
-        return outputFile;
     }
 
     private static String mergeCurrentText(Project project, String appendedText) {
@@ -172,5 +190,81 @@ public final class CollectedOutputFileManager {
 
     private static Path getOutputDirectory(Project project) {
         return getOutputDirectoryPath();
+    }
+
+    private static final class FocusRestoreState {
+        private final VirtualFile file;
+        private final int caretOffset;
+        private final boolean hasSelection;
+        private final int selectionStart;
+        private final int selectionEnd;
+
+        private FocusRestoreState(VirtualFile file,
+                                  int caretOffset,
+                                  boolean hasSelection,
+                                  int selectionStart,
+                                  int selectionEnd) {
+            this.file = file;
+            this.caretOffset = caretOffset;
+            this.hasSelection = hasSelection;
+            this.selectionStart = selectionStart;
+            this.selectionEnd = selectionEnd;
+        }
+
+        private static FocusRestoreState capture(Project project, Editor sourceEditor) {
+            Editor editor = isUsableEditor(sourceEditor) ? sourceEditor : FileEditorManager.getInstance(project).getSelectedTextEditor();
+            if (!isUsableEditor(editor)) {
+                return new FocusRestoreState(null, 0, false, 0, 0);
+            }
+
+            VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+            if (file == null || !file.isValid() || isCollectedOutputFile(file)) {
+                return new FocusRestoreState(null, 0, false, 0, 0);
+            }
+
+            SelectionModel selectionModel = editor.getSelectionModel();
+            return new FocusRestoreState(
+                    file,
+                    editor.getCaretModel().getOffset(),
+                    selectionModel.hasSelection(),
+                    selectionModel.getSelectionStart(),
+                    selectionModel.getSelectionEnd()
+            );
+        }
+
+        private void restore(Project project) {
+            if (project == null || file == null || !file.isValid()) {
+                return;
+            }
+
+            Editor editor = FileEditorManager.getInstance(project).openTextEditor(
+                    new OpenFileDescriptor(project, file, Math.max(0, caretOffset)),
+                    true
+            );
+            if (!isUsableEditor(editor)) {
+                return;
+            }
+
+            Document document = editor.getDocument();
+            int textLength = document.getTextLength();
+            int safeCaretOffset = Math.max(0, Math.min(caretOffset, textLength));
+            editor.getCaretModel().moveToOffset(safeCaretOffset);
+
+            SelectionModel selectionModel = editor.getSelectionModel();
+            if (hasSelection) {
+                int safeSelectionStart = Math.max(0, Math.min(selectionStart, textLength));
+                int safeSelectionEnd = Math.max(safeSelectionStart, Math.min(selectionEnd, textLength));
+                selectionModel.setSelection(safeSelectionStart, safeSelectionEnd);
+            } else {
+                selectionModel.removeSelection();
+            }
+
+            editor.getScrollingModel().scrollToCaret(ScrollType.MAKE_VISIBLE);
+            IdeFocusManager.getGlobalInstance().requestFocus(editor.getContentComponent(), true);
+        }
+
+        private static boolean isUsableEditor(Editor editor) {
+            return editor != null && !editor.isDisposed();
+        }
     }
 }
