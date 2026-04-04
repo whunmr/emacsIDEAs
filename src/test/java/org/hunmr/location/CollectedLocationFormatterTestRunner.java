@@ -159,6 +159,23 @@ public final class CollectedLocationFormatterTestRunner {
             }
         });
 
+        run("context section duplicate detection supports multiline usage blocks", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Usages]\n- Usages (Method buildPlan):\n" +
+                        "  - [reference]\n" +
+                        "    - (aa)= [reference] `runPlan()` located in { function `buildPlan` }  (at /tmp/dummy.go:9)" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                String block = "- Usages (Method buildPlan):\n" +
+                        "  - [reference]\n" +
+                        "    - (aa)= [reference] `runPlan()` located in { function `buildPlan` }  (at /tmp/dummy.go:9)";
+                assertTrue(
+                        CollectedPromptFormatter.contextSectionContainsLine(existing, "[Usages]", block),
+                        "multiline usage block duplicates should be detected"
+                );
+            }
+        });
+
         run("single line entry includes content and line", new Runnable() {
             @Override
             public void run() {

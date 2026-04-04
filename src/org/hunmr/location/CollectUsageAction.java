@@ -104,10 +104,16 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         }
 
         String block = CollectedUsageFormatter.formatBlock(buildUsageBlockTitle(project, usageView), groupedEntries);
+        String sectionEntry = CollectedUsageFormatter.formatSectionBlock(block);
+        if (CollectedPromptFormatter.contextSectionContainsLine(existingEntries, USAGES_SECTION, sectionEntry)) {
+            showMessage(e, project, "Already exists");
+            return;
+        }
+
         String updatedText = CollectedPromptFormatter.appendToContextSection(
                 existingEntries,
                 USAGES_SECTION,
-                CollectedUsageFormatter.formatSectionBlock(block)
+                sectionEntry
         );
         writeOutput(project, e, updatedText, collectedCount);
     }
