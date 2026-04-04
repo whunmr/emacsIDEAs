@@ -29,6 +29,7 @@ import org.hunmr.common.SimpleEditorAction;
 import org.hunmr.options.PluginConfig;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -279,11 +280,28 @@ public class CollectTypesInSelectionAction extends SimpleEditorAction {
         }
 
         if (type instanceof GoSpecType) {
-            GoTypeSpec typeSpec = ((GoSpecType) type).getTypeSpec();
+            GoTypeSpec typeSpec = resolveTypeSpec(type);
             if (typeSpec != null) {
                 addResolvedType(project, typeSpec, reason, collectedTypes);
             }
         }
+    }
+
+    private static GoTypeSpec resolveTypeSpec(GoType type) {
+        if (type == null) {
+            return null;
+        }
+
+        try {
+            Method method = type.getClass().getMethod("getTypeSpec");
+            Object value = method.invoke(type);
+            if (value instanceof GoTypeSpec) {
+                return (GoTypeSpec) value;
+            }
+        } catch (Exception ignored) {
+        }
+
+        return PsiTreeUtil.getParentOfType(type, GoTypeSpec.class, false);
     }
 
     private static void addResolvedType(Project project,
