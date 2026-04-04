@@ -361,12 +361,27 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         try {
-            Method method = target.getClass().getDeclaredMethod(methodName);
+            Method method = findNoArgMethod(target.getClass(), methodName);
+            if (method == null) {
+                return null;
+            }
             method.setAccessible(true);
             return method.invoke(target);
         } catch (Exception ignored) {
             return null;
         }
+    }
+
+    private static Method findNoArgMethod(Class<?> type, String methodName) {
+        Class<?> current = type;
+        while (current != null) {
+            try {
+                return current.getDeclaredMethod(methodName);
+            } catch (NoSuchMethodException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        return null;
     }
 
     private static final class LocationInfo {
