@@ -131,7 +131,7 @@
       <br/>
 
       <p><b>AI coding context collection</b></p>
-      <p>emacsJump can also collect code context into a temporary prompt file for Claude/Codex style workflows. The collected file is organized as <b>Context</b>, <b>Task</b>, and <b>Constraints</b>. All collected entries are appended into the <b>Context</b> section, and each collected item is kept on a single line so it can be copied into AI prompts easily.</p>
+      <p>emacsJump can also collect code context into a temporary prompt file for Claude/Codex style workflows. The collected file is organized as <b>Context</b>, <b>Problem</b>, <b>Desired Outcome</b>, <b>Task</b>, and <b>Constraints</b>. All collected entries are appended into the <b>Context</b> section, and each collected item is kept on a single line so it can be copied into AI prompts easily.</p>
       <ul>
           <li><b>F3 - CollectLocations</b>  :  collect the current caret line or current selection as a labeled context item such as <b>- &lt;a&gt;= method `handleShowMarkersKey` in class `Main`  (at /abs/path/Main.java:78)</b>. Use this for the exact place to change, a reference implementation, or a related symbol.</li>
           <li><b>F4 - CollectUsages</b>  :  collect the active, non-excluded entries from the latest Find Usages window, grouped by usage category such as <b>call</b>, <b>read</b>, <b>write</b>, or <b>reference</b>. This is useful when asking AI to update a symbol and check its impact area.</li>
@@ -145,7 +145,7 @@
           <li>Use <b>F5</b> before a behavior change to show who calls the method and what the method calls, which is especially useful for refactors and bug fixes.</li>
           <li>Use <b>F6</b> on a Go code selection when AI needs surrounding data model context, interfaces, or field-related types to make a safe change.</li>
       </ul>
-      <p><b>Example prompt:</b> <b>Context:</b> [collected by F3-F6] <b>Task:</b> add the validation logic from &lt;a&gt; to &lt;b&gt; and update all affected usages from the collected context. <b>Constraints:</b> keep public API unchanged and minimize duplicate code.</p>
+      <p><b>Example prompt:</b> <b>Context:</b> [collected by F3-F6] <b>Problem:</b> current validation is missing on the target path. <b>Desired Outcome:</b> reuse the behavior from &lt;a&gt; and keep outputs aligned. <b>Task:</b> add the validation logic from &lt;a&gt; to &lt;b&gt; and update all affected usages from the collected context. <b>Constraints:</b> keep public API unchanged and minimize duplicate code.</p>
       <br/>
 
       <br/>
