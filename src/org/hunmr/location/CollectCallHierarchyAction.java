@@ -144,16 +144,43 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         ContentManager contentManager = toolWindow.getContentManagerIfCreated();
-        if (contentManager == null) {
+        if (contentManager != null) {
+            Content selectedContent = contentManager.getSelectedContent();
+            CallHierarchyView selectedView = toCallHierarchyView(selectedContent);
+            if (selectedView != null) {
+                return selectedView;
+            }
+
+            Content[] contents = contentManager.getContents();
+            for (int i = 0; i < contents.length; i++) {
+                if (contents[i] == selectedContent) {
+                    continue;
+                }
+
+                CallHierarchyView contentView = toCallHierarchyView(contents[i]);
+                if (contentView != null) {
+                    return contentView;
+                }
+            }
+        }
+
+        HierarchyBrowserBaseEx browser = findHierarchyBrowserInComponent(getToolWindowComponent(toolWindow));
+        if (browser instanceof CallHierarchyBrowserBase) {
+            JTree tree = getCurrentTree(browser);
+            if (tree != null) {
+                return new CallHierarchyView((CallHierarchyBrowserBase) browser, tree, getCurrentViewType(browser));
+            }
+        }
+
+        return null;
+    }
+
+    private static CallHierarchyView toCallHierarchyView(Content content) {
+        if (content == null) {
             return null;
         }
 
-        Content selectedContent = contentManager.getSelectedContent();
-        if (selectedContent == null) {
-            return null;
-        }
-
-        HierarchyBrowserBaseEx browser = getHierarchyBrowser(selectedContent);
+        HierarchyBrowserBaseEx browser = getHierarchyBrowser(content);
         if (!(browser instanceof CallHierarchyBrowserBase)) {
             return null;
         }
@@ -181,6 +208,10 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
             return null;
         }
 
+        if (component instanceof HierarchyBrowserBaseEx) {
+            return (HierarchyBrowserBaseEx) component;
+        }
+
         HierarchyBrowserBaseEx browser = HierarchyBrowserBaseEx.HIERARCHY_BROWSER.getData(
                 DataManager.getInstance().getDataContext(component)
         );
@@ -199,6 +230,11 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         return null;
+    }
+
+    private static Component getToolWindowComponent(ToolWindow toolWindow) {
+        Object value = invokeNoArgMethod(toolWindow, "getComponent");
+        return value instanceof Component ? (Component) value : null;
     }
 
     private static JTree getCurrentTree(HierarchyBrowserBaseEx browser) {
