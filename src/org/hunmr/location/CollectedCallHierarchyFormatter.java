@@ -33,8 +33,21 @@ public final class CollectedCallHierarchyFormatter {
         return builder.toString();
     }
 
-    public static String formatSectionEntry(String block) {
-        return "- ```" + inlineLineBreaks(trimTrailingLineBreaks(block)) + "```";
+    public static String formatSectionBlock(String block) {
+        String trimmedBlock = trimTrailingLineBreaks(block);
+        if (trimmedBlock.isEmpty()) {
+            return "";
+        }
+
+        String[] lines = trimmedBlock.replace("\r\n", "\n").replace('\r', '\n').split("\n");
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            if (i > 0) {
+                builder.append('\n').append("  ");
+            }
+            builder.append(lines[i]);
+        }
+        return builder.toString();
     }
 
     private static String formatContext(CollectedLocationContext context) {
@@ -75,8 +88,4 @@ public final class CollectedCallHierarchyFormatter {
         return safeText.substring(0, end);
     }
 
-    private static String inlineLineBreaks(String text) {
-        String normalized = (text == null ? "" : text).replace("\r\n", "\n").replace('\r', '\n');
-        return normalized.replace("\n", "\\n ");
-    }
 }

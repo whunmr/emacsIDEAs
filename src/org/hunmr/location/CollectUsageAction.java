@@ -4,8 +4,9 @@ import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.TextRange;
@@ -102,7 +103,7 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         String updatedText = CollectedPromptFormatter.appendToContextSection(
                 existingEntries,
                 USAGES_SECTION,
-                CollectedUsageFormatter.formatSectionEntry(block)
+                CollectedUsageFormatter.formatSectionBlock(block)
         );
         writeOutput(project, e, updatedText, collectedCount);
     }
@@ -273,12 +274,15 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
     }
 
     private static void showMessage(AnActionEvent e, Project project, String message) {
-        if (e != null && e.getData(CommonDataKeys.EDITOR) != null) {
-            HintManager.getInstance().showInformationHint(e.getData(CommonDataKeys.EDITOR), message);
+        Editor editor = e == null ? null : e.getData(CommonDataKeys.EDITOR);
+        if (editor != null && !editor.isDisposed()) {
+            HintManager.getInstance().showInformationHint(editor, message);
             return;
         }
 
-        Messages.showInfoMessage(project, message, "emacsJump");
+        if (project != null) {
+            ToolWindowManager.getInstance(project).notifyByBalloon(ToolWindowId.FIND, MessageType.INFO, message);
+        }
     }
 
     private static void writeOutput(Project project, AnActionEvent e, String text, int collectedCount) {

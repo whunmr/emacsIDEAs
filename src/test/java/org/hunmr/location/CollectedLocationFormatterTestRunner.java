@@ -118,6 +118,30 @@ public final class CollectedLocationFormatterTestRunner {
             }
         });
 
+        run("context section append separates multiline usage blocks", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Usages]\nUsages:\n  [call]\n  - (aa)= foo" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n[Usages]\nUsages:\n  [call]\n  - (aa)= foo\n\nUsages:\n  [read]\n  - (ab)= bar" +
+                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContextSection(existing, "[Usages]", "Usages:\n  [read]\n  - (ab)= bar"),
+                        "multiline usage blocks should be separated by a blank line");
+            }
+        });
+
+        run("context section append separates multiline call hierarchy blocks", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Call Hierarchy]\nCall hierarchy:\n  [incoming callers]\n  [caller]= foo" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n[Call Hierarchy]\nCall hierarchy:\n  [incoming callers]\n  [caller]= foo\n\nCall hierarchy:\n  [outgoing callees]\n  [callee]= bar" +
+                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContextSection(existing, "[Call Hierarchy]", "Call hierarchy:\n  [outgoing callees]\n  [callee]= bar"),
+                        "multiline call hierarchy blocks should be separated by a blank line");
+            }
+        });
+
         run("single line entry includes content and line", new Runnable() {
             @Override
             public void run() {

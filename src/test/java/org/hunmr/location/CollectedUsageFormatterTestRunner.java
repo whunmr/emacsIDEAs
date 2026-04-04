@@ -62,12 +62,12 @@ public final class CollectedUsageFormatterTestRunner {
             }
         });
 
-        run("usage section entry is folded into one line", new Runnable() {
+        run("usage section block keeps entries on separate indented lines", new Runnable() {
             @Override
             public void run() {
-                assertEquals("- ```Usages:\\n [call]\\n - (aa)= [call] `foo()`  (at /tmp/x.go:1)```",
-                        CollectedUsageFormatter.formatSectionEntry("Usages:\n[call]\n- (aa)= [call] `foo()`  (at /tmp/x.go:1)\n"),
-                        "usage section entry should stay on one line");
+                assertEquals("Usages:\n  [call]\n  - (aa)= [call] `foo()`  (at /tmp/x.go:1)",
+                        CollectedUsageFormatter.formatSectionBlock("Usages:\n[call]\n- (aa)= [call] `foo()`  (at /tmp/x.go:1)\n"),
+                        "usage section block should keep one usage per line with indentation");
             }
         });
     }

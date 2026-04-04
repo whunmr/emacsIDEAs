@@ -281,6 +281,7 @@
   <idea-version since-build="213.7172.48" until-build="213.*"/>
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
+  <depends>org.jetbrains.plugins.go</depends>
 
   <actions>
     <group id="emacsIDEAs" text="emacsJump" description="emacsJump">

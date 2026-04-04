@@ -87,13 +87,17 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
                 "caller".equals(relation) ? collectedEntries.toString() : "",
                 "callee".equals(relation) ? collectedEntries.toString() : ""
         );
-        String sectionEntry = CollectedCallHierarchyFormatter.formatSectionEntry(block);
+        String sectionEntry = CollectedCallHierarchyFormatter.formatSectionBlock(block);
         if (CollectedPromptFormatter.contextSectionContainsLine(existingEntries, CALL_HIERARCHY_SECTION, sectionEntry)) {
             showMessage(editor, project, "Already exists");
             return;
         }
 
-        String updatedText = CollectedPromptFormatter.appendToContextSection(existingEntries, CALL_HIERARCHY_SECTION, sectionEntry);
+        String updatedText = CollectedPromptFormatter.appendToContextSection(
+                existingEntries,
+                CALL_HIERARCHY_SECTION,
+                CollectedCallHierarchyFormatter.formatSectionBlock(block)
+        );
         try {
             VirtualFile outputFile = CollectedOutputFileManager.replaceAndOpen(project, updatedText);
             String path = outputFile == null ? "tmp output file" : outputFile.getPath();

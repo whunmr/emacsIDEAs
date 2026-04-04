@@ -26,12 +26,12 @@ public final class CollectedCallHierarchyFormatterTestRunner {
             }
         });
 
-        run("hierarchy section entry is folded into one line", new Runnable() {
+        run("hierarchy section block keeps entries on separate indented lines", new Runnable() {
             @Override
             public void run() {
-                assertEquals("- ```Call hierarchy:\\n [incoming callers]\\n [caller] method `caller`  (at /tmp/x.java:10)```",
-                        CollectedCallHierarchyFormatter.formatSectionEntry("Call hierarchy:\n[incoming callers]\n[caller] method `caller`  (at /tmp/x.java:10)\n"),
-                        "section entry should stay on one line");
+                assertEquals("Call hierarchy:\n  [incoming callers]\n  [caller] method `caller`  (at /tmp/x.java:10)",
+                        CollectedCallHierarchyFormatter.formatSectionBlock("Call hierarchy:\n[incoming callers]\n[caller] method `caller`  (at /tmp/x.java:10)\n"),
+                        "hierarchy section block should keep one entry per line with indentation");
             }
         });
     }
