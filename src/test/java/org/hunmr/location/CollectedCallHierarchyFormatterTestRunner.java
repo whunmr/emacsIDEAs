@@ -2,19 +2,12 @@ package org.hunmr.location;
 
 public final class CollectedCallHierarchyFormatterTestRunner {
     public static void main(String[] args) {
-        run("hierarchy labels start at aa", new Runnable() {
-            @Override
-            public void run() {
-                assertEquals("aa", CollectedCallHierarchyFormatter.nextLabel(""), "first hierarchy label should be aa");
-            }
-        });
-
         run("hierarchy entry includes relation and container", new Runnable() {
             @Override
             public void run() {
                 CollectedLocationContext context = new CollectedLocationContext("method", "buildPlan", "class", "Main");
-                assertEquals("- (aa)= [caller] method `buildPlan` in class `Main`  (at /tmp/x.java:18)",
-                        CollectedCallHierarchyFormatter.formatEntry("aa", "caller", context, "/tmp/x.java", 18),
+                assertEquals("[caller] method `buildPlan` in class `Main`  (at /tmp/x.java:18)",
+                        CollectedCallHierarchyFormatter.formatEntry("caller", context, "/tmp/x.java", 18),
                         "hierarchy entry should include relation and symbol context");
             }
         });
@@ -24,12 +17,21 @@ public final class CollectedCallHierarchyFormatterTestRunner {
             public void run() {
                 String block = CollectedCallHierarchyFormatter.formatBlock(
                         "method `buildPlan`",
-                        "- (aa)= [caller] method `caller`  (at /tmp/x.java:10)\n",
-                        "- (ab)= [callee] method `callee`  (at /tmp/x.java:20)\n"
+                        "[caller depth-1] method `caller`  (at /tmp/x.java:10)\n",
+                        "[callee depth-1] method `callee`  (at /tmp/x.java:20)\n"
                 );
-                assertEquals("Call hierarchy for method `buildPlan`:\n[incoming callers]\n- (aa)= [caller] method `caller`  (at /tmp/x.java:10)\n[outgoing callees]\n- (ab)= [callee] method `callee`  (at /tmp/x.java:20)\n",
+                assertEquals("Call hierarchy for method `buildPlan`:\n[incoming callers]\n[caller depth-1] method `caller`  (at /tmp/x.java:10)\n[outgoing callees]\n[callee depth-1] method `callee`  (at /tmp/x.java:20)\n",
                         block,
                         "hierarchy block should keep incoming and outgoing sections");
+            }
+        });
+
+        run("hierarchy section entry is folded into one line", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("- ```Call hierarchy:\\n [incoming callers]\\n [caller] method `caller`  (at /tmp/x.java:10)```",
+                        CollectedCallHierarchyFormatter.formatSectionEntry("Call hierarchy:\n[incoming callers]\n[caller] method `caller`  (at /tmp/x.java:10)\n"),
+                        "section entry should stay on one line");
             }
         });
     }

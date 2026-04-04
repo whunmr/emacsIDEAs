@@ -37,6 +37,27 @@ public final class CollectedLocationFormatter {
         return builder.toString();
     }
 
+    public static String duplicateKey(String entry) {
+        String safeEntry = stripTrailingLineBreaks(entry == null ? "" : entry).trim();
+        return safeEntry.replaceFirst("^-\\s*<[a-z]+>=\\s*", "");
+    }
+
+    public static boolean containsDuplicate(String promptText, String entry) {
+        String safePromptText = promptText == null ? "" : promptText;
+        String targetKey = duplicateKey(entry);
+        if (targetKey.isEmpty()) {
+            return false;
+        }
+
+        String[] lines = safePromptText.replace("\r\n", "\n").replace('\r', '\n').split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            if (targetKey.equals(duplicateKey(lines[i]))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String formatEntry(String label,
                                      String selectedText,
                                      String absolutePath,

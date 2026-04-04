@@ -43,6 +43,25 @@ public final class CollectedLocationFormatterTestRunner {
             }
         });
 
+        run("prompt header is prepended before template", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("My prompt header\n\nContext:\n\nTask:\n- \n\nConstraints:\n- \n",
+                        CollectedPromptFormatter.withPromptHeader("", "My prompt header"),
+                        "prompt header should be added before the generated template");
+            }
+        });
+
+        run("prompt header is not duplicated", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "My prompt header\n\nContext:\n\n- <a>= first\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals(existing,
+                        CollectedPromptFormatter.withPromptHeader(existing, "My prompt header"),
+                        "prompt header should not be inserted twice");
+            }
+        });
+
         run("context append inserts before task section", new Runnable() {
             @Override
             public void run() {
@@ -50,6 +69,52 @@ public final class CollectedLocationFormatterTestRunner {
                 assertEquals("Context:\n\n- <a>= first\n- <b>= second\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
                         CollectedPromptFormatter.appendToContext(existing, "- <b>= second\n"),
                         "new context entries should appear before Task");
+            }
+        });
+
+        run("context append keeps entries before call hierarchy section", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n- <a>= first\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
+                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContext(existing, "- <a>= first\n"),
+                        "locations should be inserted before the call hierarchy section");
+            }
+        });
+
+        run("context section append initializes call hierarchy section", new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("Context:\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
+                                "\n\nTask:\n- \n\nConstraints:\n- \n",
+                        CollectedPromptFormatter.appendToContextSection("", "[Call Hierarchy]", "- ```Call hierarchy```"),
+                        "call hierarchy section should be created inside Context");
+            }
+        });
+
+        run("context section append initializes usages before call hierarchy", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n[Usages]\n- ```Usages```\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
+                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContextSection(existing, "[Usages]", "- ```Usages```"),
+                        "usages section should be inserted before call hierarchy");
+            }
+        });
+
+        run("context section append appends to existing section", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n- <a>= first\n\n[Call Hierarchy]\n- ```one```" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                assertEquals("Context:\n\n- <a>= first\n\n[Call Hierarchy]\n- ```one```\n- ```two```" +
+                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                        CollectedPromptFormatter.appendToContextSection(existing, "[Call Hierarchy]", "- ```two```"),
+                        "new hierarchy items should append inside the existing section");
             }
         });
 
@@ -138,6 +203,15 @@ public final class CollectedLocationFormatterTestRunner {
                         "multiline selected text should be limited to the first three lines");
             }
         });
+
+        run("location duplicate ignores changing label", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n- <a>= `abc`  (at /tmp/x.java:32)\n\nTask:\n- \n\nConstraints:\n- \n";
+                assertTrue(CollectedLocationFormatter.containsDuplicate(existing, "- <b>= `abc`  (at /tmp/x.java:32)"),
+                        "duplicate check should ignore the auto label");
+            }
+        });
     }
 
     private static void run(String name, Runnable test) {
@@ -153,6 +227,12 @@ public final class CollectedLocationFormatterTestRunner {
     private static void assertEquals(String expected, String actual, String message) {
         if (!expected.equals(actual)) {
             throw new AssertionError(message + "\nexpected: " + expected + "\nactual:   " + actual);
+        }
+    }
+
+    private static void assertTrue(boolean value, String message) {
+        if (!value) {
+            throw new AssertionError(message);
         }
     }
 }

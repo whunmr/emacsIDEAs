@@ -25,6 +25,7 @@ import com.intellij.usages.impl.rules.UsageTypeProvider;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageInFile;
 import com.intellij.psi.PsiElement;
+import org.hunmr.options.PluginConfig;
 import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.Container;
@@ -36,6 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAction {
+    private static final String USAGES_SECTION = "[Usages]";
+
     @Override
     public void update(AnActionEvent e) {
         e.getPresentation().setEnabled(e.getProject() != null);
@@ -56,7 +59,10 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
 
         List<Usage> sortedUsages = usageView.getSortedUsages();
         Set<Usage> excludedUsages = usageView.getExcludedUsages();
-        String existingEntries = CollectedOutputFileManager.getCurrentText(project);
+        String existingEntries = CollectedPromptFormatter.withPromptHeader(
+                CollectedOutputFileManager.getCurrentText(project),
+                PluginConfig.getInstance()._promptHeader
+        );
         String nextLabel = CollectedUsageFormatter.nextLabel(existingEntries);
         Map<String, List<String>> groupedEntries = new LinkedHashMap<String, List<String>>();
         int nextIndex = decodeUsageLabel(nextLabel);
@@ -93,7 +99,11 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         }
 
         String block = CollectedUsageFormatter.formatBlock("Usages", groupedEntries);
-        String updatedText = CollectedPromptFormatter.appendToContext(existingEntries, block);
+        String updatedText = CollectedPromptFormatter.appendToContextSection(
+                existingEntries,
+                USAGES_SECTION,
+                CollectedUsageFormatter.formatSectionEntry(block)
+        );
         writeOutput(project, e, updatedText, collectedCount);
     }
 
