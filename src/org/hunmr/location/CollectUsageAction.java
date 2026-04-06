@@ -151,6 +151,38 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
         return UsageViewManager.getInstance(project).getSelectedUsageView();
     }
 
+    static boolean hasActiveUsageView(Project project, AnActionEvent e) {
+        return findActiveUsageView(project, e) != null;
+    }
+
+    private static UsageView findActiveUsageView(Project project, AnActionEvent e) {
+        if (project == null || e == null) {
+            return null;
+        }
+
+        UsageView currentUsageView = UsageView.USAGE_VIEW_KEY.getData(e.getDataContext());
+        if (currentUsageView != null) {
+            return currentUsageView;
+        }
+
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.FIND);
+        if (toolWindow == null) {
+            return null;
+        }
+
+        ContentManager contentManager = toolWindow.getContentManagerIfCreated();
+        if (contentManager == null) {
+            return null;
+        }
+
+        UsageView selectedUsageView = getUsageViewFromContent(contentManager.getSelectedContent());
+        if (selectedUsageView != null) {
+            return selectedUsageView;
+        }
+
+        return UsageViewManager.getInstance(project).getSelectedUsageView();
+    }
+
     private static UsageView getUsageViewFromContent(Content content) {
         if (content == null) {
             return null;

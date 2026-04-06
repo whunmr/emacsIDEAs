@@ -133,7 +133,7 @@
       <p><b>AI coding context collection</b></p>
       <p>emacsJump can also collect code context into a temporary prompt file for Claude/Codex style workflows. The collected file is organized as <b>Context</b>, <b>Problem</b>, <b>Desired Outcome</b>, <b>Task</b>, and <b>Constraints</b>. All collected entries are appended into the <b>Context</b> section, and each collected item is kept on a single line so it can be copied into AI prompts easily.</p>
       <ul>
-          <li><b>F3 - CollectLocations</b>  :  collect the current caret line or current selection as a labeled context item such as <b>- &lt;a&gt;= method `handleShowMarkersKey` in class `Main`  (at /abs/path/Main.java:78)</b>. Use this for the exact place to change, a reference implementation, or a related symbol.</li>
+          <li><b>F3 - CollectContext</b>  :  collect from the active container. In the editor, collect the current caret line or current selection as a labeled context item such as <b>- &lt;a&gt;= method `handleShowMarkersKey` in class `Main`  (at /abs/path/Main.java:78)</b>. In the Find Usages window, collect the active usage results. In the Call Hierarchy window, collect the active caller/callee tree.</li>
           <li><b>F4 - CollectUsages</b>  :  collect the active, non-excluded entries from the latest Find Usages window, grouped by usage category such as <b>call</b>, <b>read</b>, <b>write</b>, or <b>reference</b>. This is useful when asking AI to update a symbol and check its impact area.</li>
           <li><b>F5 - CollectCallHierarchy</b>  :  collect the entries currently shown in the open Call Hierarchy window, using whichever caller or callee view is selected there. Open Call Hierarchy first, then use this to pass the IDE-confirmed call graph context to AI.</li>
           <li><b>F6 - CollectTypesInSelection</b>  :  for Go selections, collect related types referenced by the selected code, including inferred variable/parameter types and one level of field-related types. Items include type kind such as <b>struct</b> or <b>interface</b>, package/import path, and reasons such as <b>parameter type</b> or <b>field type of `Handler.req`</b>.</li>
@@ -559,8 +559,8 @@
       <keyboard-shortcut keymap="$default" first-keystroke="meta ctrl SPACE" />
     </action>
 
-    <action id="CollectLocationsAction" class="org.hunmr.location.CollectLocationsAction" text="CollectLocations"
-            description="Collect file locations for AI prompts">
+    <action id="CollectLocationsAction" class="org.hunmr.location.CollectLocationsAction" text="CollectContext"
+            description="Collect from the active editor, Find Usages, or Call Hierarchy window for AI prompts">
       <add-to-group group-id="emacsIDEAs" anchor="last"/>
       <keyboard-shortcut keymap="$default" first-keystroke="F3" />
     </action>

@@ -233,6 +233,33 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         return null;
     }
 
+    static boolean hasActiveCallHierarchyView(Project project, AnActionEvent e) {
+        return findActiveCallHierarchyView(project, e) != null;
+    }
+
+    private static CallHierarchyView findActiveCallHierarchyView(Project project, AnActionEvent e) {
+        if (project == null || e == null) {
+            return null;
+        }
+
+        CallHierarchyView currentView = toCallHierarchyView(getCurrentHierarchyBrowser(e));
+        if (currentView != null) {
+            return currentView;
+        }
+
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.HIERARCHY);
+        if (toolWindow == null) {
+            return null;
+        }
+
+        ContentManager contentManager = toolWindow.getContentManagerIfCreated();
+        if (contentManager == null) {
+            return null;
+        }
+
+        return toCallHierarchyView(contentManager.getSelectedContent());
+    }
+
     private static CallHierarchyView toCallHierarchyView(Content content) {
         if (content == null) {
             return null;
@@ -249,6 +276,27 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
         }
 
         return new CallHierarchyView((CallHierarchyBrowserBase) browser, tree, getCurrentViewType(browser));
+    }
+
+    private static CallHierarchyView toCallHierarchyView(HierarchyBrowserBaseEx browser) {
+        if (!(browser instanceof CallHierarchyBrowserBase)) {
+            return null;
+        }
+
+        JTree tree = getCurrentTree(browser);
+        if (tree == null) {
+            return null;
+        }
+
+        return new CallHierarchyView((CallHierarchyBrowserBase) browser, tree, getCurrentViewType(browser));
+    }
+
+    private static HierarchyBrowserBaseEx getCurrentHierarchyBrowser(AnActionEvent e) {
+        if (e == null) {
+            return null;
+        }
+
+        return HierarchyBrowserBaseEx.HIERARCHY_BROWSER.getData(e.getDataContext());
     }
 
     private static HierarchyBrowserBaseEx getHierarchyBrowser(Content content) {
