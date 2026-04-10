@@ -18,9 +18,11 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import javax.swing.SwingConstants;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 
 public final class CollectedOutputFileManager {
     private static final String OUTPUT_DIR_NAME = "emacsJump";
@@ -57,12 +59,17 @@ public final class CollectedOutputFileManager {
     }
 
     public static Path getOutputDirectoryPath() {
+        String tempDirectory = System.getProperty("java.io.tmpdir");
+        if (tempDirectory != null && !tempDirectory.isEmpty()) {
+            return new File(tempDirectory, OUTPUT_DIR_NAME).toPath();
+        }
+
         String systemPath = PathManager.getSystemPath();
         if (systemPath != null && !systemPath.isEmpty()) {
             return new File(systemPath, OUTPUT_DIR_NAME).toPath();
         }
 
-        return new File(System.getProperty("java.io.tmpdir"), OUTPUT_DIR_NAME).toPath();
+        return new File(new File(".").getAbsoluteFile(), OUTPUT_DIR_NAME).toPath();
     }
 
     public static VirtualFile replaceAndOpen(Project project, String text) throws IOException {
@@ -82,6 +89,7 @@ public final class CollectedOutputFileManager {
                 outputFile = createNewOutputFile(project);
             }
 
+            allowWritingWithoutDialog(outputFile);
             replaceText(project, outputFile, text);
             Document document = getOrCreateDocument(outputFile);
             if (document != null) {
@@ -172,12 +180,20 @@ public final class CollectedOutputFileManager {
 
         com.intellij.openapi.fileEditor.impl.EditorWindow currentWindow = manager.getCurrentWindow();
         if (currentWindow == null) {
+            com.intellij.openapi.fileEditor.impl.EditorWindow[] windows = manager.getWindows();
+            if (windows != null && windows.length > 0) {
+                currentWindow = windows[0];
+            }
+        }
+
+        if (currentWindow == null) {
             FileEditorManager.getInstance(project).openTextEditor(new OpenFileDescriptor(project, outputFile), true);
             return;
         }
 
         com.intellij.openapi.fileEditor.impl.EditorWindow targetWindow = manager.getNextWindow(currentWindow);
         if (targetWindow == null) {
+            manager.setCurrentWindow(currentWindow);
             manager.createSplitter(SwingConstants.VERTICAL, currentWindow);
             targetWindow = manager.getNextWindow(currentWindow);
         }
@@ -185,6 +201,7 @@ public final class CollectedOutputFileManager {
         if (targetWindow != null) {
             manager.openFileWithProviders(outputFile, true, targetWindow);
             manager.setCurrentWindow(targetWindow);
+            FileEditorManager.getInstance(project).openTextEditor(new OpenFileDescriptor(project, outputFile), true);
             return;
         }
 
@@ -193,6 +210,39 @@ public final class CollectedOutputFileManager {
 
     private static Path getOutputDirectory(Project project) {
         return getOutputDirectoryPath();
+    }
+
+    private static void allowWritingWithoutDialog(VirtualFile outputFile) {
+        if (outputFile == null || !outputFile.isValid()) {
+            return;
+        }
+
+        invokeAllowWriting(outputFile);
+
+        VirtualFile parent = outputFile.getParent();
+        if (parent != null && parent.isValid()) {
+            invokeAllowWriting(parent);
+        }
+    }
+
+    private static void invokeAllowWriting(VirtualFile file) {
+        try {
+            Class<?> providerClass = Class.forName("com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider");
+            tryInvokeAllowWriting(providerClass, file);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void tryInvokeAllowWriting(Class<?> providerClass, VirtualFile file) throws ReflectiveOperationException {
+        try {
+            Method iterableMethod = providerClass.getMethod("allowWriting", Iterable.class);
+            iterableMethod.invoke(null, Collections.singleton(file));
+            return;
+        } catch (NoSuchMethodException ignored) {
+        }
+
+        Method arrayMethod = providerClass.getMethod("allowWriting", VirtualFile[].class);
+        arrayMethod.invoke(null, new Object[]{new VirtualFile[]{file}});
     }
 
     private static final class FocusRestoreState {

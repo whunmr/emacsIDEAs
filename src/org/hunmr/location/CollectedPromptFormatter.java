@@ -4,9 +4,15 @@ public final class CollectedPromptFormatter {
     private static final String USAGES_SECTION = "[Usages]";
     private static final String CALL_HIERARCHY_SECTION = "[Call Hierarchy]";
     private static final String CONTEXT_HEADER = "Context:\n";
+    private static final String PROBLEM_HEADER = "Problem:\n";
+    private static final String DESIRED_OUTCOME_HEADER = "Desired Outcome:\n";
     private static final String TASK_HEADER = "Task:\n";
     private static final String CONSTRAINTS_HEADER = "Constraints:\n";
-    private static final String DEFAULT_TEMPLATE = CONTEXT_HEADER + "\n" + TASK_HEADER + "- \n\n" + CONSTRAINTS_HEADER + "- \n";
+    private static final String DEFAULT_TEMPLATE = CONTEXT_HEADER + "\n"
+            + PROBLEM_HEADER + "- \n\n"
+            + DESIRED_OUTCOME_HEADER + "- \n\n"
+            + TASK_HEADER + "- \n\n"
+            + CONSTRAINTS_HEADER + "- \n";
 
     private CollectedPromptFormatter() {
     }
@@ -94,27 +100,46 @@ public final class CollectedPromptFormatter {
         if (!normalized.contains("Context:")) {
             normalized = CONTEXT_HEADER + '\n' + trimTrailingLineBreaks(normalized) + '\n';
         }
-        if (!normalized.contains("Task:")) {
-            normalized = trimTrailingLineBreaks(normalized) + "\n\n" + TASK_HEADER + "- \n";
-        }
-        if (!normalized.contains("Constraints:")) {
-            normalized = trimTrailingLineBreaks(normalized) + "\n\n" + CONSTRAINTS_HEADER + "- \n";
-        }
+        normalized = ensureSection(normalized, PROBLEM_HEADER, DESIRED_OUTCOME_HEADER, TASK_HEADER, CONSTRAINTS_HEADER);
+        normalized = ensureSection(normalized, DESIRED_OUTCOME_HEADER, TASK_HEADER, CONSTRAINTS_HEADER);
+        normalized = ensureSection(normalized, TASK_HEADER, CONSTRAINTS_HEADER);
+        normalized = ensureSection(normalized, CONSTRAINTS_HEADER);
         if (!normalized.endsWith("\n")) {
             normalized += '\n';
         }
         return normalized;
     }
 
-    private static int findTaskHeaderIndex(String text) {
-        int index = text.indexOf("\n" + TASK_HEADER);
-        if (index >= 0) {
-            return index + 1;
+    private static String ensureSection(String text, String sectionHeader, String... beforeHeaders) {
+        String sectionLabel = trimTrailingLineBreaks(sectionHeader);
+        if (text.contains(sectionLabel)) {
+            return text;
         }
-        if (text.startsWith(TASK_HEADER)) {
-            return 0;
+
+        String sectionBlock = sectionHeader + "- \n";
+        int insertIndex = findFirstHeaderIndex(text, beforeHeaders);
+        if (insertIndex < 0) {
+            return trimTrailingLineBreaks(text) + "\n\n" + sectionBlock;
         }
-        return -1;
+
+        String before = trimTrailingLineBreaks(text.substring(0, insertIndex));
+        String after = text.substring(insertIndex);
+        return before + "\n\n" + sectionBlock + "\n" + after;
+    }
+
+    private static int findFirstHeaderIndex(String text, String... headers) {
+        int firstIndex = -1;
+        for (int i = 0; i < headers.length; i++) {
+            int index = indexOfHeader(text, headers[i]);
+            if (index >= 0 && (firstIndex < 0 || index < firstIndex)) {
+                firstIndex = index;
+            }
+        }
+        return firstIndex;
+    }
+
+    private static int findPromptTailIndex(String text) {
+        return findFirstHeaderIndex(text, PROBLEM_HEADER, DESIRED_OUTCOME_HEADER, TASK_HEADER, CONSTRAINTS_HEADER);
     }
 
     private static String trimTrailingLineBreaks(String text) {
@@ -131,11 +156,11 @@ public final class CollectedPromptFormatter {
     }
 
     private static PromptParts splitPrompt(String template) {
-        int taskIndex = findTaskHeaderIndex(template);
-        if (taskIndex < 0) {
+        int tailIndex = findPromptTailIndex(template);
+        if (tailIndex < 0) {
             return new PromptParts(template, "");
         }
-        return new PromptParts(template.substring(0, taskIndex), template.substring(taskIndex));
+        return new PromptParts(template.substring(0, tailIndex), template.substring(tailIndex));
     }
 
     private static String joinPrompt(String contextPart, String tailPart) {
@@ -212,11 +237,19 @@ public final class CollectedPromptFormatter {
     }
 
     private static int indexOfSection(String contextPart, String sectionHeader) {
-        int index = contextPart.indexOf("\n" + sectionHeader + "\n");
+        int index = indexOfHeader(contextPart, sectionHeader + "\n");
+        if (index >= 0) {
+            return index;
+        }
+        return -1;
+    }
+
+    private static int indexOfHeader(String text, String header) {
+        int index = text.indexOf("\n" + header);
         if (index >= 0) {
             return index + 1;
         }
-        if (contextPart.startsWith(sectionHeader + "\n")) {
+        if (text.startsWith(header)) {
             return 0;
         }
         return -1;

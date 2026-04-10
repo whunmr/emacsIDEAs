@@ -1,6 +1,9 @@
 package org.hunmr.location;
 
 public final class CollectedLocationFormatterTestRunner {
+    private static final String EMPTY_PROMPT_TAIL = "\n\nProblem:\n- \n\nDesired Outcome:\n- \n\nTask:\n- \n\nConstraints:\n- \n";
+    private static final String FILLED_PROMPT_TAIL = "\n\nProblem:\n- \n\nDesired Outcome:\n- \n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+
     public static void main(String[] args) {
         run("labels start at a", new Runnable() {
             @Override
@@ -37,7 +40,7 @@ public final class CollectedLocationFormatterTestRunner {
         run("context template initializes around first entry", new Runnable() {
             @Override
             public void run() {
-                assertEquals("Context:\n\n- <a>= x\n\nTask:\n- \n\nConstraints:\n- \n",
+                assertEquals("Context:\n\n- <a>= x" + EMPTY_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContext("", "- <a>= x\n"),
                         "first collected entry should be inserted into the Context section");
             }
@@ -46,7 +49,7 @@ public final class CollectedLocationFormatterTestRunner {
         run("prompt header is prepended before template", new Runnable() {
             @Override
             public void run() {
-                assertEquals("My prompt header\n\nContext:\n\nTask:\n- \n\nConstraints:\n- \n",
+                assertEquals("My prompt header\n\nContext:\n\nProblem:\n- \n\nDesired Outcome:\n- \n\nTask:\n- \n\nConstraints:\n- \n",
                         CollectedPromptFormatter.withPromptHeader("", "My prompt header"),
                         "prompt header should be added before the generated template");
             }
@@ -56,7 +59,7 @@ public final class CollectedLocationFormatterTestRunner {
             @Override
             public void run() {
                 String existing = "My prompt header\n\nContext:\n\n- <a>= first\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
-                assertEquals(existing,
+                assertEquals("My prompt header\n\nContext:\n\n- <a>= first" + FILLED_PROMPT_TAIL,
                         CollectedPromptFormatter.withPromptHeader(existing, "My prompt header"),
                         "prompt header should not be inserted twice");
             }
@@ -66,7 +69,7 @@ public final class CollectedLocationFormatterTestRunner {
             @Override
             public void run() {
                 String existing = "Context:\n\n- <a>= first\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
-                assertEquals("Context:\n\n- <a>= first\n- <b>= second\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                assertEquals("Context:\n\n- <a>= first\n- <b>= second" + FILLED_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContext(existing, "- <b>= second\n"),
                         "new context entries should appear before Task");
             }
@@ -78,7 +81,7 @@ public final class CollectedLocationFormatterTestRunner {
                 String existing = "Context:\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
                         "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
                 assertEquals("Context:\n\n- <a>= first\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
-                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                                FILLED_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContext(existing, "- <a>= first\n"),
                         "locations should be inserted before the call hierarchy section");
             }
@@ -88,7 +91,7 @@ public final class CollectedLocationFormatterTestRunner {
             @Override
             public void run() {
                 assertEquals("Context:\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
-                                "\n\nTask:\n- \n\nConstraints:\n- \n",
+                                EMPTY_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContextSection("", "[Call Hierarchy]", "- ```Call hierarchy```"),
                         "call hierarchy section should be created inside Context");
             }
@@ -100,7 +103,7 @@ public final class CollectedLocationFormatterTestRunner {
                 String existing = "Context:\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
                         "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
                 assertEquals("Context:\n\n[Usages]\n- ```Usages```\n\n[Call Hierarchy]\n- ```Call hierarchy```" +
-                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                                FILLED_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContextSection(existing, "[Usages]", "- ```Usages```"),
                         "usages section should be inserted before call hierarchy");
             }
@@ -112,7 +115,7 @@ public final class CollectedLocationFormatterTestRunner {
                 String existing = "Context:\n\n- <a>= first\n\n[Call Hierarchy]\n- ```one```" +
                         "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
                 assertEquals("Context:\n\n- <a>= first\n\n[Call Hierarchy]\n- ```one```\n- ```two```" +
-                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                                FILLED_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContextSection(existing, "[Call Hierarchy]", "- ```two```"),
                         "new hierarchy items should append inside the existing section");
             }
@@ -124,7 +127,7 @@ public final class CollectedLocationFormatterTestRunner {
                 String existing = "Context:\n\n[Usages]\nUsages:\n  [call]\n  - (aa)= foo" +
                         "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
                 assertEquals("Context:\n\n[Usages]\nUsages:\n  [call]\n  - (aa)= foo\n\nUsages:\n  [read]\n  - (ab)= bar" +
-                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                                FILLED_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContextSection(existing, "[Usages]", "Usages:\n  [read]\n  - (ab)= bar"),
                         "multiline usage blocks should be separated by a blank line");
             }
@@ -136,9 +139,26 @@ public final class CollectedLocationFormatterTestRunner {
                 String existing = "Context:\n\n[Call Hierarchy]\nCall hierarchy:\n  [incoming callers]\n  [caller]= foo" +
                         "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
                 assertEquals("Context:\n\n[Call Hierarchy]\nCall hierarchy:\n  [incoming callers]\n  [caller]= foo\n\nCall hierarchy:\n  [outgoing callees]\n  [callee]= bar" +
-                                "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n",
+                                FILLED_PROMPT_TAIL,
                         CollectedPromptFormatter.appendToContextSection(existing, "[Call Hierarchy]", "Call hierarchy:\n  [outgoing callees]\n  [callee]= bar"),
                         "multiline call hierarchy blocks should be separated by a blank line");
+            }
+        });
+
+        run("context section duplicate detection supports multiline usage blocks", new Runnable() {
+            @Override
+            public void run() {
+                String existing = "Context:\n\n[Usages]\n- Usages (Method buildPlan):\n" +
+                        "  - [reference]\n" +
+                        "    - (aa)= [reference] `runPlan()` located in { function `buildPlan` }  (at /tmp/dummy.go:9)" +
+                        "\n\nTask:\n- do it\n\nConstraints:\n- keep api\n";
+                String block = "- Usages (Method buildPlan):\n" +
+                        "  - [reference]\n" +
+                        "    - (aa)= [reference] `runPlan()` located in { function `buildPlan` }  (at /tmp/dummy.go:9)";
+                assertTrue(
+                        CollectedPromptFormatter.contextSectionContainsLine(existing, "[Usages]", block),
+                        "multiline usage block duplicates should be detected"
+                );
             }
         });
 
