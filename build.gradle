@@ -8,6 +8,12 @@ plugins {
 group = providers.gradleProperty('pluginGroup').get()
 version = providers.gradleProperty('pluginVersion').get()
 
+def requiredJavaVersion = JavaVersion.toVersion(21)
+def buildJdkHomePath = providers.gradleProperty('buildJdkHome')
+        .orElse(providers.environmentVariable('EMACSJUMP_BUILD_JDK_HOME'))
+        .orNull
+def buildJdkHome = buildJdkHomePath == null || buildJdkHomePath.trim().isEmpty() ? null : file(buildJdkHomePath)
+
 repositories {
     mavenCentral()
 
@@ -17,8 +23,13 @@ repositories {
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+    sourceCompatibility = requiredJavaVersion
+    targetCompatibility = requiredJavaVersion
+
+    if (buildJdkHome == null) {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
 }
 
@@ -51,11 +62,21 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 21
+    if (buildJdkHome != null) {
+        options.fork = true
+        options.forkOptions.javaHome = buildJdkHome
+    }
 }
 
 tasks.named('processResources') {
     exclude '**/*.java'
     duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(JavaExec).configureEach {
+    if (buildJdkHome != null) {
+        executable = new File(buildJdkHome, 'bin/java').absolutePath
+    }
 }
 
 tasks.register('argumentParserTest', JavaExec) {
