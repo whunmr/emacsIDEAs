@@ -34,11 +34,11 @@ public class CollectLocationsAction extends SimpleEditorAction {
 
         CollectTarget target = resolveCollectTarget(project, e);
         if (target == CollectTarget.USAGES) {
-            new CollectUsageAction().actionPerformed(e);
+            new CollectUsageAction().performCollect(e);
             return;
         }
         if (target == CollectTarget.CALL_HIERARCHY) {
-            new CollectCallHierarchyAction().actionPerformed(e);
+            new CollectCallHierarchyAction().performCollect(e);
             return;
         }
 

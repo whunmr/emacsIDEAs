@@ -2,6 +2,7 @@ package org.hunmr.util;
 
 import com.intellij.codeInsight.actions.ReformatCodeAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
@@ -120,7 +121,7 @@ public class EditorUtils {
         }
 
         ReformatCodeAction reformat = new ReformatCodeAction();
-        reformat.actionPerformed(e);
+        ActionUtil.invokeAction(reformat, e.getDataContext(), e.getPlace(), e.getInputEvent(), null);
     }
 
     public static void selectTextRange(Editor editor, TextRange[] tr) {

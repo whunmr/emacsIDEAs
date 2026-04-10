@@ -47,6 +47,10 @@ public class CollectCallHierarchyAction extends com.intellij.openapi.project.Dum
 
     @Override
     public void actionPerformed(AnActionEvent e) {
+        performCollect(e);
+    }
+
+    void performCollect(AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) {
             return;

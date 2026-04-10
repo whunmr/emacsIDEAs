@@ -33,7 +33,12 @@ public class CopyCutWithoutSelectAction extends EmacsIdeasAction {
         this._instance = this;
     }
 
+    @Override
     public void actionPerformed(AnActionEvent e) {
+        performCopyCutWithoutSelection(e);
+    }
+
+    public void performCopyCutWithoutSelection(AnActionEvent e) {
         if (super.initAction(e)) {
             attachKeyListener(_handleCopyKeyListener);
         }

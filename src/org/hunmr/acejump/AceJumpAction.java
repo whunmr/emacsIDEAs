@@ -43,7 +43,7 @@ public class AceJumpAction extends EmacsIdeasAction {
     public void performAction(AnActionEvent e) {
         _offsetsFinder = new CharOffsetsFinder();
         _isCalledFromOtherAction = true;
-        this.actionPerformed(e);
+        beginJump(e);
     }
 
     public void startJump(AnActionEvent e, List<JOffset> offsets) {
@@ -63,6 +63,10 @@ public class AceJumpAction extends EmacsIdeasAction {
             _offsetsFinder = new CharOffsetsFinder();
         }
 
+        beginJump(e);
+    }
+
+    private void beginJump(AnActionEvent e) {
         if (super.initAction(e)) {
             attachKeyListener(_showMarkersKeyListener);
         }

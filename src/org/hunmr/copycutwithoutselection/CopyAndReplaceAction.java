@@ -22,7 +22,7 @@ public class CopyAndReplaceAction extends EmacsIdeasAction {
             }
 
             final ChainActionEvent pendingJumpAction = new ChainActionEvent(e, createPendingJumpAction(e, editor), editor);
-            CopyCutWithoutSelectAction.getInstance().actionPerformed(pendingJumpAction);
+            CopyCutWithoutSelectAction.getInstance().performCopyCutWithoutSelection(pendingJumpAction);
             cleanupSetupsInAndBackToNormalEditingMode();
         }
     }
@@ -35,7 +35,7 @@ public class CopyAndReplaceAction extends EmacsIdeasAction {
                     return;
                 }
 
-                AceJumpAction.getInstance().actionPerformed(createPendingSelectAndPasteAction(e, editor));
+                AceJumpAction.getInstance().performAction(createPendingSelectAndPasteAction(e, editor));
             }
         };
     }

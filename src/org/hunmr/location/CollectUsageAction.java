@@ -23,8 +23,6 @@ import com.intellij.usages.UsageInfo2UsageAdapter;
 import com.intellij.usages.UsageView;
 import com.intellij.usages.UsageViewManager;
 import com.intellij.usages.UsageViewPresentation;
-import com.intellij.usages.impl.rules.UsageType;
-import com.intellij.usages.impl.rules.UsageTypeProvider;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageInFile;
 import com.intellij.psi.PsiElement;
@@ -51,6 +49,10 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
 
     @Override
     public void actionPerformed(AnActionEvent e) {
+        performCollect(e);
+    }
+
+    void performCollect(AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) {
             return;
@@ -426,14 +428,6 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             }
         }
 
-        UsageType usageType = resolveUsageType(usage);
-        if (usageType != null) {
-            String usageTypeText = usageType.toString();
-            if (usageTypeText != null && !usageTypeText.trim().isEmpty()) {
-                return normalizeUsageCategory(usageTypeText);
-            }
-        }
-
         if (context != null && context.hasSymbol()) {
             String symbolName = context.getSymbolName();
             if (lineContent != null && symbolName != null && lineContent.contains(symbolName + "(")) {
@@ -444,26 +438,14 @@ public class CollectUsageAction extends com.intellij.openapi.project.DumbAwareAc
             }
         }
 
-        return "other";
-    }
-
-    private static UsageType resolveUsageType(Usage usage) {
-        if (!(usage instanceof PsiElementUsage)) {
-            return null;
-        }
-
-        PsiElement element = ((PsiElementUsage) usage).getElement();
-        if (element == null) {
-            return null;
-        }
-
-        for (UsageTypeProvider provider : UsageTypeProvider.EP_NAME.getExtensionList()) {
-            UsageType usageType = provider.getUsageType(element);
-            if (usageType != null) {
-                return usageType;
+        if (lineContent != null) {
+            String normalizedLine = lineContent.trim().toLowerCase();
+            if (normalizedLine.startsWith("import ") || normalizedLine.startsWith("using ")) {
+                return "import";
             }
         }
-        return null;
+
+        return "other";
     }
 
     private static String normalizeUsageCategory(String text) {

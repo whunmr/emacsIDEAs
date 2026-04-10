@@ -199,7 +199,6 @@ public final class CollectedOutputFileManager {
         }
 
         if (targetWindow != null) {
-            manager.openFileWithProviders(outputFile, true, targetWindow);
             manager.setCurrentWindow(targetWindow);
             FileEditorManager.getInstance(project).openTextEditor(new OpenFileDescriptor(project, outputFile), true);
             return;
